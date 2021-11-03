@@ -12,6 +12,12 @@ The basic abstractions in GEFEST are Point, Polygon, Structure and Domain.
 
 ...
 
+The workflow of the generative design is the following:
+
+![logo](./docs/img/workflow.png)
+
+...
+
 ## Acknowledgments
 
 We acknowledge the contributors for their important impact and the participants of the numerous scientific conferences
