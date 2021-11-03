@@ -31,9 +31,6 @@ class Point:
     def z(self, value):
         self._z = value
 
-    def coords(self):
-        return [self.x, self.y, self.z]
-
 
 @dataclass
 class Point2D(Point):
@@ -44,6 +41,3 @@ class Point2D(Point):
     @z.setter
     def z(self, value):
         self._z = 0
-
-    def coords(self):
-        return [self.x, self.y]

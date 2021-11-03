@@ -1,20 +1,25 @@
 from copy import deepcopy
 from multiprocessing import Pool
 
-from gefest.core.algs.postproc.resolve_errors import postprocess
+from gefest.core.algs.postproc import postprocess
 from gefest.core.opt.constraints import check_constraints
-from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import get_random_structure
+from gefest.core.utils import GlobalEnv
 
 MAX_ITER = 50000
 NUM_PROC = 1
 
 
-def initial_pop_random(size: int, domain: Domain, initial_state=None):
+def initial_pop_random(size: int, domain=None):
     print('Start init')
     population_new = []
 
-    if initial_state is None:
+    env = GlobalEnv()
+
+    if domain is None:
+        domain = GlobalEnv().domain
+
+    if env.initial_state is None:
         while len(population_new) < size:
             if NUM_PROC > 1:
                 with Pool(NUM_PROC) as p:
@@ -23,7 +28,7 @@ def initial_pop_random(size: int, domain: Domain, initial_state=None):
                 new_items = []
                 for i in range(size):
                     new_items.append(get_pop_worker(domain))
-                    print(f'Initial created: {i} from {size}')
+                    print (f'Initial created: {i} from {size}')
 
             for structure in new_items:
                 population_new.append(structure)
@@ -32,18 +37,21 @@ def initial_pop_random(size: int, domain: Domain, initial_state=None):
         print('End init')
     else:
         for _ in range(size):
-            population_new.append(deepcopy(initial_state))
+            population_new.append(deepcopy(env.initial_state))
     return population_new
 
 
 def get_pop_worker(domain):
     structure_size = 1  # random.randint(1, 2)
-    #print(f'Try to create size {structure_size}')
+    print(f'Try to create size {structure_size}')
+
+    # new_env = GlobalEnv()
+    # new_env.domain = domain
 
     is_correct = False
     while not is_correct:
         structure = get_random_structure(min_pols_num=structure_size, max_pols_num=structure_size,
-                                         min_pol_size=3, max_pol_size=50, domain=domain)
+                                         min_pol_size=3, max_pol_size=5, domain=domain)
         # structure.plot(title='Initial')
         structure = postprocess(structure, domain)
         # structure.plot(title='Initial post')
