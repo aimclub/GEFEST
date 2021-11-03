@@ -4,14 +4,12 @@ from random import randint
 
 import numpy as np
 
-from gefest.core.opt.individual import Individual
-from gefest.core.opt.setup import Setup
-from gefest.core.viz.struct_vizualizer import StructVizualizer
+import gefest.core.opt.operators.crossover
+import gefest.core.opt.operators.mutation
 
 
 class BaseGA:
-    def __init__(self, params, calculate_objectives,
-                 evolutionary_operators, task_setup: Setup,
+    def __init__(self, params, calculate_objectives, evolutionary_operators,
                  visualiser=None):
         '''
          Genetic algorithm (GA)
@@ -22,24 +20,22 @@ class BaseGA:
         self.calculate_objectives = calculate_objectives
         self.operators = evolutionary_operators
 
-        self.task_setup = task_setup
-
         self.__init_operators()
         self.__init_populations()
 
-        self.visualiser = StructVizualizer(self.task_setup.domain)
+        self.visualiser = visualiser
 
         self.generation_number = 0
 
     def __init_operators(self):
         self.init_population = self.operators.init_population
-        self.crossover = self.operators.crossover
-        self.mutation = self.operators.mutation
+        self.crossover = gefest.core.opt.operators.crossover.crossover
+        self.mutation = gefest.core.opt.operators.mutation.mutation
 
     def __init_populations(self):
 
-        gens = self.init_population(self.params.pop_size, self.task_setup.domain)
-        self._pop = [Individual(genotype=gen) for gen in gens]
+        gens = self.init_population(self.params.pop_size)
+        self._pop = [BaseGA.Individ(genotype=gen) for gen in gens]
 
     class Params:
         def __init__(self, max_gens, pop_size, crossover_rate, mutation_rate, mutation_value_rate):
@@ -49,14 +45,22 @@ class BaseGA:
             self.mutation_rate = mutation_rate
             self.mutation_value_rate = mutation_value_rate
 
+    class Individ:
+        def __init__(self, genotype):
+            self.objectives = ()
+            self.analytics_objectives = []
+            self.fitness = None
+            self.genotype = copy.deepcopy(genotype)
+            self.population_number = 0
+
     def solution(self, verbose=True, **kwargs):
         pass
 
     def fitness(self):
-        self.calculate_objectives(population=self._pop)
+
+        self.calculate_objectives(population=self._pop, visualiser=self.visualiser)
         for ind in self._pop:
             ind.fitness = ind.objectives[0]
-        self._pop = [ind for ind in self._pop if ind.fitness is not None]
 
     def random_selection(self, group_size):
         return [self._pop[randint(0, len(self._pop) - 1)] for _ in range(group_size)]
@@ -89,16 +93,10 @@ class BaseGA:
             p1 = selected[pair_index]
             p2 = selected[pair_index + 1]
 
-            child_gen = self.crossover(s1=p1.genotype, s2=p2.genotype,
-                                       domain=self.task_setup.domain,
-                                       rate=self.params.crossover_rate)
-
-            child_gen = self.mutation(structure=child_gen,
-                                      domain=self.task_setup.domain,
-                                      rate=self.params.mutation_rate)
-
+            child_gen = self.crossover(p1.genotype, p2.genotype, self.params.crossover_rate)
+            child_gen = self.mutation(child_gen, self.params.mutation_rate)
             if str(child_gen) != str(p1.genotype) and str(child_gen) != str(p2.genotype):
-                child = Individual(genotype=copy.deepcopy(child_gen))
+                child = BaseGA.Individ(genotype=copy.deepcopy(child_gen))
                 child.generation_number = self.generation_number
                 children.append(child)
 
