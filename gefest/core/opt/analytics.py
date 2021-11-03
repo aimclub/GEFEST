@@ -38,7 +38,11 @@ class EvoAnalytics:
     def _write_candidate_to_csv(f, pop_num, objs, analytics_objectives, genotype, referenced_dataset, local_id):
         writer = csv.writer(f, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(
+<<<<<<< HEAD
             [pop_num, referenced_dataset, ','.join([str(round(_, 6)) for _ in objs if _ is not None]),
+=======
+            [pop_num, referenced_dataset, ','.join([str(round(_, 6)) for _ in objs]),
+>>>>>>> e91c88c (Initial code)
              analytics_objectives, local_id])
 
     @staticmethod
