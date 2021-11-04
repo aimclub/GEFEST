@@ -4,9 +4,9 @@ from shapely.geometry.multipolygon import MultiPolygon as ShapelyMultiPolygon
 from shapely.geometry.polygon import Polygon as ShapelyPolygon
 from shapely.ops import nearest_points
 
-from core.structure.domain import Domain
-from core.structure.geometry import out_of_bound, self_intersection, too_close
-from core.structure.structure import Polygon, PolygonPoint, Structure
+from gefest.core.algs.geom.validation import out_of_bound, self_intersection, too_close
+from gefest.core.structure.domain import Domain
+from gefest.core.structure.structure import Polygon, Structure
 
 
 def postprocess(structure: Structure, domain: Domain):
@@ -39,15 +39,16 @@ def _correct_wrong_point(poly: Polygon, domain: Domain):
         point.x = min(point.x, domain.max_x + domain.len_x * 0.05)
         point.y = min(point.y, domain.max_y + domain.len_y * 0.05)
         if not domain.contains(point):
-            _, nearest_correct_position = \
-                nearest_points(point.as_geom(),
-                               domain.as_geom())
-            point.x = nearest_correct_position.x
-            point.y = nearest_correct_position.y
+
+            point = domain.geometry.nearest_points(point, domain.bound_poly)
+            #     nearest_points(point.as_geom(),
+            #                    domain.as_geom())
+            # point.x = nearest_correct_position.x
+            # point.y = nearest_correct_position.y
             point_moved = True
 
         if point_moved:
-            poly.resize(0.8, 0.8)
+            poly = domain.geometry.resize_poly(poly=poly, x_scale=0.8, y_scale=0.8)
     return poly
 
 

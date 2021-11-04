@@ -1,9 +1,10 @@
 from abc import abstractmethod
 from math import sqrt
 
+from scipy.constants import pt
 from shapely import affinity
-from shapely.geometry import Point as GeomPoint
-from shapely.geometry import Polygon as GeomPolygon
+from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
+from shapely.ops import nearest_points
 
 from gefest.core.structure.point import Point
 from gefest.core.structure.polygon import Polygon
@@ -48,10 +49,16 @@ class Geometry:
     def is_contain_point(self, poly: 'Polygon', point: 'Point'):
         pass
 
+    @abstractmethod
     def _poly_to_geom(self, poly: Polygon):
         pass
+    @abstractmethod
 
-class Geometry2D:
+    def _point_to_geom(self, point: Point):
+        pass
+
+
+class Geometry2D(Geometry):
     def _poly_to_geom(self, poly: Polygon):
         return GeomPolygon([GeomPoint(pt.x, pt.y) for pt in poly.points])
 
@@ -90,3 +97,9 @@ class Geometry2D:
         geom_poly_allowed = self._poly_to_geom(poly)
         geom_pt = GeomPoint(point.x, point.y)
         return geom_poly_allowed.contains(geom_pt)
+
+    def nearest_points(self, point: Point, poly: 'Polygon'):
+        geom_poly = self._poly_to_geom(poly)
+        geom_point = GeomPoint(pt.x, pt.y)
+        _, nearest_correct_position = nearest_points(geom_point, geom_poly)
+
