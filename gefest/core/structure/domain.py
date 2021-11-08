@@ -2,7 +2,7 @@ from typing import List, Optional, Tuple
 
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 
-from gefest.core.geometry.geometry import Geometry2D
+from gefest.core.geometry.geometry_2d import Geometry2D
 from gefest.core.structure.point import Point
 from gefest.core.structure.polygon import Polygon
 

@@ -3,13 +3,14 @@ from multiprocessing import Pool
 
 from gefest.core.algs.postproc.resolve_errors import postprocess
 from gefest.core.opt.constraints import check_constraints
+from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import get_random_structure
 
 MAX_ITER = 50000
 NUM_PROC = 1
 
 
-def initial_pop_random(size: int, domain=None, initial_state=None):
+def initial_pop_random(size: int, domain: Domain, initial_state=None):
     print('Start init')
     population_new = []
 
@@ -37,15 +38,12 @@ def initial_pop_random(size: int, domain=None, initial_state=None):
 
 def get_pop_worker(domain):
     structure_size = 1  # random.randint(1, 2)
-    print(f'Try to create size {structure_size}')
-
-    # new_env = GlobalEnv()
-    # new_env.domain = domain
+    #print(f'Try to create size {structure_size}')
 
     is_correct = False
     while not is_correct:
         structure = get_random_structure(min_pols_num=structure_size, max_pols_num=structure_size,
-                                         min_pol_size=3, max_pol_size=5, domain=domain)
+                                         min_pol_size=3, max_pol_size=50, domain=domain)
         # structure.plot(title='Initial')
         structure = postprocess(structure, domain)
         # structure.plot(title='Initial post')

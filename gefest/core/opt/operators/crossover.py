@@ -2,10 +2,10 @@ import copy
 import random
 from multiprocessing import Pool
 
-from gefest.core.algs.postproc import postprocess
+from gefest.core.algs.postproc.resolve_errors import postprocess
 from gefest.core.opt.constraints import check_constraints
+from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import Structure
-from gefest.core.utils import GlobalEnv
 
 MAX_ITER = 50000
 NUM_PROC = 1
@@ -13,8 +13,6 @@ NUM_PROC = 1
 
 def crossover_worker(args):
     s1, s2, domain = args[0], args[1], args[2]
-    # new_env = GlobalEnv()
-    # new_env.domain = domain
 
     new_structure = copy.deepcopy(s1)
 
@@ -40,16 +38,13 @@ def crossover_worker(args):
     return new_structure
 
 
-def crossover(s1: Structure, s2: Structure, rate=0.4, domain=None):
+def crossover(s1: Structure, s2: Structure, domain: Domain, rate=0.4):
     random_val = random.random()
     if random_val >= rate or len(s1.polygons) == 1 or len(s2.polygons) == 1:
         if random.random() > 0.5:
             return s1
         else:
             return s2
-
-    if domain is None:
-        domain = GlobalEnv().domain
 
     is_correct = False
     n_iter = 0

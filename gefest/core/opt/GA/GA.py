@@ -29,9 +29,12 @@ class GA(BaseGA):
                 print("!")
 
             selected = self.tournament_selection()
-            self._pop = sorted(selected, key=lambda x: x.fitness)  # [0:self.params.pop_size]
+            self._pop = sorted(selected, key=lambda x: x.fitness)
             best = sorted(self._pop, key=lambda x: x.fitness)[0]
+
             print(f'Best fitness is {best.fitness}')
+            self.visualiser.plot_structure(best.genotype)
+
             self.generation_number += 1
             EvoAnalytics.create_boxplot()
 
