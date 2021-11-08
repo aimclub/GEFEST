@@ -1,10 +1,7 @@
 from abc import abstractmethod
 from math import sqrt
 
-from scipy.constants import pt
-from shapely import affinity
-from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
-from shapely.ops import nearest_points
+from typing import List
 
 from gefest.core.structure.point import Point
 from gefest.core.structure.polygon import Polygon
@@ -23,7 +20,7 @@ class Geometry:
     def rotate_poly(self, poly: Polygon, angle: float):
         pass
 
-    def get_length(self, polygon: 'Polygon'):
+    def get_length(self, polygon: Polygon):
         if len(polygon.points) < 1:
             return 0
 
@@ -42,64 +39,29 @@ class Geometry:
         return total_length
 
     @abstractmethod
-    def get_square(self, polygon: 'Polygon'):
+    def get_square(self, polygon: Polygon):
         pass
 
     @abstractmethod
-    def is_contain_point(self, poly: 'Polygon', point: 'Point'):
+    def is_contain_point(self, poly: Polygon, point: 'Point'):
         pass
 
     @abstractmethod
-    def _poly_to_geom(self, poly: Polygon):
+    def get_convex(self, poly: Polygon):
         pass
+
     @abstractmethod
-
-    def _point_to_geom(self, point: Point):
+    def intersects(self, poly_1: Polygon, poly_2: Polygon) -> bool:
         pass
 
+    @abstractmethod
+    def distance(self, pt_1: 'Point', pt_2: 'Point') -> float:
+        pass
+    
+    @abstractmethod
+    def nearest_point(self, point: Point, poly: Polygon) -> Point:
+        pass
 
-class Geometry2D(Geometry):
-    def _poly_to_geom(self, poly: Polygon):
-        return GeomPolygon([GeomPoint(pt.x, pt.y) for pt in poly.points])
-
-    def resize_poly(self, poly: Polygon, x_scale: float, y_scale: float):
-        geom_polygon = self._poly_to_geom(poly)
-
-        rescaled_geom_polygon = affinity.scale(geom_polygon,
-                                               x_scale, y_scale)
-
-        poly.points = [Point(x, y) for x, y in
-                       zip(list(rescaled_geom_polygon.exterior.xy[0]),
-                           list(rescaled_geom_polygon.exterior.xy[1]))]
-
-        return poly
-
-    def rotate_poly(self, poly: Polygon, angle: float):
-        geom_polygon = self._poly_to_geom(poly)
-
-        rotated_geom_polygon = affinity.rotate(geom_polygon, angle, 'center')
-
-        poly.points = [Point(x, y) for x, y in
-                       zip(list(rotated_geom_polygon.exterior.xy[0]),
-                           list(rotated_geom_polygon.exterior.xy[1]))]
-
-        return poly
-
-    def get_square(self, polygon: 'Polygon'):
-        if len(polygon.points) <= 1:
-            return 0
-
-        geom_polygon = self._poly_to_geom(polygon)
-
-        return geom_polygon.area
-
-    def is_contain_point(self, poly: 'Polygon', point: 'Point'):
-        geom_poly_allowed = self._poly_to_geom(poly)
-        geom_pt = GeomPoint(point.x, point.y)
-        return geom_poly_allowed.contains(geom_pt)
-
-    def nearest_points(self, point: Point, poly: 'Polygon'):
-        geom_poly = self._poly_to_geom(poly)
-        geom_point = GeomPoint(pt.x, pt.y)
-        _, nearest_correct_position = nearest_points(geom_point, geom_poly)
-
+    @abstractmethod
+    def nearest_points(self, poly_1: Polygon, poly_2: Polygon) -> List[Point]:
+        pass

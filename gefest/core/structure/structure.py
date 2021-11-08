@@ -11,6 +11,7 @@ from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 from shapely.ops import nearest_points
 
 from gefest.core.algs.geom.validation import MIN_DIST, self_intersection
+from gefest.core.structure.domain import Domain
 from gefest.core.structure.point import Point
 from gefest.core.structure.polygon import Polygon
 
@@ -85,9 +86,10 @@ def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol
     return structure
 
 
-def get_random_poly(min_pol_size=3, max_pol_size=5, is_large=False,
-                    parent_structure: Optional[Structure] = None,
-                    domain=None) -> Optional[Polygon]:
+def get_random_poly(min_pol_size, max_pol_size, is_large: bool,
+                    parent_structure: Optional[Structure],
+                    domain: Domain) -> Optional[Polygon]:
+    geometry = domain.geometry
     try:
         polygon = Polygon(polygon_id=str(uuid4()), points=[])
 
@@ -113,7 +115,7 @@ def get_random_poly(min_pol_size=3, max_pol_size=5, is_large=False,
 
                 centroid = Point(x_coord, y_coord)
                 is_correct_centroid = (domain.contains(centroid) and
-                                       all([not existing_poly.contains(centroid) for
+                                       all([not geometry.is_contain_point(existing_poly, centroid) for
                                             existing_poly in parent_structure.polygons]))
             if num_iter == 0:
                 print('Cannot locate centroid')
@@ -135,7 +137,8 @@ def get_random_poly(min_pol_size=3, max_pol_size=5, is_large=False,
                     while not is_correct_point and iter_num > 0:
                         iter_num -= 1
 
-                        if prev_point is not None and not domain.contains(prev_point):
+                        if (prev_point is not None and
+                                not geometry.is_contain_point(domain.bound_poly, prev_point)):
                             raise ValueError('Wrong prev_point')
 
                         point = get_random_point(prev_point, polygon,
@@ -146,7 +149,8 @@ def get_random_poly(min_pol_size=3, max_pol_size=5, is_large=False,
                             continue
 
                         is_correct_point = \
-                            all([not existing_poly.contains(point) for existing_poly in parent_structure.polygons]) \
+                            all([not geometry.is_contain_point(existing_poly, point)
+                                 for existing_poly in parent_structure.polygons]) \
                             and not self_intersection(Structure([Polygon('tmp', polygon.points + [point])]))
 
                     if iter_num == 0:
@@ -156,11 +160,7 @@ def get_random_poly(min_pol_size=3, max_pol_size=5, is_large=False,
                 prev_point = point
 
             polygon.points.append(point)
-            # if len(polygon.points) > 2:
-            #    polygon.plot()
-            #    plt.show()
-        # polygon.plot()
-        # plt.show()
+
     except Exception as ex:
         print(ex)
         import traceback
@@ -173,7 +173,10 @@ def get_random_point(prev_point: Point,
                      parent_poly: Optional[Polygon] = None,
                      parent_structure: Optional[Structure] = None,
                      domain=None) -> Optional[Point]:
-    if prev_point is not None and not domain.contains(prev_point):
+
+    geometry = domain.geometry
+
+    if prev_point is not None and not geometry.is_contain_point(domain.bound_poly, prev_point):
         print("!!!!!!!!!!!!!!")
         raise ValueError('Wrong prev_point')
 
@@ -196,21 +199,17 @@ def get_random_point(prev_point: Point,
 
             if (is_correct_point and parent_poly and
                     len(parent_poly.points) > 0 and num_iter > MAX_ITER / 2):
-                # check then new point is not near existing points
-                # if len(parent_poly.points) > 2:
-                #    nearest_pts = nearest_points(pt.as_geom(), parent_poly.as_geom())
-                #    is_correct_point = nearest_pts[0].distance(nearest_pts[1]) > domains.len_x * 0.05
-                # else:
-                is_correct_point = all([pt.as_geom().distance(poly_pt.as_geom()) > domain.len_x * 0.1
+
+                is_correct_point = all([geometry.distance(pt, poly_pt) > domain.len_x * 0.1
                                         for poly_pt in parent_poly.points])
 
             if is_correct_point and parent_structure and len(parent_structure.polygons) > 0:
                 # check then new point is not near existing polygons
                 for poly_from_structure in parent_structure.polygons:
-                    if poly_from_structure.length != parent_poly.length:
+                    if geometry.get_length(poly_from_structure) != geometry.get_length(parent_poly):
                         # TODO more smart check
-                        _, nearest_pt = nearest_points(pt.as_geom(), poly_from_structure.as_geom().boundary)
-                        is_correct_point = pt.as_geom().distance(nearest_pt) > MIN_DIST
+                        nearest_pt = geometry.nearest_point(pt, poly_from_structure)
+                        is_correct_point = geometry.distance(pt, nearest_pt) > MIN_DIST
                         if not is_correct_point:
                             break
         except Exception as ex:
