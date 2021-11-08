@@ -1,12 +1,15 @@
-from typing import List, Union
+from functools import partial
+from typing import Callable, List, Union
 
 from gefest.core.opt.GA.GA import GA
 from gefest.core.opt.objectives import (calculate_objectives)
 from gefest.core.opt.operators.operators import default_operators
+from gefest.core.opt.setup import Setup
 from gefest.core.structure.domain import Domain
+from gefest.core.viz.struct_vizualizer import StructVizualizer
 
 
-def optimize(domain: Union[Domain, List[Domain]], max_gens=300, pop_size=300):
+def optimize(task_setup: Setup, objective_function: Callable, max_gens=300, pop_size=300):
     operators = default_operators()
     results = []
 
@@ -15,9 +18,7 @@ def optimize(domain: Union[Domain, List[Domain]], max_gens=300, pop_size=300):
                        mutation_value_rate=[])
     _, best = GA(
         params=params,
-        calculate_objectives=calculate_objectives,
-        evolutionary_operators=operators).solution(verbose=False)
+        calculate_objectives=partial(calculate_objectives, model_func=objective_function),
+        evolutionary_operators=operators, task_setup=task_setup).solution(verbose=False)
 
-    results = [best]
-
-    return results
+    return best.genotype
