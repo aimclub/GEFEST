@@ -9,7 +9,7 @@ from gefest.core.structure.point import Point
 
 class Polygon:
     def __init__(self, polygon_id: str, points: List[Point]):
-        self.polygoin_id = polygon_id
+        self.id = polygon_id
         self.points = points
 
     # @property
