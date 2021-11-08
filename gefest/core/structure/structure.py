@@ -10,10 +10,10 @@ import numpy as np
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 from shapely.ops import nearest_points
 
-from gefest.core.structure.geometry import MIN_DIST, self_intersection
-from gefest.core.structure.polygon import Polygon, PolygonPoint
-from gefest.core.utils import GlobalEnv
-from shapely import affinity
+from gefest.core.algs.geom.validation import MIN_DIST, self_intersection
+from gefest.core.structure.point import Point
+from gefest.core.structure.polygon import Polygon
+
 
 @dataclass
 class Structure:
@@ -48,9 +48,6 @@ class Structure:
         return sum([len(p.points) for p in self.polygons])
 
     def plot(self, domain=None, title=None):
-        if domain is None:
-            domain = GlobalEnv().domain
-
         for poly in self.polygons:
             poly.plot()
         if isinstance(domain, list):
@@ -69,10 +66,6 @@ class Structure:
 
 def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol_size=5, domain=None) -> Structure:
     structure = Structure(polygons=[])
-    if domain is None:
-        current_domain = GlobalEnv().domain
-    else:
-        current_domain = domain
 
     max_pols_num = min(max_pols_num, domain.max_poly_num)
     min_pols_num = min(min_pols_num, domain.max_poly_num)
@@ -83,7 +76,7 @@ def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol
     for _ in range(num_pols):
         polygon = get_random_poly(min_pol_size, max_pol_size,
                                   is_large=is_large, parent_structure=structure,
-                                  domain=current_domain)
+                                  domain=domain)
         if len(polygon.points) > 2:
             structure.polygons.append(polygon)
         else:
@@ -96,19 +89,15 @@ def get_random_poly(min_pol_size=3, max_pol_size=5, is_large=False,
                     parent_structure: Optional[Structure] = None,
                     domain=None) -> Optional[Polygon]:
     try:
-        if domain is None:
-            current_domain = GlobalEnv().domain
-        else:
-            current_domain = domain
         polygon = Polygon(polygon_id=str(uuid4()), points=[])
 
-        polygon.points.extend(deepcopy(current_domain.fixed_points))
+        polygon.points.extend(deepcopy(domain.fixed_points))
 
-        num_points = randint(min_pol_size, max_pol_size - len(current_domain.fixed_points))
+        num_points = randint(min_pol_size, max_pol_size - len(domain.fixed_points))
 
         # default centroid
-        centroid = PolygonPoint(np.random.uniform(low=current_domain.min_x, high=current_domain.max_x),
-                                np.random.uniform(low=current_domain.min_y, high=current_domain.max_y))
+        centroid = Point(np.random.uniform(low=domain.min_x, high=domain.max_x),
+                         np.random.uniform(low=domain.min_y, high=domain.max_y))
 
         # set centroids
         if parent_structure is not None:
@@ -117,13 +106,13 @@ def get_random_poly(min_pol_size=3, max_pol_size=5, is_large=False,
             num_iter = 5000
             while not is_correct_centroid and num_iter > 0:
                 num_iter -= 1
-                y_coord = np.random.uniform(low=current_domain.min_y,
-                                            high=current_domain.max_y)
-                x_coord = np.random.uniform(low=current_domain.min_x,
-                                            high=current_domain.max_x)
+                y_coord = np.random.uniform(low=domain.min_y,
+                                            high=domain.max_y)
+                x_coord = np.random.uniform(low=domain.min_x,
+                                            high=domain.max_x)
 
-                centroid = PolygonPoint(x_coord, y_coord)
-                is_correct_centroid = (current_domain.contains(centroid) and
+                centroid = Point(x_coord, y_coord)
+                is_correct_centroid = (domain.contains(centroid) and
                                        all([not existing_poly.contains(centroid) for
                                             existing_poly in parent_structure.polygons]))
             if num_iter == 0:
@@ -133,13 +122,12 @@ def get_random_poly(min_pol_size=3, max_pol_size=5, is_large=False,
         prev_point = centroid
         for _ in range(num_points):
             if is_large:
-                point = PolygonPoint(np.random.uniform(low=current_domain.min_x, high=current_domain.max_x),
-                                     np.random.uniform(low=current_domain.min_y, high=current_domain.max_y))
+                point = Point(np.random.uniform(low=domain.min_x, high=domain.max_x),
+                              np.random.uniform(low=domain.min_y, high=domain.max_y))
             else:
-                if prev_point is not None and not current_domain.contains(prev_point):
-                    print("!!!!!!!!!!!!!!3")
+                if prev_point is not None and not domain.contains(prev_point):
                     raise ValueError('Wrong prev_point')
-                point = get_random_point(prev_point, domain=current_domain)
+                point = get_random_point(prev_point, domain=domain)
 
                 if parent_structure is not None:
                     is_correct_point = False
@@ -147,13 +135,12 @@ def get_random_poly(min_pol_size=3, max_pol_size=5, is_large=False,
                     while not is_correct_point and iter_num > 0:
                         iter_num -= 1
 
-                        if prev_point is not None and not current_domain.contains(prev_point):
-                            print("!!!!!!!!!!!!!!0")
+                        if prev_point is not None and not domain.contains(prev_point):
                             raise ValueError('Wrong prev_point')
 
                         point = get_random_point(prev_point, polygon,
                                                  parent_structure=parent_structure,
-                                                 domain=current_domain)
+                                                 domain=domain)
                         if point is None:
                             iter_num = 0
                             continue
@@ -182,16 +169,11 @@ def get_random_poly(min_pol_size=3, max_pol_size=5, is_large=False,
     return polygon
 
 
-def get_random_point(prev_point: PolygonPoint,
+def get_random_point(prev_point: Point,
                      parent_poly: Optional[Polygon] = None,
                      parent_structure: Optional[Structure] = None,
-                     domain=None) -> Optional[PolygonPoint]:
-    if domain is not None:
-        current_domain = domain
-    else:
-        current_domain = GlobalEnv().domain
-
-    if prev_point is not None and not current_domain.contains(prev_point):
+                     domain=None) -> Optional[Point]:
+    if prev_point is not None and not domain.contains(prev_point):
         print("!!!!!!!!!!!!!!")
         raise ValueError('Wrong prev_point')
 
@@ -203,14 +185,14 @@ def get_random_point(prev_point: PolygonPoint,
         try:
             num_iter -= 1
             # print('get rp', MAX_ITER - num_iter)
-            pt = PolygonPoint(
-                min(max(np.random.normal(prev_point.x, current_domain.len_x * 0.05),
-                        current_domain.min_x + current_domain.len_x * 0.05),
-                    current_domain.max_x - current_domain.len_x * 0.05),
-                min(max(np.random.normal(prev_point.y, current_domain.len_y * 0.05),
-                        current_domain.min_y + current_domain.len_y * 0.05),
-                    current_domain.max_y - current_domain.len_y * 0.05))
-            is_correct_point = current_domain.contains(pt)
+            pt = Point(
+                min(max(np.random.normal(prev_point.x, domain.len_x * 0.05),
+                        domain.min_x + domain.len_x * 0.05),
+                    domain.max_x - domain.len_x * 0.05),
+                min(max(np.random.normal(prev_point.y, domain.len_y * 0.05),
+                        domain.min_y + domain.len_y * 0.05),
+                    domain.max_y - domain.len_y * 0.05))
+            is_correct_point = domain.contains(pt)
 
             if (is_correct_point and parent_poly and
                     len(parent_poly.points) > 0 and num_iter > MAX_ITER / 2):
@@ -219,7 +201,7 @@ def get_random_point(prev_point: PolygonPoint,
                 #    nearest_pts = nearest_points(pt.as_geom(), parent_poly.as_geom())
                 #    is_correct_point = nearest_pts[0].distance(nearest_pts[1]) > domains.len_x * 0.05
                 # else:
-                is_correct_point = all([pt.as_geom().distance(poly_pt.as_geom()) > current_domain.len_x * 0.1
+                is_correct_point = all([pt.as_geom().distance(poly_pt.as_geom()) > domain.len_x * 0.1
                                         for poly_pt in parent_poly.points])
 
             if is_correct_point and parent_structure and len(parent_structure.polygons) > 0:

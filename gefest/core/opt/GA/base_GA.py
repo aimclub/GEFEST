@@ -6,6 +6,7 @@ import numpy as np
 
 import gefest.core.opt.operators.crossover
 import gefest.core.opt.operators.mutation
+from gefest.core.opt.individual import Individual
 
 
 class BaseGA:
@@ -35,7 +36,7 @@ class BaseGA:
     def __init_populations(self):
 
         gens = self.init_population(self.params.pop_size)
-        self._pop = [BaseGA.Individ(genotype=gen) for gen in gens]
+        self._pop = [Individual(genotype=gen) for gen in gens]
 
     class Params:
         def __init__(self, max_gens, pop_size, crossover_rate, mutation_rate, mutation_value_rate):
@@ -44,14 +45,6 @@ class BaseGA:
             self.crossover_rate = crossover_rate
             self.mutation_rate = mutation_rate
             self.mutation_value_rate = mutation_value_rate
-
-    class Individ:
-        def __init__(self, genotype):
-            self.objectives = ()
-            self.analytics_objectives = []
-            self.fitness = None
-            self.genotype = copy.deepcopy(genotype)
-            self.population_number = 0
 
     def solution(self, verbose=True, **kwargs):
         pass
@@ -96,7 +89,7 @@ class BaseGA:
             child_gen = self.crossover(p1.genotype, p2.genotype, self.params.crossover_rate)
             child_gen = self.mutation(child_gen, self.params.mutation_rate)
             if str(child_gen) != str(p1.genotype) and str(child_gen) != str(p2.genotype):
-                child = BaseGA.Individ(genotype=copy.deepcopy(child_gen))
+                child = Individual(genotype=copy.deepcopy(child_gen))
                 child.generation_number = self.generation_number
                 children.append(child)
 

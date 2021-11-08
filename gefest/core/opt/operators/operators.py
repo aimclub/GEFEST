@@ -1,5 +1,4 @@
-from gefest.core.opt.operators.mutation import mutation
-from gefest.core.opt.operators.crossover import crossover
+from gefest.core.opt.operators import crossover, mutation
 
 from gefest.core.opt.operators.initial import initial_pop_random
 
