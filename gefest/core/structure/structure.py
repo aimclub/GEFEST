@@ -48,22 +48,6 @@ class Structure:
     def size(self):
         return sum([len(p.points) for p in self.polygons])
 
-    def plot(self, domain=None, title=None):
-        for poly in self.polygons:
-            poly.plot()
-        if isinstance(domain, list):
-            for d in domain:
-                geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in d.allowed_area])
-                x, y = geom_poly_allowed.exterior.xy
-                plt.plot(x, y)
-        else:
-            geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in domain.allowed_area])
-            x, y = geom_poly_allowed.exterior.xy
-            plt.plot(x, y)
-        if title:
-            plt.title(title)
-        plt.show()
-
 
 def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol_size=5, domain=None) -> Structure:
     structure = Structure(polygons=[])
