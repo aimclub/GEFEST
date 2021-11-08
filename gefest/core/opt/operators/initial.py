@@ -1,25 +1,19 @@
 from copy import deepcopy
 from multiprocessing import Pool
 
-from gefest.core.algs.postproc import postprocess
+from gefest.core.algs.postproc.resolve_errors import postprocess
 from gefest.core.opt.constraints import check_constraints
 from gefest.core.structure.structure import get_random_structure
-from gefest.core.utils import GlobalEnv
 
 MAX_ITER = 50000
 NUM_PROC = 1
 
 
-def initial_pop_random(size: int, domain=None):
+def initial_pop_random(size: int, domain=None, initial_state=None):
     print('Start init')
     population_new = []
 
-    env = GlobalEnv()
-
-    if domain is None:
-        domain = GlobalEnv().domain
-
-    if env.initial_state is None:
+    if initial_state is None:
         while len(population_new) < size:
             if NUM_PROC > 1:
                 with Pool(NUM_PROC) as p:
@@ -28,7 +22,7 @@ def initial_pop_random(size: int, domain=None):
                 new_items = []
                 for i in range(size):
                     new_items.append(get_pop_worker(domain))
-                    print (f'Initial created: {i} from {size}')
+                    print(f'Initial created: {i} from {size}')
 
             for structure in new_items:
                 population_new.append(structure)
@@ -37,7 +31,7 @@ def initial_pop_random(size: int, domain=None):
         print('End init')
     else:
         for _ in range(size):
-            population_new.append(deepcopy(env.initial_state))
+            population_new.append(deepcopy(initial_state))
     return population_new
 
 
