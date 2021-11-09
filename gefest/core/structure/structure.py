@@ -5,10 +5,7 @@ from random import randint
 from typing import List, Optional
 from uuid import uuid4
 
-import matplotlib.pyplot as plt
 import numpy as np
-from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
-from shapely.ops import nearest_points
 
 from gefest.core.algs.geom.validation import MIN_DIST, self_intersection
 from gefest.core.structure.domain import Domain
@@ -98,7 +95,7 @@ def get_random_poly(min_pol_size, max_pol_size, is_large: bool,
                                             high=domain.max_x)
 
                 centroid = Point(x_coord, y_coord)
-                is_correct_centroid = (domain.contains(centroid) and
+                is_correct_centroid = (geometry.is_contain_point(domain.bound_poly, centroid) and
                                        all([not geometry.is_contain_point(existing_poly, centroid) for
                                             existing_poly in parent_structure.polygons]))
             if num_iter == 0:
@@ -111,7 +108,7 @@ def get_random_poly(min_pol_size, max_pol_size, is_large: bool,
                 point = Point(np.random.uniform(low=domain.min_x, high=domain.max_x),
                               np.random.uniform(low=domain.min_y, high=domain.max_y))
             else:
-                if prev_point is not None and not domain.contains(prev_point):
+                if prev_point is not None and not geometry.is_contain_point(domain.bound_poly, prev_point):
                     raise ValueError('Wrong prev_point')
                 point = get_random_point(prev_point, domain=domain)
 
@@ -179,7 +176,7 @@ def get_random_point(prev_point: Point,
                 min(max(np.random.normal(prev_point.y, domain.len_y * 0.05),
                         domain.min_y + domain.len_y * 0.05),
                     domain.max_y - domain.len_y * 0.05))
-            is_correct_point = domain.contains(pt)
+            is_correct_point = geometry.is_contain_point(domain.bound_poly, pt)
 
             if (is_correct_point and parent_poly and
                     len(parent_poly.points) > 0 and num_iter > MAX_ITER / 2):
