@@ -1,4 +1,4 @@
-![gefest_logo](./docs/img/gefest_logo.png)
+<img src="./docs/img/gefest_logo.png" width="500"/>
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
