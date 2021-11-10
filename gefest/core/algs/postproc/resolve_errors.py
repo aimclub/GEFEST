@@ -34,7 +34,7 @@ def _correct_wrong_point(poly: Polygon, domain: Domain):
         point.y = max(point.y, domain.min_y + domain.len_y * 0.05)
         point.x = min(point.x, domain.max_x + domain.len_x * 0.05)
         point.y = min(point.y, domain.max_y + domain.len_y * 0.05)
-        if not domain.contains(point):
+        if not domain.geometry.is_contain_point(domain.bound_poly, point):
             new_point = domain.geometry.nearest_point(point, domain.bound_poly)
             poly.points[p_id] = new_point
             point_moved = True

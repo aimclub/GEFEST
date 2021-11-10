@@ -3,7 +3,6 @@ from math import sqrt
 
 from typing import List
 
-from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 from gefest.core.structure.point import Point
 from gefest.core.structure.polygon import Polygon
 
@@ -21,10 +20,23 @@ class Geometry:
     def rotate_poly(self, poly: Polygon, angle: float):
         pass
 
-    def get_length(self, poly: Polygon):
-        geom_poly = GeomPolygon([GeomPoint(pt.x, pt.y) for pt in poly.points])
+    def get_length(self, polygon: Polygon):
+        if len(polygon.points) < 1:
+            return 0
 
-        return geom_poly.length
+        total_length = 0
+        for i in range(1, len(polygon.points)):
+            total_length += sqrt(
+                (polygon.points[i - 1].x - polygon.points[i].x) ** 2 +
+                (polygon.points[i - 1].y - polygon.points[i].y) ** 2 +
+                (polygon.points[i - 1].z - polygon.points[i].z) ** 2)
+
+        total_length += sqrt(
+            (polygon.points[len(polygon.points) - 1].x - polygon.points[0].x) ** 2 +
+            (polygon.points[len(polygon.points) - 1].y - polygon.points[0].y) ** 2 +
+            (polygon.points[len(polygon.points) - 1].z - polygon.points[0].z) ** 2)
+
+        return total_length
 
     @abstractmethod
     def get_square(self, polygon: Polygon):

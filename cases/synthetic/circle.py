@@ -23,10 +23,10 @@ def area_length_ratio(struct: Structure):
     if area == 0:
         return None
 
-    return (1 - 4*3.1416*area / length**2)
+    return length / area
 
 
 optimized_structure = optimize(task_setup=task_setup,
                                objective_function=area_length_ratio,
-                               pop_size=30,
-                               max_gens=100)
+                               pop_size=100,
+                               max_gens=300)

@@ -20,7 +20,7 @@ def mutation(structure: Structure,  domain: Domain, rate=0.6):
 
     is_correct = False
 
-    min_pol_size = 90
+    min_pol_size = 4
     changes_num = 1
 
     n_iter = 0
@@ -74,8 +74,8 @@ def mutate_worker(args):
             elif random.random() < polygon_add_mutation_prob and \
                     len(new_structure.polygons) < domain.max_poly_num:
                 # if add polygon to structure
-                new_poly = get_random_poly(min_pol_size=90,
-                                           max_pol_size=100,
+                new_poly = get_random_poly(min_pol_size=3,
+                                           max_pol_size=50,
                                            is_large=False,
                                            parent_structure=new_structure,
                                            domain=domain)
@@ -84,7 +84,7 @@ def mutate_worker(args):
                 new_structure.polygons.append(new_poly)
             elif random.random() < polygon_rotate_mutation_prob:
                 # if add polygon to structure
-                angle = float(random.randint(-80, 80))
+                angle = float(random.randint(-30, 30))
                 polygon_to_mutate = geometry.rotate_poly(polygon_to_mutate, angle)
             elif random.random() < polygon_reshape_mutation_prob:
                 # if add polygon to structure
@@ -106,7 +106,8 @@ def mutate_worker(args):
                 else:
                     # if change point in polygon
 
-                    if point_to_mutate is not None and not domain.contains(point_to_mutate):
+                    if point_to_mutate is not None and not geometry.is_contain_point(domain.bound_poly,
+                                                                                     point_to_mutate):
                         print("!!!!!!!!!!!!!!1")
                         raise ValueError('Wrong prev_point')
 

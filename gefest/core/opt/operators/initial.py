@@ -43,7 +43,7 @@ def get_pop_worker(domain):
     is_correct = False
     while not is_correct:
         structure = get_random_structure(min_pols_num=structure_size, max_pols_num=structure_size,
-                                         min_pol_size=90, max_pol_size=100, domain=domain)
+                                         min_pol_size=3, max_pol_size=50, domain=domain)
         # structure.plot(title='Initial')
         structure = postprocess(structure, domain)
         # structure.plot(title='Initial post')
