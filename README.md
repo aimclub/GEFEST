@@ -1,4 +1,4 @@
-# GEFEST
+![gefest_logo](./docs/img/gefest_logo.png)
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
@@ -14,7 +14,7 @@ The basic abstractions in GEFEST are Point, Polygon, Structure and Domain.
 
 The workflow of the generative design is the following:
 
-![logo](./docs/img/workflow.png)
+![workflow](./docs/img/workflow.png)
 
 ...
 
