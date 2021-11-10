@@ -106,7 +106,8 @@ def mutate_worker(args):
                 else:
                     # if change point in polygon
 
-                    if point_to_mutate is not None and not domain.contains(point_to_mutate):
+                    if point_to_mutate is not None and not geometry.is_contain_point(domain.bound_poly,
+                                                                                     point_to_mutate):
                         print("!!!!!!!!!!!!!!1")
                         raise ValueError('Wrong prev_point')
 
