@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
-**GEFEST** (**G**enerativ **E**volution **F**or **E**ncoded **ST**ructures) is a toolbox for the generative design of
+**GEFEST** (**G**enerative **E**volution **F**or **E**ncoded **ST**ructures) is a toolbox for the generative design of
 physical objects.
 
 It uses: (1) numerical modelling to simulate the interaction between object and environment;
