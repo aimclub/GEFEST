@@ -49,7 +49,7 @@ class Structure:
         return sum([len(p.points) for p in self.polygons])
 
 
-def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol_size=5, domain=None) -> Structure:
+def get_random_structure(min_pols_num, max_pols_num, min_pol_size, max_pol_size, domain=None) -> Structure:
     structure = Structure(polygons=[])
 
     max_pols_num = min(max_pols_num, domain.max_poly_num)

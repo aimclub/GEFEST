@@ -14,7 +14,7 @@ def optimize(task_setup: Setup, objective_function: Callable, max_gens=300, pop_
     results = []
 
     params = GA.Params(max_gens=max_gens, pop_size=pop_size,
-                       crossover_rate=0.6, mutation_rate=0.6,
+                       crossover_rate=0.8, mutation_rate=0.8,
                        mutation_value_rate=[])
     _, best = GA(
         params=params,
