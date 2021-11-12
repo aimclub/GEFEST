@@ -38,13 +38,16 @@ class BaseGA:
 
     def __init_populations(self):
 
-        gens = self.init_population(self.params.pop_size, self.task_setup.domain)
+        gens = self.init_population(self.params.pop_size, self.task_setup.domain,
+                                    self.params.max_point_num, self.params.min_point_num)
         self._pop = [Individual(genotype=gen) for gen in gens]
 
     class Params:
-        def __init__(self, max_gens, pop_size, crossover_rate, mutation_rate, mutation_value_rate):
+        def __init__(self, max_gens, pop_size, max_point_num, min_point_num, crossover_rate, mutation_rate, mutation_value_rate):
             self.max_gens = max_gens
             self.pop_size = pop_size
+            self.max_point_num = max_point_num
+            self.min_point_num = min_point_num
             self.crossover_rate = crossover_rate
             self.mutation_rate = mutation_rate
             self.mutation_value_rate = mutation_value_rate
@@ -95,7 +98,9 @@ class BaseGA:
 
             child_gen = self.mutation(structure=child_gen,
                                       domain=self.task_setup.domain,
-                                      rate=self.params.mutation_rate)
+                                      rate=self.params.mutation_rate,
+                                      min_point_num=self.params.min_point_num,
+                                      max_point_num=self.params.max_point_num)
 
             if str(child_gen) != str(p1.genotype) and str(child_gen) != str(p2.genotype):
                 child = Individual(genotype=copy.deepcopy(child_gen))

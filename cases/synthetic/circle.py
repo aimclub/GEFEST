@@ -3,6 +3,7 @@ from gefest.core.opt.optimize import optimize
 from gefest.core.opt.setup import Setup
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import Structure
+import numpy as np
 
 geometry = Geometry2D()
 domain = Domain(allowed_area=[(0, 0),
@@ -23,10 +24,12 @@ def area_length_ratio(struct: Structure):
     if area == 0:
         return None
 
-    return length / area
+    return (1 - 4*np.pi * area / length**2)
 
 
 optimized_structure = optimize(task_setup=task_setup,
                                objective_function=area_length_ratio,
                                pop_size=100,
-                               max_gens=300)
+                               max_gens=300,
+                               max_point_num=100,
+                               min_point_num=50)

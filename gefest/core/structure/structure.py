@@ -65,7 +65,7 @@ class Structure:
         plt.show()
 
 
-def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol_size=5, domain=None) -> Structure:
+def get_random_structure(min_pols_num, max_pols_num, min_point_num, max_point_num, domain=None) -> Structure:
     structure = Structure(polygons=[])
 
     max_pols_num = min(max_pols_num, domain.max_poly_num)
@@ -75,7 +75,7 @@ def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol
     is_large = num_pols == 1
 
     for _ in range(num_pols):
-        polygon = get_random_poly(min_pol_size, max_pol_size,
+        polygon = get_random_poly(min_point_num, max_point_num,
                                   is_large=is_large, parent_structure=structure,
                                   domain=domain)
         if len(polygon.points) > 2:
@@ -86,7 +86,7 @@ def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol
     return structure
 
 
-def get_random_poly(min_pol_size, max_pol_size, is_large: bool,
+def get_random_poly(min_point_num, max_point_num, is_large: bool,
                     parent_structure: Optional[Structure],
                     domain: Domain) -> Optional[Polygon]:
     geometry = domain.geometry
@@ -95,8 +95,7 @@ def get_random_poly(min_pol_size, max_pol_size, is_large: bool,
 
         polygon.points.extend(deepcopy(domain.fixed_points))
 
-        num_points = randint(min_pol_size, max_pol_size - len(domain.fixed_points))
-
+        num_points = randint(min_point_num, max_point_num - len(domain.fixed_points))
         # default centroid
         centroid = Point(np.random.uniform(low=domain.min_x, high=domain.max_x),
                          np.random.uniform(low=domain.min_y, high=domain.max_y))
