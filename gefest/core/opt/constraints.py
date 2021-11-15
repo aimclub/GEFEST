@@ -26,7 +26,9 @@ def check_constraints(structure: Structure, is_lightweight: bool = False, domain
             return -obj < 0
 
         if not structurally_correct:
-            print(f'Constraint violated in {domain.name}: {cts}')
+            #print(f'Constraint violated in {domain.name}: {cts}')
+            #structure.plot(domain,
+                           #title=f'Constraint violated in {domain.name}: {cts}')
             return False
     except Exception as ex:
         print(ex)

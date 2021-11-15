@@ -33,9 +33,9 @@ class GA(BaseGA):
             best = sorted(self._pop, key=lambda x: x.fitness)[0]
 
             print(f'Best fitness is {best.fitness}')
-            self.visualiser.plot_structure(best.genotype)
+            #self.visualiser.plot_structure(best.genotype)
 
             self.generation_number += 1
-            EvoAnalytics.create_boxplot()
+            #EvoAnalytics.create_boxplot()
 
         return self._pop, best
