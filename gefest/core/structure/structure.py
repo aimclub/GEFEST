@@ -48,35 +48,23 @@ class Structure:
     def size(self):
         return sum([len(p.points) for p in self.polygons])
 
-    def plot(self, domain=None, title=None):
-        for poly in self.polygons:
-            poly.plot()
-        if isinstance(domain, list):
-            for d in domain:
-                geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in d.allowed_area])
-                x, y = geom_poly_allowed.exterior.xy
-                plt.plot(x, y)
-        else:
-            geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in domain.allowed_area])
-            x, y = geom_poly_allowed.exterior.xy
-            plt.plot(x, y)
-        if title:
-            plt.title(title)
+    def plot(self, structure, domain=None, title=None):
+        x = [point._x for point in structure.polygons[0].points]
+        y = [point._y for point in structure.polygons[0].points]
+        plt.plot(x,y)
+        plt.title(title)
         plt.show()
 
 
-def get_random_structure(min_pols_num, max_pols_num, min_point_num, max_point_num, domain=None) -> Structure:
+def get_random_structure(domain) -> Structure:
     structure = Structure(polygons=[])
 
-    max_pols_num = min(max_pols_num, domain.max_poly_num)
-    min_pols_num = min(min_pols_num, domain.max_poly_num)
-
-    num_pols = randint(min_pols_num, max_pols_num)
+    num_pols = randint(domain.min_poly_num, domain.max_poly_num)
     is_large = num_pols == 1
 
     for _ in range(num_pols):
-        polygon = get_random_poly(min_point_num, max_point_num,
-                                  is_large=is_large, parent_structure=structure,
+        polygon = get_random_poly(is_large=is_large,
+                                  parent_structure=structure,
                                   domain=domain)
         if len(polygon.points) > 2:
             structure.polygons.append(polygon)
@@ -86,7 +74,7 @@ def get_random_structure(min_pols_num, max_pols_num, min_point_num, max_point_nu
     return structure
 
 
-def get_random_poly(min_point_num, max_point_num, is_large: bool,
+def get_random_poly(is_large: bool,
                     parent_structure: Optional[Structure],
                     domain: Domain) -> Optional[Polygon]:
     geometry = domain.geometry
@@ -95,7 +83,7 @@ def get_random_poly(min_point_num, max_point_num, is_large: bool,
 
         polygon.points.extend(deepcopy(domain.fixed_points))
 
-        num_points = randint(min_point_num, max_point_num - len(domain.fixed_points))
+        num_points = randint(domain.min_points_num, domain.max_points_num)
         # default centroid
         centroid = Point(np.random.uniform(low=domain.min_x, high=domain.max_x),
                          np.random.uniform(low=domain.min_y, high=domain.max_y))
@@ -107,15 +95,13 @@ def get_random_poly(min_point_num, max_point_num, is_large: bool,
             num_iter = 5000
             while not is_correct_centroid and num_iter > 0:
                 num_iter -= 1
-                y_coord = np.random.uniform(low=domain.min_y,
-                                            high=domain.max_y)
-                x_coord = np.random.uniform(low=domain.min_x,
-                                            high=domain.max_x)
 
-                centroid = Point(x_coord, y_coord)
-                is_correct_centroid = (domain.contains(centroid) and
-                                       all([not geometry.is_contain_point(existing_poly, centroid) for
+                centroid = Point(np.random.uniform(low=domain.min_x, high=domain.max_x),
+                                 np.random.uniform(low=domain.min_y, high=domain.max_y))
+
+                is_correct_centroid = (all([not geometry.is_contain_point(existing_poly, centroid) for
                                             existing_poly in parent_structure.polygons]))
+
             if num_iter == 0:
                 print('Cannot locate centroid')
                 return polygon
@@ -123,11 +109,9 @@ def get_random_poly(min_point_num, max_point_num, is_large: bool,
         prev_point = centroid
         for _ in range(num_points):
             if is_large:
-                point = Point(np.random.uniform(low=domain.min_x, high=domain.max_x),
-                              np.random.uniform(low=domain.min_y, high=domain.max_y))
+                point = create_next_point(prev_point, domain)
+                prev_point = point
             else:
-                if prev_point is not None and not domain.contains(prev_point):
-                    raise ValueError('Wrong prev_point')
                 point = get_random_point(prev_point, domain=domain)
 
                 if parent_structure is not None:
@@ -175,10 +159,6 @@ def get_random_point(prev_point: Point,
 
     geometry = domain.geometry
 
-    if prev_point is not None and not geometry.is_contain_point(domain.bound_poly, prev_point):
-        print("!!!!!!!!!!!!!!")
-        raise ValueError('Wrong prev_point')
-
     is_correct_point = False
     pt = None
     MAX_ITER = 100
@@ -187,13 +167,7 @@ def get_random_point(prev_point: Point,
         try:
             num_iter -= 1
             # print('get rp', MAX_ITER - num_iter)
-            pt = Point(
-                min(max(np.random.normal(prev_point.x, domain.len_x * 0.05),
-                        domain.min_x + domain.len_x * 0.05),
-                    domain.max_x - domain.len_x * 0.05),
-                min(max(np.random.normal(prev_point.y, domain.len_y * 0.05),
-                        domain.min_y + domain.len_y * 0.05),
-                    domain.max_y - domain.len_y * 0.05))
+            pt = create_next_point(prev_point, domain)
             is_correct_point = domain.contains(pt)
 
             if (is_correct_point and parent_poly and
@@ -219,4 +193,15 @@ def get_random_point(prev_point: Point,
     if num_iter == 0:
         print('Preliminary return of point')
         return None
+    return pt
+
+
+def create_next_point(prev_point: Point, domain) -> Point:
+    pt = Point(
+        min(max(np.random.normal(prev_point.x, domain.len_x * 0.05),
+                domain.min_x + domain.len_x * 0.05),
+            domain.max_x - domain.len_x * 0.05),
+        min(max(np.random.normal(prev_point.y, domain.len_y * 0.05),
+                domain.min_y + domain.len_y * 0.05),
+            domain.max_y - domain.len_y * 0.05))
     return pt
