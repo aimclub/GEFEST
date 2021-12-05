@@ -1,9 +1,15 @@
+import random
+
+import bezier
+import numpy as np
+
 from shapely import affinity
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 from shapely.geometry.multipolygon import MultiPolygon as ShapelyMultiPolygon
 from shapely.geometry.polygon import Polygon as ShapelyPolygon
 from shapely.ops import nearest_points
 from typing import List
+from uuid import uuid4
 
 from gefest.core.geometry.geometry import Geometry
 from gefest.core.structure.point import Point
@@ -60,9 +66,30 @@ class Geometry2D(Geometry):
         _, nearest_correct_position = nearest_points(geom_poly_1, geom_poly_2)
         return [Point(pos.x, pos.y) for pos in nearest_correct_position]
 
+    def bezier_transform(self, poly: 'GeomPolygon') -> Polygon:
+        points = poly.boundary.xy
+
+        x = points[0]
+        y = points[1]
+        z = np.asfortranarray([x, y])
+
+        curv = bezier.Curve.from_nodes(z)
+        number_of_points = random.randint(20, 30)
+        S = np.linspace(0, 1, number_of_points)
+
+        transform_poly = Polygon(polygon_id=str(uuid4()),
+                         points=[(Point(curv.evaluate(s)[0][0], curv.evaluate(s)[1][0])) for s in S])
+
+        transform_geom = self._poly_to_geom(transform_poly)
+
+        return transform_geom
+
     def get_convex(self, poly: 'Polygon') -> Polygon:
-        geom_poly = self._poly_to_geom(poly)
-        geom_convex = geom_poly.buffer(1)
+        geom_convex = self._poly_to_geom(poly).convex_hull
+        geom_convex = self.bezier_transform(geom_convex)
+
+        #geom_convex = make_valid(geom_poly)
+        #geom_convex = geom_poly.buffer(1)
 
         convex_points = []
         if isinstance(geom_convex, ShapelyMultiPolygon):
