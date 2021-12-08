@@ -41,7 +41,7 @@ optimized_structure, spend_time = optimize(task_setup=task_setup,
 
 visualiser = StructVizualizer(task_setup.domain)
 visualiser.plot_structure(optimized_structure, spend_time)
-#EvoAnalytics.create_boxplot()
+EvoAnalytics.create_boxplot()
 
 """
 from shapely.geometry import Point

@@ -66,7 +66,7 @@ class Geometry2D(Geometry):
         _, nearest_correct_position = nearest_points(geom_poly_1, geom_poly_2)
         return [Point(pos.x, pos.y) for pos in nearest_correct_position]
 
-    def bezier_transform(self, poly: 'GeomPolygon') -> Polygon:
+    def bezier_transform(self, poly: 'GeomPolygon', domain: 'Domain') -> Polygon:
         points = poly.boundary.xy
 
         x = points[0]
@@ -74,7 +74,7 @@ class Geometry2D(Geometry):
         z = np.asfortranarray([x, y])
 
         curv = bezier.Curve.from_nodes(z)
-        number_of_points = random.randint(20, 30)
+        number_of_points = random.randint(domain.min_points_num, domain.max_points_num)
         S = np.linspace(0, 1, number_of_points)
 
         transform_poly = Polygon(polygon_id=str(uuid4()),
@@ -84,9 +84,9 @@ class Geometry2D(Geometry):
 
         return transform_geom
 
-    def get_convex(self, poly: 'Polygon') -> Polygon:
+    def get_convex(self, poly: 'Polygon', domain: 'Domain') -> Polygon:
         geom_convex = self._poly_to_geom(poly).convex_hull
-        geom_convex = self.bezier_transform(geom_convex)
+        geom_convex = self.bezier_transform(geom_convex, domain)
 
         #geom_convex = make_valid(geom_poly)
         #geom_convex = geom_poly.buffer(1)

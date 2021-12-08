@@ -56,7 +56,7 @@ def _correct_wrong_point(poly: Polygon, domain: Domain):
 
 def _correct_self_intersection(poly: Polygon, domain: Domain):
     # change self-intersected poly to convex
-    convex_poly = domain.geometry.get_convex(poly)
+    convex_poly = domain.geometry.get_convex(poly, domain)
     return convex_poly
 
 
