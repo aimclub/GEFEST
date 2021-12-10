@@ -24,10 +24,6 @@ class GA(BaseGA):
 
             self.fitness()
 
-            if len(set([_.fitness for _ in self._pop])) != \
-                    len(([_.fitness for _ in self._pop])):
-                print("!")
-
             selected = self.tournament_selection()
             self._pop = sorted(selected, key=lambda x: x.fitness)
             best = sorted(self._pop, key=lambda x: x.fitness)[0]

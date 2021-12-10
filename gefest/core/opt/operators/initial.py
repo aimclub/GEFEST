@@ -1,13 +1,10 @@
 from copy import deepcopy
 from multiprocessing import Pool
 
-import numpy as np
-
 from gefest.core.algs.postproc.resolve_errors import postprocess
 from gefest.core.opt.constraints import check_constraints
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import get_random_structure
-from profilehooks import profile
 
 MAX_ITER = 50000
 NUM_PROC = 1
@@ -38,21 +35,19 @@ def initial_pop_random(size: int, domain: Domain, initial_state=None):
             population_new.append(deepcopy(initial_state))
     return population_new
 
-@profile
+
 def get_pop_worker(domain):
-    #print(f'Try to create size {structure_size}')
+    # print(f'Try to create size {structure_size}')
 
     is_correct = False
     while not is_correct:
         structure = get_random_structure(domain=domain)
-        #structure.plot(structure, title='Initial')
+        # structure.plot(structure, title='Initial')
         structure = postprocess(structure, domain)
-        #structure.plot(structure, title='Initial post')
+        # structure.plot(structure, title='Initial post')
         is_correct = check_constraints(structure, is_lightweight=True, domain=domain)
 
         if is_correct:
             # structure.plot(title='Initial correct')
             print(f'Created, domain {domain.name}')
             return structure
-
-

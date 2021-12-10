@@ -7,8 +7,6 @@ from uuid import uuid4
 
 import matplotlib.pyplot as plt
 import numpy as np
-from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
-from shapely.ops import nearest_points
 
 from gefest.core.algs.geom.validation import MIN_DIST, self_intersection
 from gefest.core.structure.domain import Domain
@@ -51,7 +49,7 @@ class Structure:
     def plot(self, structure, domain=None, title=None):
         x = [point._x for point in structure.polygons[0].points]
         y = [point._y for point in structure.polygons[0].points]
-        plt.plot(x,y)
+        plt.plot(x, y)
         plt.title(title)
         plt.show()
 
@@ -156,7 +154,6 @@ def get_random_point(prev_point: Point,
                      parent_poly: Optional[Polygon] = None,
                      parent_structure: Optional[Structure] = None,
                      domain=None) -> Optional[Point]:
-
     geometry = domain.geometry
 
     is_correct_point = False
@@ -172,7 +169,6 @@ def get_random_point(prev_point: Point,
 
             if (is_correct_point and parent_poly and
                     len(parent_poly.points) > 0 and num_iter > MAX_ITER / 2):
-
                 is_correct_point = all([geometry.distance(pt, poly_pt) > domain.len_x * 0.1
                                         for poly_pt in parent_poly.points])
 

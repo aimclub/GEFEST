@@ -1,13 +1,10 @@
 from functools import partial
-from typing import Callable, List, Union
-import timeit
+from typing import Callable
 
 from gefest.core.opt.GA.GA import GA
 from gefest.core.opt.objectives import calculate_objectives
 from gefest.core.opt.operators.operators import default_operators
 from gefest.core.opt.setup import Setup
-from gefest.core.structure.domain import Domain
-from gefest.core.viz.struct_vizualizer import StructVizualizer
 
 
 def optimize(task_setup: Setup, objective_function: Callable, max_gens, pop_size):
@@ -17,11 +14,9 @@ def optimize(task_setup: Setup, objective_function: Callable, max_gens, pop_size
                        crossover_rate=0.6, mutation_rate=0.6,
                        mutation_value_rate=[])
 
-    start = timeit.default_timer()
     _, best = GA(
         params=params,
         calculate_objectives=partial(calculate_objectives, model_func=objective_function),
         evolutionary_operators=operators, task_setup=task_setup).solution(verbose=False)
-    end = timeit.default_timer() - start
 
-    return best.genotype, end
+    return best.genotype

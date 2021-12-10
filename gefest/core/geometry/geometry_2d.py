@@ -1,15 +1,14 @@
 import random
+from typing import List
+from uuid import uuid4
 
 import bezier
 import numpy as np
-
 from shapely import affinity
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 from shapely.geometry.multipolygon import MultiPolygon as ShapelyMultiPolygon
 from shapely.geometry.polygon import Polygon as ShapelyPolygon
 from shapely.ops import nearest_points
-from typing import List
-from uuid import uuid4
 
 from gefest.core.geometry.geometry import Geometry
 from gefest.core.structure.point import Point
@@ -66,7 +65,7 @@ class Geometry2D(Geometry):
         _, nearest_correct_position = nearest_points(geom_poly_1, geom_poly_2)
         return [Point(pos.x, pos.y) for pos in nearest_correct_position]
 
-    def bezier_transform(self, poly: 'GeomPolygon', domain: 'Domain') -> Polygon:
+    def bezier_transform(self, poly: 'GeomPolygon') -> Polygon:
         points = poly.boundary.xy
 
         x = points[0]
@@ -74,11 +73,11 @@ class Geometry2D(Geometry):
         z = np.asfortranarray([x, y])
 
         curv = bezier.Curve.from_nodes(z)
-        number_of_points = random.randint(domain.min_points_num, domain.max_points_num)
+        number_of_points = len(x)
         S = np.linspace(0, 1, number_of_points)
 
         transform_poly = Polygon(polygon_id=str(uuid4()),
-                         points=[(Point(curv.evaluate(s)[0][0], curv.evaluate(s)[1][0])) for s in S])
+                                 points=[(Point(curv.evaluate(s)[0][0], curv.evaluate(s)[1][0])) for s in S])
 
         transform_geom = self._poly_to_geom(transform_poly)
 
@@ -86,10 +85,7 @@ class Geometry2D(Geometry):
 
     def get_convex(self, poly: 'Polygon', domain: 'Domain') -> Polygon:
         geom_convex = self._poly_to_geom(poly).convex_hull
-        geom_convex = self.bezier_transform(geom_convex, domain)
-
-        #geom_convex = make_valid(geom_poly)
-        #geom_convex = geom_poly.buffer(1)
+        geom_convex = self.bezier_transform(geom_convex)
 
         convex_points = []
         if isinstance(geom_convex, ShapelyMultiPolygon):
@@ -118,3 +114,26 @@ class Geometry2D(Geometry):
         distance = geom_pt_1.distance(geom_pt_2)
 
         return distance
+
+
+def create_circle(struct: 'Structure') -> 'Structure':
+    geom = Geometry2D()
+    poly = struct.polygons[0]
+
+    num_points = len(poly.points)
+    radius = geom.get_length(struct.polygons[0]) / (2 * np.pi)
+
+    x = [pt.x for pt in poly.points]
+    y = [pt.y for pt in poly.points]
+
+    center_x = round((max(x) + min(x)) / 2, 2)
+    center_y = round((max(y) + min(y)) / 2, 2)
+
+    theta = np.linspace(0, 2 * np.pi, num_points)
+    a = radius * np.cos(theta) + center_x + 2.2 * radius
+    b = radius * np.sin(theta) + center_y
+
+    struct = [Polygon(polygon_id=str(uuid4()),
+                      points=[(Point(x, y)) for x, y in zip(a, b)])]
+
+    return struct

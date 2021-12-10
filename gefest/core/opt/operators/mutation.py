@@ -12,7 +12,7 @@ from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import Structure, get_random_point, get_random_poly
 
 
-def mutation(structure: Structure,  domain: Domain, rate=0.6):
+def mutation(structure: Structure, domain: Domain, rate=0.6):
     random_val = random.random()
 
     if random_val > rate:
@@ -28,7 +28,6 @@ def mutation(structure: Structure,  domain: Domain, rate=0.6):
 
     while not is_correct and n_iter < MAX_ITER:
         n_iter += 1
-        print('mut', n_iter)
 
         if NUM_PROC > 1:
             with Pool(NUM_PROC) as p:
@@ -95,9 +94,7 @@ def add_delete_point_mutation(new_structure: Structure, polygon_to_mutate_idx, m
         new_structure.polygons[polygon_to_mutate_idx].points.remove(point_to_mutate)
     else:
         # if change point in polygon
-
         if point_to_mutate is not None and not domain.contains(point_to_mutate):
-            print("!!!!!!!!!!!!!!1")
             raise ValueError('Wrong prev_point')
 
         new_point = get_random_point(point_to_mutate, polygon_to_mutate,
@@ -131,7 +128,6 @@ def pos_change_point_mutation(new_structure: Structure, polygon_to_mutate_idx, m
     new_structure.polygons[polygon_to_mutate_idx].points[mutate_point_idx].y = y_old + displacement_y
 
     return new_structure
-
 
 
 def points_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: Domain):

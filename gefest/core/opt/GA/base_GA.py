@@ -75,7 +75,6 @@ class BaseGA:
             if best not in chosen:
                 chosen.append(best)
             elif n_iter > self.params.pop_size + 100:
-                print('RAND SELECTED')
                 n_iter = 0
                 rnd = self._pop[randint(0, len(self._pop) - 1)]
                 chosen.append(rnd)

@@ -8,27 +8,26 @@ class StructVizualizer:
     def __init__(self, domain: Domain):
         self.domain = domain
 
-    def plot_structure(self, struct: Structure, spend_time):
-        plt.figure(figsize=(7, 7))
+    def plot_structure(self, struct: Structure, info):
+        spend_time = info['spend_time']
 
         for poly in struct.polygons:
-            self.plot_poly(poly)
+            self.plot_poly(poly, info)
 
         boundary = self.domain.bound_poly
         x = [pt.x for pt in boundary.points]
         y = [pt.y for pt in boundary.points]
 
-        plt.plot(x, y, label='considered area')
-        plt.title(str(round(spend_time,2)) + ', sec')
+        plt.plot(x, y)
+        plt.title(str(round(spend_time, 2)) + ', sec')
         plt.legend()
-        plt.show()
 
-    def plot_poly(self, poly):
+    def plot_poly(self, poly, info):
+        type = info['type']
+        fitness = info['fitness']
+
         x = [pt.x for pt in poly.points]
         y = [pt.y for pt in poly.points]
 
-        diam_x = max(x) - min(x)
-        diam_y = max(y) - min(y)
-
-        plt.plot(x, y, label='d_x= ' + str(diam_x) + ' d_y= ' + str(diam_y))
+        plt.plot(x, y, label=str(type) + ', fitness=' + str(round(fitness, 5)))
         plt.legend()

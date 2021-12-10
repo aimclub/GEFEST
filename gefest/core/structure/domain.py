@@ -1,7 +1,5 @@
 from typing import List, Optional, Tuple
 
-from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
-
 from gefest.core.geometry.geometry_2d import Geometry2D
 from gefest.core.structure.point import Point
 from gefest.core.structure.polygon import Polygon
@@ -65,9 +63,9 @@ class Domain:
         return abs(self.max_y - self.min_y)
 
     def contains(self, point: Point):
-        geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in self.allowed_area])
-        geom_pt = GeomPoint(point.x, point.y)
-        return geom_poly_allowed.contains(geom_pt)
+        geom_poly_allowed = Polygon(polygon_id=f'bnd_{self.name}',
+                                    points=[Point(pt[0], pt[1]) for pt in self.allowed_area])
+        return self.geometry.is_contain_point(geom_poly_allowed, point)
 
     @property
     def bound_poly(self):
