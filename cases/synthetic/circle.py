@@ -13,15 +13,15 @@ from gefest.core.viz.struct_vizualizer import StructVizualizer
 
 geometry = Geometry2D()
 domain = Domain(allowed_area=[(0, 0),
-                              (0, 100),
-                              (100, 100),
-                              (100, 0),
+                              (0, 300),
+                              (300, 300),
+                              (300, 0),
                               (0, 0)],
                 geometry=geometry,
                 max_poly_num=1,
                 min_poly_num=1,
-                max_points_num=50,
-                min_points_num=40)
+                max_points_num=40,
+                min_points_num=30)
 
 task_setup = Setup(domain=domain)
 

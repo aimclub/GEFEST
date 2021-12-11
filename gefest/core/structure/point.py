@@ -9,7 +9,7 @@ class Point:
 
     @property
     def x(self):
-        return self._x
+        return round(self._x)
 
     @x.setter
     def x(self, value):
@@ -17,7 +17,7 @@ class Point:
 
     @property
     def y(self):
-        return self._y
+        return round(self._y)
 
     @y.setter
     def y(self, value):
@@ -25,7 +25,7 @@ class Point:
 
     @property
     def z(self):
-        return self._z
+        return round(self._z)
 
     @z.setter
     def z(self, value):
