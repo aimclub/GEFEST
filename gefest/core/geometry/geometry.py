@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from math import sqrt
+from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 
 from typing import List
 
@@ -24,19 +24,9 @@ class Geometry:
         if len(polygon.points) < 1:
             return 0
 
-        total_length = 0
-        for i in range(1, len(polygon.points)):
-            total_length += sqrt(
-                (polygon.points[i - 1].x - polygon.points[i].x) ** 2 +
-                (polygon.points[i - 1].y - polygon.points[i].y) ** 2 +
-                (polygon.points[i - 1].z - polygon.points[i].z) ** 2)
+        geom_polygon = GeomPolygon([GeomPoint(pt.x, pt.y) for pt in polygon.points])
 
-        total_length += sqrt(
-            (polygon.points[len(polygon.points) - 1].x - polygon.points[0].x) ** 2 +
-            (polygon.points[len(polygon.points) - 1].y - polygon.points[0].y) ** 2 +
-            (polygon.points[len(polygon.points) - 1].z - polygon.points[0].z) ** 2)
-
-        return total_length
+        return geom_polygon.length
 
     @abstractmethod
     def get_square(self, polygon: Polygon):

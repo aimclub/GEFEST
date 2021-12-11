@@ -7,7 +7,9 @@ from gefest.core.structure.polygon import Polygon
 
 class Domain:
     def __init__(self, name='main', allowed_area: Optional[List[Tuple]] = None,
-                 max_poly_num=4, min_dist=15, fixed_points: Optional[List[Tuple]] = None,
+                 max_poly_num=4, min_poly_num=2,
+                 max_points_num=50, min_points_num=20,
+                 min_dist=15, fixed_points: Optional[List[Tuple]] = None,
                  geometry=None):
         self.name = name
         if geometry is None:
@@ -26,6 +28,11 @@ class Domain:
         self.allowed_area = allowed_area
 
         self.max_poly_num = max_poly_num
+        self.min_poly_num = min_poly_num
+
+        self.max_points_num = max_points_num
+        self.min_points_num = min_points_num
+
         self.min_dist = min_dist
 
         self.fixed_points = [Point(p[0], p[1]) for p in fixed_points] \
@@ -54,6 +61,11 @@ class Domain:
     @property
     def len_y(self):
         return abs(self.max_y - self.min_y)
+
+    def contains(self, point: Point):
+        geom_poly_allowed = Polygon(polygon_id=f'bnd_{self.name}',
+                                    points=[Point(pt[0], pt[1]) for pt in self.allowed_area])
+        return self.geometry.is_contain_point(geom_poly_allowed, point)
 
     @property
     def bound_poly(self):

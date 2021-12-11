@@ -63,8 +63,6 @@ def crossover(s1: Structure, s2: Structure, domain: Domain, rate=0.4):
 
         for structure in new_items:
             if structure is not None:
-                # is_correct = check_constraints(structure, domain=domain, is_lightweight=True)
-                # if is_correct:
                 new_structure = structure
                 break
 

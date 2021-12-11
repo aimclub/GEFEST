@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from gefest.core.algs.geom.validation import out_of_bound, self_intersection, too_close
+from gefest.core.algs.geom.validation import out_of_bound, self_intersection, too_close, unclosed_poly
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import Polygon, Structure
 
@@ -10,6 +10,8 @@ def postprocess(structure: Structure, domain: Domain):
 
     for i, poly in enumerate(corrected_structure.polygons):
         local_structure = Structure([poly])
+        if unclosed_poly(local_structure):
+            corrected_structure.polygons[i] = _correct_unclosed_poly(poly)
         if self_intersection(local_structure):
             corrected_structure.polygons[i] = _correct_self_intersection(poly, domain)
         if out_of_bound(local_structure, domain):
@@ -25,6 +27,13 @@ def postprocess(structure: Structure, domain: Domain):
     return corrected_structure
 
 
+def _correct_unclosed_poly(poly: Polygon) -> Polygon:
+    point_to_add = poly.points[0]
+    poly.points.append(point_to_add)
+    correct_poly = poly
+    return correct_poly
+
+
 def _correct_wrong_point(poly: Polygon, domain: Domain):
     point_moved = False
     for p_id, point in enumerate(poly.points):
@@ -34,7 +43,7 @@ def _correct_wrong_point(poly: Polygon, domain: Domain):
         point.y = max(point.y, domain.min_y + domain.len_y * 0.05)
         point.x = min(point.x, domain.max_x + domain.len_x * 0.05)
         point.y = min(point.y, domain.max_y + domain.len_y * 0.05)
-        if not domain.geometry.is_contain_point(domain.bound_poly, point):
+        if not domain.contains(point):
             new_point = domain.geometry.nearest_point(point, domain.bound_poly)
             poly.points[p_id] = new_point
             point_moved = True
@@ -47,7 +56,7 @@ def _correct_wrong_point(poly: Polygon, domain: Domain):
 
 def _correct_self_intersection(poly: Polygon, domain: Domain):
     # change self-intersected poly to convex
-    convex_poly = domain.geometry.get_convex(poly)
+    convex_poly = domain.geometry.get_convex(poly, domain)
     return convex_poly
 
 

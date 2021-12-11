@@ -64,7 +64,6 @@ class EvoAnalytics:
         plt.clf()
         plt.figure(figsize=(20, 10))
         plt.xticks(rotation=45)
-        # plt.rcParams['axes.titlesize'] = 30
         sns.boxplot(x=df['pop_num'], y=df['obj0'], palette="Blues")
         plt.show()
 

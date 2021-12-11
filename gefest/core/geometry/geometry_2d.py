@@ -1,9 +1,13 @@
+from typing import List
+from uuid import uuid4
+
+import bezier
+import numpy as np
 from shapely import affinity
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 from shapely.geometry.multipolygon import MultiPolygon as ShapelyMultiPolygon
 from shapely.geometry.polygon import Polygon as ShapelyPolygon
 from shapely.ops import nearest_points
-from typing import List
 
 from gefest.core.geometry.geometry import Geometry
 from gefest.core.structure.point import Point
@@ -60,9 +64,28 @@ class Geometry2D(Geometry):
         _, nearest_correct_position = nearest_points(geom_poly_1, geom_poly_2)
         return [Point(pos.x, pos.y) for pos in nearest_correct_position]
 
-    def get_convex(self, poly: 'Polygon') -> Polygon:
-        geom_poly = self._poly_to_geom(poly)
-        geom_convex = geom_poly.buffer(1)
+    def bezier_transform(self, poly: 'GeomPolygon') -> Polygon:
+        convex_poly = self._poly_to_geom(poly).convex_hull
+        points = convex_poly.boundary.xy
+
+        x = points[0]
+        y = points[1]
+        z = np.asfortranarray([x, y])
+
+        bezier_curve = bezier.Curve.from_nodes(z)
+        number_of_points = len(poly.points)
+        bezier_params = np.linspace(0, 1, number_of_points)
+
+        transform_poly = Polygon(polygon_id=str(uuid4()),
+                                 points=[(Point(bezier_curve.evaluate(param)[0][0], bezier_curve.evaluate(param)[1][0]))
+                                         for param in bezier_params])
+
+        transform_geom = self._poly_to_geom(transform_poly)
+
+        return transform_geom
+
+    def get_convex(self, poly: 'Polygon', domain: 'Domain') -> Polygon:
+        geom_convex = self.bezier_transform(poly)
 
         convex_points = []
         if isinstance(geom_convex, ShapelyMultiPolygon):
@@ -91,3 +114,26 @@ class Geometry2D(Geometry):
         distance = geom_pt_1.distance(geom_pt_2)
 
         return distance
+
+
+def create_circle(struct: 'Structure') -> 'Structure':
+    geom = Geometry2D()
+    poly = struct.polygons[0]
+
+    num_points = len(poly.points)
+    radius = geom.get_length(struct.polygons[0]) / (2 * np.pi)
+
+    x = [pt.x for pt in poly.points]
+    y = [pt.y for pt in poly.points]
+
+    center_x = round((max(x) + min(x)) / 2, 2)
+    center_y = round((max(y) + min(y)) / 2, 2)
+
+    theta = np.linspace(0, 2 * np.pi, num_points)
+    a = radius * np.cos(theta) + center_x + 2.2 * radius
+    b = radius * np.sin(theta) + center_y
+
+    struct = [Polygon(polygon_id=str(uuid4()),
+                      points=[(Point(x, y)) for x, y in zip(a, b)])]
+
+    return struct
