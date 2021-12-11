@@ -1,4 +1,3 @@
-import random
 from typing import List
 from uuid import uuid4
 
@@ -72,12 +71,13 @@ class Geometry2D(Geometry):
         y = points[1]
         z = np.asfortranarray([x, y])
 
-        curv = bezier.Curve.from_nodes(z)
+        bezier_curve = bezier.Curve.from_nodes(z)
         number_of_points = len(x)
-        S = np.linspace(0, 1, number_of_points)
+        bezier_params = np.linspace(0, 1, number_of_points)
 
         transform_poly = Polygon(polygon_id=str(uuid4()),
-                                 points=[(Point(curv.evaluate(s)[0][0], curv.evaluate(s)[1][0])) for s in S])
+                                 points=[(Point(bezier_curve.evaluate(param)[0][0], bezier_curve.evaluate(param)[1][0]))
+                                         for param in bezier_params])
 
         transform_geom = self._poly_to_geom(transform_poly)
 

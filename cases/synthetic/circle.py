@@ -20,8 +20,8 @@ domain = Domain(allowed_area=[(0, 0),
                 geometry=geometry,
                 max_poly_num=1,
                 min_poly_num=1,
-                max_points_num=150,
-                min_points_num=100)
+                max_points_num=50,
+                min_points_num=40)
 
 task_setup = Setup(domain=domain)
 
@@ -43,7 +43,7 @@ start = timeit.default_timer()
 optimized_structure = optimize(task_setup=task_setup,
                                objective_function=area_length_ratio,
                                pop_size=100,
-                               max_gens=100)
+                               max_gens=20)
 spend_time = timeit.default_timer() - start
 
 visualiser = StructVizualizer(task_setup.domain)

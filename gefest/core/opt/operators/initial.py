@@ -37,17 +37,12 @@ def initial_pop_random(size: int, domain: Domain, initial_state=None):
 
 
 def get_pop_worker(domain):
-    # print(f'Try to create size {structure_size}')
-
     is_correct = False
     while not is_correct:
         structure = get_random_structure(domain=domain)
-        # structure.plot(structure, title='Initial')
         structure = postprocess(structure, domain)
-        # structure.plot(structure, title='Initial post')
         is_correct = check_constraints(structure, is_lightweight=True, domain=domain)
 
         if is_correct:
-            # structure.plot(title='Initial correct')
             print(f'Created, domain {domain.name}')
             return structure

@@ -163,7 +163,6 @@ def get_random_point(prev_point: Point,
     while not is_correct_point and num_iter > 0:
         try:
             num_iter -= 1
-            # print('get rp', MAX_ITER - num_iter)
             pt = create_next_point(prev_point, domain)
             is_correct_point = domain.contains(pt)
 
