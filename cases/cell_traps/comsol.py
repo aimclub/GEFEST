@@ -10,19 +10,12 @@ from uuid import uuid4
 import numpy as np
 import pickledb
 
-from comsol.polygen import poly_draw
-from core.structure.structure import Structure
-
 # @author: user
 # """
+from gefest.core.structure.structure import Structure
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-import matplotlib.pyplot as plt
-from core.utils import project_root
-from core.utils import GlobalEnv
-
-global_env = GlobalEnv
 
 USE_AVG_CONST = False
 
@@ -38,12 +31,11 @@ def poly_add(model, polygons):
     return model
 
 
-def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float, str]:
+def simulate_hydrodynamics(structure: Structure, client) -> Tuple[float, float, str]:
     gc.collect()
-    client = GlobalEnv().comsol_client
     target, mean_diff, idx = _load_fitness(structure)
-    if target is None or GlobalEnv().full_save_load:
-        model, idx = _load_simulation_result(structure)
+    if target is None:
+        model, idx = _load_simulation_result(client, structure)
         if model is None:
             poly_box = []
             print('Start COMSOL')
@@ -73,7 +65,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float
                     model.evaluate('vlct_2'),
                     model.evaluate('vlct_3'),
                     model.evaluate('vlct_4'),
-                    # model.evaluate('vlct_5'),
+                    model.evaluate('vlct_5'),
                     model.evaluate('vlct_side'),
                     model.evaluate('vlct_main')]
         except Exception as ex:
@@ -101,15 +93,6 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float
             print('Speed equality violated', [abs(float(o) / np.mean(outs[0:4]) - 1) * 100 for o in outs[0:4]])
             target = 0
 
-        if with_vizualization and target > 0:
-            poly_draw(model)
-
-            if not os.path.exists('./tmp'):
-                os.mkdir('./tmp')
-
-            plt.savefig(f'./tmp/{target}.png')
-            plt.clf()
-
         client.clear()
 
         _save_fitness(structure, target, mean_diff)
@@ -119,7 +102,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float
     else:
         print(f'Cached: {target}')
 
-    return target, mean_diff, idx
+    return -target
 
 
 def _save_simulation_result(configuration, model):
@@ -140,7 +123,7 @@ def _save_simulation_result(configuration, model):
     return model_uid
 
 
-def _load_simulation_result(configuration):
+def _load_simulation_result(client, configuration):
     db = pickledb.load('comsol_db.saved', False)
 
     model_uid = db.get(str(configuration))
@@ -148,7 +131,7 @@ def _load_simulation_result(configuration):
     if model_uid is False:
         return None, None
 
-    model = GlobalEnv().comsol_client.load(f'./models/{model_uid}.mph')
+    model = client.load(f'./models/{model_uid}.mph')
 
     return model, model_uid
 

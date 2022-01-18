@@ -1,8 +1,11 @@
 import random
+from functools import partial
 
 import matplotlib.pyplot as plt
 import numpy as np
+import mph
 
+from cases.cell_traps.comsol import simulate_hydrodynamics
 from gefest.core.opt.analytics import EvoAnalytics
 from gefest.core.opt.optimize import optimize
 from gefest.core.opt.setup import Setup
@@ -14,12 +17,10 @@ random.seed(42)
 np.random.seed(42)
 
 
-def objective(struct: Structure):
-    return 0.0
-
-
 if __name__ == '__main__':
     EvoAnalytics.clear()
+
+    comsol_objective = partial(simulate_hydrodynamics, client=mph.Client(cores=12))
 
     domain = Domain(allowed_area=[(-125, 100),
                                   (-75, 155),
@@ -35,14 +36,14 @@ if __name__ == '__main__':
     task_setup = Setup(domain=domain)
 
     optimized_structure = optimize(task_setup=task_setup,
-                                   objective_function=objective,
-                                   pop_size=10,
-                                   max_gens=20)
+                                   objective_function=comsol_objective,
+                                   pop_size=100,
+                                   max_gens=200)
 
     visualiser = StructVizualizer(task_setup.domain)
     plt.figure(figsize=(7, 7))
 
-    info = {'fitness': objective(optimized_structure),
+    info = {'fitness': comsol_objective(optimized_structure),
             'type': 'prediction'}
     visualiser.plot_structure(optimized_structure, info)
 
