@@ -21,8 +21,7 @@ The workflow of the generative design is the following:
 ## Acknowledgments
 
 We acknowledge the contributors for their important impact and the participants of the numerous scientific conferences
-and workshops for their valuable advice and suggestions. The project is funded by ITMO University Students R&D project
-№621289.
+and workshops for their valuable advice and suggestions.
 
 ## Contacts
 

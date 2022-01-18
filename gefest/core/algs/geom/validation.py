@@ -43,6 +43,7 @@ def self_intersection(structure: 'Structure'):
                 _forbidden_validity(explain_validity(GeomPolygon([GeomPoint(pt.x, pt.y) for pt in poly.points])))
                 for poly in structure.polygons])
 
+
 def unclosed_poly(structure: 'Structure') -> bool:
     return any([poly.points[0] != poly.points[-1] for poly in structure.polygons])
 

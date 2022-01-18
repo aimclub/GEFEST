@@ -113,8 +113,8 @@ def add_delete_point_mutation(new_structure: Structure, polygon_to_mutate_idx, m
 
 
 def pos_change_point_mutation(new_structure: Structure, polygon_to_mutate_idx, mutate_point_idx, domain):
-    eps_x = domain.len_x / 10
-    eps_y = domain.len_y / 10
+    eps_x = round(domain.len_x / 10)
+    eps_y = round(domain.len_y / 10)
 
     displacement_x = random.randint(-eps_x, eps_x)
     displacement_y = random.randint(-eps_y, eps_y)

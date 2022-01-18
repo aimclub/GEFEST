@@ -9,8 +9,6 @@ class StructVizualizer:
         self.domain = domain
 
     def plot_structure(self, struct: Structure, info):
-        spend_time = info['spend_time']
-
         for poly in struct.polygons:
             self.plot_poly(poly, info)
 
@@ -19,7 +17,6 @@ class StructVizualizer:
         y = [pt.y for pt in boundary.points]
 
         plt.plot(x, y)
-        plt.title(f'{spend_time:.2f}, sec')
         plt.legend()
 
     def plot_poly(self, poly, info):

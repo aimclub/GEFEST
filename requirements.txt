@@ -11,4 +11,4 @@ MPh==0.7.6
 pickledb==0.9.2
 shapely==1.7.1
 bezier
-pytest==6.2.5
+pytest==5.2.0
