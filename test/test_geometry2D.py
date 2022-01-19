@@ -1,6 +1,3 @@
-# import sys
-# sys.path.append('/Users/denis/OneDrive - ITMO UNIVERSITY/NSS_work/GEFEST')
-
 import pytest
 from gefest.core.geometry.geometry_2d import Geometry2D
 from gefest.core.structure.domain import Domain
@@ -20,6 +17,7 @@ def test_Geometry2d():
         square_difference = geometry.get_square(new_poly) - geometry.get_square(poly)
 
         assert square_difference != 0
+
 
 
 
