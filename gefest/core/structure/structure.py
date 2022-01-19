@@ -64,7 +64,7 @@ def get_random_structure(domain) -> Structure:
         polygon = get_random_poly(is_large=is_large,
                                   parent_structure=structure,
                                   domain=domain)
-        if len(polygon.points) > 2:
+        if polygon is not None and len(polygon.points) > 2:
             structure.polygons.append(polygon)
         else:
             print('Wrong polygon')

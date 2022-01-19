@@ -10,19 +10,15 @@ It uses: (1) numerical modelling to simulate the interaction between object and 
 
 The basic abstractions in GEFEST are Point, Polygon, Structure and Domain.
 
-...
-
 The workflow of the generative design is the following:
 
 ![workflow](./docs/img/workflow.png)
 
-...
 
 ## Acknowledgments
 
 We acknowledge the contributors for their important impact and the participants of the numerous scientific conferences
-and workshops for their valuable advice and suggestions. The project is funded by ITMO University Students R&D project
-№621289.
+and workshops for their valuable advice and suggestions.
 
 ## Contacts
 
