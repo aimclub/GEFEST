@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 
 from gefest.core.geometry.geometry_2d import Geometry2D
@@ -5,68 +6,87 @@ from gefest.core.structure.point import Point
 from gefest.core.structure.polygon import Polygon
 
 geometry = Geometry2D()
-a = 10
-b = 20
-rectangle_points = [(0,0), (0,b), (a,b), (a,0)]
-rectange_poly = Polygon('rectangle', points=[Point(*coords) for coords in rectangle_points])
+# marking length and width for testing polygon
+poly_width = 10
+poly_length = 20
+
+# creating a testing polygon via corner points
+rectangle_points = [(0, 0), (0, poly_length), (poly_width, poly_length), (poly_width, 0)]
+rectangle_poly = Polygon('rectangle', points=[Point(*coords) for coords in rectangle_points])
+
+triangle_points = [(0, 0), (poly_width, poly_length), (0, poly_length)]
+triangle_poly = Polygon('triangle', points=[Point(*coords) for coords in triangle_points])
+
+# creating an expected rotated polygon for testing rotate_poly() function
+exp_coords = [(-poly_width / 2, poly_width / 2), (-poly_width / 2, poly_length - poly_width / 2),
+              (poly_length - poly_width / 2, poly_length - poly_width / 2),
+              (poly_length - poly_width / 2, poly_width / 2)]
+exp_rectangle_poly = Polygon(polygon_id='expected', points=[Point(*coords) for coords in exp_coords])
 
 
 def test_resize_poly():
-    """Test for resize_poly function from Geometry2D"""
+    """Test for resize_poly function from Geometry2D class"""
 
     x_scale = 2
     y_scale = 3
 
-    original_poly = rectange_poly
+    original_poly = rectangle_poly
     resized_poly = geometry.resize_poly(original_poly, x_scale=x_scale, y_scale=y_scale)
 
     resized_square = geometry.get_square(resized_poly)
     original_square = geometry.get_square(original_poly)
 
     observed_difference = resized_square - original_square
-    expected_difference = ((a*x_scale) * (b*y_scale)) - a*b
+    expected_difference = ((poly_width * x_scale) * (poly_length * y_scale)) - poly_width * poly_length
 
     assert isinstance(resized_poly, Polygon)
     assert np.isclose(observed_difference, expected_difference)
 
 
-def test_rotate_poly():
-    """Test for rotate_poly function from Geometry2D"""
+@pytest.mark.parametrize("angle, expected_poly", [(90, exp_rectangle_poly), (180, rectangle_poly)])
+def test_rotate_poly(angle, expected_poly):
+    """Test for rotate_poly function from Geometry2D class"""
 
     def getting_coords(points):
-        """Subfunction for supporting to get coordinates from Point object"""
+        """Sub function for supporting to get coordinates from Point object"""
 
         final_coords = []
         for coords in points:
             x, y, z = coords.coords()
-            final_coords.append((x,y))
+            final_coords.append((x, y))
         return final_coords
 
-    def angle_90():
-        """Testing rotate function with angle=90"""
+    rotate_poly = geometry.rotate_poly(rectangle_poly, angle=angle)
 
-        angle = 90
+    rotated_coords = getting_coords(rotate_poly.points)
+    expected_coords = getting_coords(expected_poly.points)
 
-        rotate_poly = geometry.rotate_poly(rectange_poly, angle=angle)
-        expected_poly = Polygon(polygon_id='expected', points=[Point(*coords) for coords in [(-a/2, a/2),
-                                                                                            (-a/2, b-a/2),
-                                                                                            (b-a/2, b-a/2),
-                                                                                            (b-a/2, a/2)]])
+    assert [False for i in zip(rotated_coords, expected_coords) if expected_coords != rotated_coords]
 
-        rotated_coords = getting_coords(rotate_poly.points)
-        expected_coords = getting_coords(expected_poly.points)
 
-        assert [False for i in zip(rotated_coords, expected_coords) if
-                expected_coords != rotated_coords]
+@pytest.mark.parametrize("figure, expected_poly", [(rectangle_poly, poly_width * poly_length),
+                                                   (triangle_poly, poly_width * poly_length / 2)])
+def test_get_square(figure, expected_poly):
+    """Test for get_square function from Geometry2D class"""
 
-    def angle_180():
-        """Testing rotate function with angle=180"""
-        angle = 180
+    observed_square = geometry.get_square(figure)
 
-        rotate_poly = geometry.rotate_poly(rectange_poly, angle=angle)
+    assert observed_square == expected_poly
 
-        rotated_coords = getting_coords(rotate_poly.points)
-        expected_coords = getting_coords(rectange_poly.points)
 
-        assert [False for i in zip(rotated_coords, expected_coords) if
-                expected_coords != rotated_coords]
+@pytest.mark.parametrize("figure, expected_point", [(rectangle_poly, Point(*rectangle_points[1])),
+                                                    (triangle_poly, Point(*triangle_points[1]))])
+def test_contains_point(figure, expected_point):
+    """Test for get_square function from Geometry2D class"""
+
+    assert geometry.is_contain_point(figure, expected_point)
+
+
+@pytest.mark.parametrize("figure, point, expected_point",
+                         [(rectangle_poly, Point(*rectangle_points[3]), Point(*rectangle_points[3])),
+                          (triangle_poly, Point(*triangle_points[1]), Point(*triangle_points[1]))])
+def test_nearest_point(figure, point, expected_point):
+    """Test for nearest_point function from Geometry2D class"""
+    observed_point = geometry.nearest_point(point, figure)
+
+    assert observed_point.coords() == expected_point.coords()
