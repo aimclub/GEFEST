@@ -65,12 +65,15 @@ def test_get_square(figure, expected_poly):
     assert observed_square == expected_poly
 
 
-@pytest.mark.parametrize("figure, expected_point", [(rectangle_poly, Point(*rectangle_points[1])),
-                                                    (triangle_poly, Point(*triangle_points[1]))])
-def test_contains_point(figure, expected_point):
+@pytest.mark.parametrize("figure", [rectangle_poly, triangle_poly])
+def test_contains_point(figure):
     """Test for get_square function from Geometry2D class"""
 
+    expected_point = Point(1, 3)
     assert geometry.is_contain_point(figure, expected_point)
+
+    expected_point = Point(-1, -1)
+    assert geometry.is_contain_point(figure, expected_point) is False
 
 
 @pytest.mark.parametrize("figure, point, expected_point",
