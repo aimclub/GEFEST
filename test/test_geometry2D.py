@@ -10,7 +10,7 @@ geometry = Geometry2D()
 poly_width = 10
 poly_length = 20
 
-# creating a testing polygon via corner points
+# creating a testing polygons via corner points
 rectangle_points = [(0, 0), (0, poly_length), (poly_width, poly_length), (poly_width, 0)]
 rectangle_poly = Polygon('rectangle', points=[Point(*coords) for coords in rectangle_points])
 
@@ -47,21 +47,12 @@ def test_resize_poly():
 def test_rotate_poly(angle, expected_poly):
     """Test for rotate_poly function from Geometry2D class"""
 
-    def getting_coords(points):
-        """Sub function for supporting to get coordinates from Point object"""
-
-        final_coords = []
-        for coords in points:
-            x, y, z = coords.coords()
-            final_coords.append((x, y))
-        return final_coords
-
     rotate_poly = geometry.rotate_poly(rectangle_poly, angle=angle)
 
-    rotated_coords = getting_coords(rotate_poly.points)
-    expected_coords = getting_coords(expected_poly.points)
+    rotated_coords = [tuple(coords.coords()) for coords in rotate_poly.points]
+    expected_coords = [tuple(coords.coords()) for coords in expected_poly.points]
 
-    assert [False for i in zip(rotated_coords, expected_coords) if expected_coords != rotated_coords]
+    assert set(rotated_coords).issubset(expected_coords) and len(rotated_coords) == len(expected_coords)
 
 
 @pytest.mark.parametrize("figure, expected_poly", [(rectangle_poly, poly_width * poly_length),
