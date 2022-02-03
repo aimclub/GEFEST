@@ -22,11 +22,11 @@ class Geometry2D(Geometry):
                                                x_scale, y_scale)
 
         rescaled_points = [Point(x, y) for x, y in
-                       zip(list(rescaled_geom_polygon.exterior.xy[0]),
-                           list(rescaled_geom_polygon.exterior.xy[1]))]
+                           zip(list(rescaled_geom_polygon.exterior.xy[0]),
+                               list(rescaled_geom_polygon.exterior.xy[1]))]
 
         rescaled_poly = Polygon(polygon_id=poly.id,
-                               points=rescaled_points)
+                                points=rescaled_points)
 
         return rescaled_poly
 
@@ -35,11 +35,11 @@ class Geometry2D(Geometry):
 
         rotated_geom_polygon = affinity.rotate(geom_polygon, angle, 'center')
 
-        rotated_points = set((x,y) for x, y in
+        rotated_points = set((x, y) for x, y in
                              zip(list(rotated_geom_polygon.exterior.xy[0]),
                                  list(rotated_geom_polygon.exterior.xy[1])))
         rotated_poly = Polygon(polygon_id=poly.id,
-                    points = [Point(*points) for points in rotated_points])
+                               points=[Point(*points) for points in rotated_points])
 
         return rotated_poly
 
