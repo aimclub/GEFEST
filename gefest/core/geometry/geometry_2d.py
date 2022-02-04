@@ -21,22 +21,27 @@ class Geometry2D(Geometry):
         rescaled_geom_polygon = affinity.scale(geom_polygon,
                                                x_scale, y_scale)
 
-        poly.points = [Point(x, y) for x, y in
-                       zip(list(rescaled_geom_polygon.exterior.xy[0]),
-                           list(rescaled_geom_polygon.exterior.xy[1]))]
+        rescaled_points = [Point(x, y) for x, y in
+                           zip(list(rescaled_geom_polygon.exterior.xy[0]),
+                               list(rescaled_geom_polygon.exterior.xy[1]))]
 
-        return poly
+        rescaled_poly = Polygon(polygon_id=poly.id,
+                                points=rescaled_points)
+
+        return rescaled_poly
 
     def rotate_poly(self, poly: Polygon, angle: float):
         geom_polygon = self._poly_to_geom(poly)
 
         rotated_geom_polygon = affinity.rotate(geom_polygon, angle, 'center')
 
-        poly.points = [Point(x, y) for x, y in
-                       zip(list(rotated_geom_polygon.exterior.xy[0]),
-                           list(rotated_geom_polygon.exterior.xy[1]))]
+        rotated_points = set((x, y) for x, y in
+                             zip(list(rotated_geom_polygon.exterior.xy[0]),
+                                 list(rotated_geom_polygon.exterior.xy[1])))
+        rotated_poly = Polygon(polygon_id=poly.id,
+                               points=[Point(*points) for points in rotated_points])
 
-        return poly
+        return rotated_poly
 
     def get_square(self, polygon: 'Polygon'):
         if len(polygon.points) <= 1:
