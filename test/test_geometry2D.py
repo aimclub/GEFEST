@@ -78,7 +78,7 @@ def test_contains_point(figure):
 
 @pytest.mark.parametrize("figure_1, figure_2, expected_point",
                          [(Point(*rectangle_points[3]), rectangle_poly, Point(*rectangle_points[3])),
-                          (triangle_poly, rectangle_poly, Point(0,0))])
+                          (triangle_poly, rectangle_poly, Point(0, 0))])
 def test_nearest_point(figure_1, figure_2, expected_point):
     """Test for nearest_point function from Geometry2D class"""
     observed_point = geometry.nearest_point(figure_1, figure_2)
