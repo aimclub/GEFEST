@@ -56,18 +56,14 @@ class Geometry2D(Geometry):
         geom_pt = GeomPoint(point.x, point.y)
         return geom_poly_allowed.contains(geom_pt)
 
-    def nearest_point(self, point: Point, poly: Polygon) -> Point:
+    def nearest_point(self, nearest_obj: Point or Polygon, poly: Polygon) -> Point:
         geom_poly = self._poly_to_geom(poly)
-        geom_point = GeomPoint(point.x, point.y)
-        _, nearest_correct_position = nearest_points(geom_point, geom_poly)
+        if type(nearest_obj) == Point:
+            geom_nearest_obj = GeomPoint(nearest_obj.x, nearest_obj.y)
+        elif type(nearest_obj) == Polygon:
+            geom_nearest_obj = self._poly_to_geom(nearest_obj)
+        _, nearest_correct_position = nearest_points(geom_nearest_obj, geom_poly)
         return Point(nearest_correct_position.x, nearest_correct_position.y)
-
-    def nearest_points(self, poly_1: Polygon, poly_2: Polygon) -> List[Point]:
-        geom_poly_1 = self._poly_to_geom(poly_1)
-        geom_poly_2 = self._poly_to_geom(poly_2)
-
-        _, nearest_correct_position = nearest_points(geom_poly_1, geom_poly_2)
-        return [Point(pos.x, pos.y) for pos in nearest_correct_position]
 
     def bezier_transform(self, poly: 'GeomPolygon') -> Polygon:
         convex_poly = self._poly_to_geom(poly).convex_hull
