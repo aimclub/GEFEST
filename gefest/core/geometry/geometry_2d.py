@@ -85,7 +85,7 @@ class Geometry2D(Geometry):
 
         return transform_geom
 
-    def get_convex(self, poly: 'Polygon', method: str,  domain: 'Domain') -> Polygon:
+    def get_convex(self, poly: 'Polygon', method: str) -> Polygon:
 
         method_variants = {'bezier': self._bezier_transform(poly)}
         geom_convex = method_variants[method]
