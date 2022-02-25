@@ -34,7 +34,7 @@ def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain):
     if poly_1 is poly_2 or len(poly_1.points) == 0 or len(poly_2.points) == 0:
         return 9999
 
-    nearest_pts = domain.geometry.nearest_points(poly_1, poly_2)
+    nearest_pts = domain.geometry.nearest_point(poly_1, poly_2)
     return domain.geometry.distance(nearest_pts[0], nearest_pts[1])
 
 

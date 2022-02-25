@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 from uuid import uuid4
 
 import bezier
@@ -56,20 +56,16 @@ class Geometry2D(Geometry):
         geom_pt = GeomPoint(point.x, point.y)
         return geom_poly_allowed.contains(geom_pt)
 
-    def nearest_point(self, point: Point, poly: Polygon) -> Point:
+    def nearest_point(self, nearest_obj: Union[Point, Polygon], poly: Polygon) -> Point:
         geom_poly = self._poly_to_geom(poly)
-        geom_point = GeomPoint(point.x, point.y)
-        _, nearest_correct_position = nearest_points(geom_point, geom_poly)
+        if isinstance(nearest_obj, Point):
+            geom_nearest_obj = GeomPoint(nearest_obj.x, nearest_obj.y)
+        elif isinstance(nearest_obj, Polygon):
+            geom_nearest_obj = self._poly_to_geom(nearest_obj)
+        _, nearest_correct_position = nearest_points(geom_nearest_obj, geom_poly)
         return Point(nearest_correct_position.x, nearest_correct_position.y)
 
-    def nearest_points(self, poly_1: Polygon, poly_2: Polygon) -> List[Point]:
-        geom_poly_1 = self._poly_to_geom(poly_1)
-        geom_poly_2 = self._poly_to_geom(poly_2)
-
-        _, nearest_correct_position = nearest_points(geom_poly_1, geom_poly_2)
-        return [Point(pos.x, pos.y) for pos in nearest_correct_position]
-
-    def bezier_transform(self, poly: 'GeomPolygon') -> Polygon:
+    def _bezier_transform(self, poly: 'GeomPolygon') -> Polygon:
         convex_poly = self._poly_to_geom(poly).convex_hull
         points = convex_poly.boundary.xy
 
@@ -89,17 +85,21 @@ class Geometry2D(Geometry):
 
         return transform_geom
 
-    def get_convex(self, poly: 'Polygon', domain: 'Domain') -> Polygon:
-        geom_convex = self.bezier_transform(poly)
+    def get_convex(self, poly: 'Polygon', *args, method='bezier') -> Polygon:
+        method_variants = {'bezier': self._bezier_transform(poly)}
 
-        convex_points = []
-        if isinstance(geom_convex, ShapelyMultiPolygon):
-            geom_convex = geom_convex[0]
-        if isinstance(geom_convex, ShapelyPolygon) and len(poly.points) > 2:
-            for convex_pt in [(x, y) for x, y in zip(geom_convex.exterior.coords.xy[0],
-                                                     geom_convex.exterior.coords.xy[1])]:
-                convex_points.append(Point(*convex_pt))
-        return Polygon(poly.id, convex_points)
+        if method in method_variants.keys():
+            geom_convex = method_variants[method]
+            convex_points = []
+            if isinstance(geom_convex, ShapelyMultiPolygon):
+                geom_convex = geom_convex[0]
+            if isinstance(geom_convex, ShapelyPolygon) and len(poly.points) > 2:
+                for convex_pt in [(x, y) for x, y in zip(geom_convex.exterior.coords.xy[0],
+                                                         geom_convex.exterior.coords.xy[1])]:
+                    convex_points.append(Point(*convex_pt))
+            return Polygon(poly.id, convex_points)
+        else:
+            raise KeyError(f'Unknown method: "{method}", use one of followed: {list(method_variants.keys())}')
 
     def intersects(self, poly_1: 'Polygon', poly_2: 'Polygon') -> bool:
         geom_poly_1 = self._poly_to_geom(poly_1)
@@ -114,7 +114,7 @@ class Geometry2D(Geometry):
 
     def distance(self, pt_1: Point, pt_2: Point) -> float:
         geom_pt_1 = self._pt_to_geom(pt_1)
-        geom_pt_2 = self._pt_to_geom(pt_1)
+        geom_pt_2 = self._pt_to_geom(pt_2)
 
         distance = geom_pt_1.distance(geom_pt_2)
 
