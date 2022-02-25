@@ -4,6 +4,8 @@ import numpy as np
 from gefest.core.geometry.geometry_2d import Geometry2D
 from gefest.core.structure.point import Point
 from gefest.core.structure.polygon import Polygon
+from gefest.core.structure.structure import Structure
+from gefest.core.algs.geom.validation import self_intersection
 
 geometry = Geometry2D()
 # marking length and width for testing polygon
@@ -16,6 +18,9 @@ rectangle_poly = Polygon('rectangle', points=[Point(*coords) for coords in recta
 
 triangle_points = [(0, 0), (poly_width, poly_length), (0, poly_length)]
 triangle_poly = Polygon('triangle', points=[Point(*coords) for coords in triangle_points])
+
+incorrect_points = [(0, 0), (0, poly_length), (poly_width, poly_length), (0, poly_length), (poly_width, 0)]
+incorrect_poly = Polygon('incorrect_poly', points=[Point(*coords) for coords in incorrect_points])
 
 # creating an expected rotated polygon for testing rotate_poly() function
 exp_coords = [(-poly_width / 2, poly_width / 2), (-poly_width / 2, poly_length - poly_width / 2),
@@ -84,3 +89,31 @@ def test_nearest_point(figure_1, figure_2, expected_point):
     observed_point = geometry.nearest_point(figure_1, figure_2)
 
     assert observed_point.coords() == expected_point.coords()
+
+
+def test_get_convex():
+    """Test for get_convex function from Geometry2D class"""
+    poly_to_structure = Structure([incorrect_poly])
+    assert self_intersection(poly_to_structure)
+
+    transformed_poly = geometry.get_convex(*poly_to_structure.polygons)
+    poly_to_structure = Structure([transformed_poly])
+    assert not self_intersection(poly_to_structure)
+
+
+def test_intersects():
+    """Test for intersects function from Geometry2D class"""
+    assert geometry.intersects(rectangle_poly, triangle_poly)
+
+    bounds_off_points = [(x + 100, y + 100) for x, y in incorrect_points]
+    bounds_off_poly = Polygon('bounds_off_rectangle', points=[Point(*coords) for coords in bounds_off_points])
+    assert not geometry.intersects(rectangle_poly, bounds_off_poly)
+
+
+def test_distance():
+    """Test for distance function from Geometry2D class"""
+    dist_1 = geometry.distance(rectangle_poly.points[0],
+                               rectangle_poly.points[1])
+    dist_2 = geometry.distance(rectangle_poly.points[2],
+                               rectangle_poly.points[3])
+    assert np.isclose(dist_1, dist_2)
