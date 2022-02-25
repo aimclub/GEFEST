@@ -88,7 +88,7 @@ class Geometry2D(Geometry):
     def get_convex(self, poly: 'Polygon', *args, method='bezier') -> Polygon:
         method_variants = {'bezier': self._bezier_transform(poly)}
 
-        if method in list(method_variants.keys()):
+        if method in method_variants.keys():
             geom_convex = method_variants[method]
             convex_points = []
             if isinstance(geom_convex, ShapelyMultiPolygon):
@@ -99,7 +99,7 @@ class Geometry2D(Geometry):
                     convex_points.append(Point(*convex_pt))
             return Polygon(poly.id, convex_points)
         else:
-            raise KeyError(f'Unknown method, use one of followed: {list(method_variants.keys())}')
+            raise KeyError(f'Unknown method: "{method}", use one of followed: {list(method_variants.keys())}')
 
     def intersects(self, poly_1: 'Polygon', poly_2: 'Polygon') -> bool:
         geom_poly_1 = self._poly_to_geom(poly_1)
