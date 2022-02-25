@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 
-from typing import List
+from typing import List, Union
 
 from gefest.core.structure.point import Point
 from gefest.core.structure.polygon import Polygon
@@ -49,9 +49,5 @@ class Geometry:
         pass
     
     @abstractmethod
-    def nearest_point(self, point: Point, poly: Polygon) -> Point:
-        pass
-
-    @abstractmethod
-    def nearest_points(self, poly_1: Polygon, poly_2: Polygon) -> List[Point]:
+    def nearest_point(self, nearest_obj: Union[Point, Polygon], poly: Polygon) -> Point:
         pass
