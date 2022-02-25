@@ -48,7 +48,7 @@ def test_resize_poly():
     assert np.isclose(observed_difference, expected_difference)
 
 
-@pytest.mark.parametrize("angle, expected_poly", [(90, exp_rectangle_poly), (180, rectangle_poly)])
+@pytest.mark.parametrize('angle, expected_poly', [(90, exp_rectangle_poly), (180, rectangle_poly)])
 def test_rotate_poly(angle, expected_poly):
     """Test for rotate_poly function from Geometry2D class"""
 
@@ -60,7 +60,7 @@ def test_rotate_poly(angle, expected_poly):
     assert set(rotated_coords).issubset(expected_coords) and len(rotated_coords) == len(expected_coords)
 
 
-@pytest.mark.parametrize("figure, expected_poly", [(rectangle_poly, poly_width * poly_length),
+@pytest.mark.parametrize('figure, expected_poly', [(rectangle_poly, poly_width * poly_length),
                                                    (triangle_poly, poly_width * poly_length / 2)])
 def test_get_square(figure, expected_poly):
     """Test for get_square function from Geometry2D class"""
@@ -70,7 +70,7 @@ def test_get_square(figure, expected_poly):
     assert observed_square == expected_poly
 
 
-@pytest.mark.parametrize("figure", [rectangle_poly, triangle_poly])
+@pytest.mark.parametrize('figure', [rectangle_poly, triangle_poly])
 def test_contains_point(figure):
     """Test for get_square function from Geometry2D class"""
 
@@ -81,7 +81,7 @@ def test_contains_point(figure):
     assert not geometry.is_contain_point(figure, expected_point)
 
 
-@pytest.mark.parametrize("figure_1, figure_2, expected_point",
+@pytest.mark.parametrize('figure_1, figure_2, expected_point',
                          [(Point(*rectangle_points[3]), rectangle_poly, Point(*rectangle_points[3])),
                           (triangle_poly, rectangle_poly, Point(0, 0))])
 def test_nearest_point(figure_1, figure_2, expected_point):
