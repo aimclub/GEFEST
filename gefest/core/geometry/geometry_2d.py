@@ -85,21 +85,21 @@ class Geometry2D(Geometry):
 
         return transform_geom
 
-    def get_convex(self, poly: 'Polygon', *args, method=None) -> Polygon:
-        if method is None:
-            method = 'bezier'
-
+    def get_convex(self, poly: 'Polygon', *args, method='bezier') -> Polygon:
         method_variants = {'bezier': self._bezier_transform(poly)}
-        geom_convex = method_variants[method]
 
-        convex_points = []
-        if isinstance(geom_convex, ShapelyMultiPolygon):
-            geom_convex = geom_convex[0]
-        if isinstance(geom_convex, ShapelyPolygon) and len(poly.points) > 2:
-            for convex_pt in [(x, y) for x, y in zip(geom_convex.exterior.coords.xy[0],
-                                                     geom_convex.exterior.coords.xy[1])]:
-                convex_points.append(Point(*convex_pt))
-        return Polygon(poly.id, convex_points)
+        if method in list(method_variants.keys()):
+            geom_convex = method_variants[method]
+            convex_points = []
+            if isinstance(geom_convex, ShapelyMultiPolygon):
+                geom_convex = geom_convex[0]
+            if isinstance(geom_convex, ShapelyPolygon) and len(poly.points) > 2:
+                for convex_pt in [(x, y) for x, y in zip(geom_convex.exterior.coords.xy[0],
+                                                         geom_convex.exterior.coords.xy[1])]:
+                    convex_points.append(Point(*convex_pt))
+            return Polygon(poly.id, convex_points)
+        else:
+            raise KeyError(f'Unknown method, use one of followed: {list(method_variants.keys())}')
 
     def intersects(self, poly_1: 'Polygon', poly_2: 'Polygon') -> bool:
         geom_poly_1 = self._poly_to_geom(poly_1)
