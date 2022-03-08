@@ -1,6 +1,7 @@
 from typing import List
 from uuid import uuid4
 
+import bezier
 import numpy as np
 from shapely import affinity
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon, LineString, MultiLineString
@@ -18,12 +19,12 @@ class Geometry2D(Geometry):
     """
 
     def __init__(self,
-                 is_closed=True):
+                 is_closed):
         self.is_closed = is_closed
 
     def get_coords(self, poly):
         # Transformation from shapely coords to GEFEST points for further analysis
-        if isinstance(poly, GeomPolygon):
+        if poly.type == 'Polygon':
             # Converting  shapely.Polygon to shapely.LineString translation for correct conversion
             poly = LineString(poly.exterior.coords)
         if self.is_closed or len(poly.coords.xy[0]) < 3:
@@ -103,7 +104,33 @@ class Geometry2D(Geometry):
         _, nearest_correct_position = nearest_points(geom_poly_1, geom_poly_2)  # Set of points as output
         return [Point(pos.x, pos.y) for pos in nearest_correct_position]
 
-    def get_convex(self, poly: 'Polygon') -> Polygon:
+    def bezier_transform(self, poly: 'Polygon') -> Polygon:
+        """
+        Function for bezier transformation over the polygon.
+        The polygon is transformed into a convex spherical figure without self-intersections.
+        Such transformation might be useful if you are working with round-shaped figures
+        """
+
+        poly = GeomPolygon([self._pt_to_geom(pt) for pt in poly.points])  # Transform to shapely Polygon
+        points = LineString(poly.boundary).xy  # Getting points of polygon
+
+        x = points[0]
+        y = points[1]
+        z = np.asfortranarray([x, y])  # Create a sequence of control points needed to define a bezier curve
+
+        bezier_curve = bezier.Curve.from_nodes(z)  # Bezier curve on a sequence of control points
+        number_of_points = len(poly.points)
+        bezier_params = np.linspace(0, 1, number_of_points)  # Values to put as bezier parameters
+
+        transform_poly = Polygon(polygon_id=str(uuid4()),
+                                 points=[(Point(bezier_curve.evaluate(param)[0][0], bezier_curve.evaluate(param)[1][0]))
+                                         for param in
+                                         bezier_params])  # Bezier transformation as GEFEST polygon
+
+        transform_geom = GeomPolygon([self._pt_to_geom(pt) for pt in transform_poly.points])
+        return transform_geom
+
+    def get_conv(self, poly: 'Polygon') -> Polygon:
         # Obtaining a convex polygon to avoid intersections
         if len(poly.points) < 3:
             return poly
@@ -112,6 +139,19 @@ class Geometry2D(Geometry):
         polygon = Polygon(polygon_id='tmp', points=points)
 
         return polygon
+
+    """
+    def get_convex(self, poly: 'Polygon', domain: 'Domain') -> Polygon:
+        geom_convex = self.bezier_transform(poly)
+        if not domain.is_closed:
+            geom_convex = LineString([(x, y) for x, y in zip(geom_convex.exterior.coords.xy[0][:-1],
+                                                             geom_convex.exterior.coords.xy[1][:-1])])
+
+        convex_points = []
+        points = self.get_coords(geom_convex)
+        _ = [convex_points.append(pt) for pt in points]
+        return Polygon(poly.id, convex_points)
+    """
 
     def get_centroid(self, poly: 'Polygon'):
         # Getting a point that is the center of mass of the polygon
@@ -132,13 +172,6 @@ class Geometry2D(Geometry):
         multi_geom = MultiLineString([self._poly_to_geom(poly) for poly in polygons])
         return multi_geom.is_simple
 
-    def contains(self, poly1: 'Polygon', poly2: 'Polygon'):
-        geom_polygon1 = self._poly_to_geom(poly1)
-        geom_polygon2 = GeomPolygon([self._pt_to_geom(pt) for pt in poly2.points])
-
-        is_contain = geom_polygon2.contains(geom_polygon1)
-        return is_contain
-
     def intersects_poly(self, poly_1: 'Polygon', poly_2: 'Polygon') -> bool:
         # Intersection between two polygons
         geom_poly_1 = self._poly_to_geom(poly_1)
@@ -153,7 +186,7 @@ class Geometry2D(Geometry):
         # Transformation GEFEST point to shapely Point
         return GeomPoint(pt.x, pt.y)
 
-    def min_distance(self, poly_1: 'Polygon', poly_2: 'Polygon') -> float:
+    def distance(self, poly_1: 'Polygon', poly_2: 'Polygon') -> float:
         # Smallest distance between two polygons
         geom_poly_1 = self._poly_to_geom(poly_1)
         geom_poly_2 = self._poly_to_geom(poly_2)
@@ -189,7 +222,7 @@ def create_circle(struct: 'Structure') -> 'Structure':
     a = radius * np.cos(theta) + center_x + 2.2 * radius
     b = radius * np.sin(theta) + center_y
 
-    struct = Polygon(polygon_id=str(uuid4()),
-                     points=[(Point(x, y)) for x, y in zip(a, b)])
+    struct = [Polygon(polygon_id=str(uuid4()),
+                      points=[(Point(x, y)) for x, y in zip(a, b)])]
 
     return struct

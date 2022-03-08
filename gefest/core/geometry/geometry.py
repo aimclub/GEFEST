@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from shapely.geometry import Point as GeomPoint, LineString
 
-from typing import Union
+from typing import List
 
 from gefest.core.structure.point import Point
 from gefest.core.structure.polygon import Polygon
@@ -47,17 +47,17 @@ class Geometry:
         pass
 
     @abstractmethod
-    def intersects_poly(self, poly_1: Polygon, poly_2: Polygon) -> bool:
-        pass
-
-    @abstractmethod
     def intersects(self, poly_1: Polygon, poly_2: Polygon) -> bool:
         pass
 
     @abstractmethod
-    def min_distance(self, pt_1: 'Point', pt_2: 'Point') -> float:
+    def distance(self, pt_1: 'Point', pt_2: 'Point') -> float:
         pass
 
     @abstractmethod
-    def nearest_point(self, nearest_obj: Union[Point, Polygon], poly: Polygon) -> Point:
+    def nearest_point(self, point: Point, poly: Polygon) -> Point:
+        pass
+
+    @abstractmethod
+    def nearest_points(self, poly_1: Polygon, poly_2: Polygon) -> List[Point]:
         pass
