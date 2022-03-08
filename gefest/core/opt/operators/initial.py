@@ -11,6 +11,8 @@ NUM_PROC = 1
 
 
 def initial_pop_random(size: int, domain: Domain, initial_state=None):
+    # Method for initialization of population
+
     print('Start init')
     population_new = []
 
@@ -37,12 +39,19 @@ def initial_pop_random(size: int, domain: Domain, initial_state=None):
 
 
 def get_pop_worker(domain):
-    is_correct = False
-    while not is_correct:
-        structure = get_random_structure(domain=domain)
-        structure = postprocess(structure, domain)
-        is_correct = check_constraints(structure, is_lightweight=True, domain=domain)
-
-        if is_correct:
-            print(f'Created, domain {domain.name}')
-            return structure
+    # Create a random structure and postprocess it
+    structure = get_random_structure(domain=domain)
+    structure = postprocess(structure, domain, None)
+    constraints = check_constraints(structure=structure, domain=domain)
+    i = 3  # Number of postprocessing attempts
+    while constraints is not None:
+        structure = postprocess(structure, domain, constraints)
+        constraints = check_constraints(structure=structure, domain=domain)
+        i -= 1
+        if i < 0:
+            # If the number of attempts is over,
+            # a new structure is created on which postprocessing is performed
+            structure = get_random_structure(domain=domain)
+            structure = postprocess(structure, domain, constraints)
+            constraints = check_constraints(structure=structure, domain=domain)
+    return structure

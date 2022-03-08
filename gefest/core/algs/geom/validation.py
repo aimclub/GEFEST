@@ -1,52 +1,69 @@
-from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
-from shapely.validation import explain_validity
+from shapely.geometry import Point as GeomPoint, LineString
 
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.polygon import Polygon
 
-MIN_DIST = 15
+min_dist_from_boundary = 0.01
 
-min_dist_from_boundary = 1
+"""
+Here are defined general constraints on polygons.
+We define intersection between polygons in structure, self-intersection in polygons,
+out of bound for points in polygon, closeness between polygons and unclosed (for closed polygons).
+"""
 
 
-def out_of_bound(structure: 'Structure', domain=None) -> bool:
-    geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in domain.allowed_area])
+def intersection(structure: 'Structure',
+                 geometry: 'Geometry'):
+    if len(structure.polygons) < 2:
+        return 0
+    else:
+        if geometry.intersects(structure):
+            return 0
+    return 1
 
+
+def out_of_bound(structure: 'Structure', domain):
     for poly in structure.polygons:
         for pt in poly.points:
-            geom_pt = GeomPoint(pt.x, pt.y)
-            if not geom_poly_allowed.contains(geom_pt) and not \
-                    geom_poly_allowed.distance(geom_pt) < min_dist_from_boundary:
-                return True
+            if pt.x < domain.min_x + 1 or pt.x > domain.max_x - 1:
+                return 1
+            if pt.y < domain.min_y + 1 or pt.y > domain.max_y - 1:
+                return 1
+            return 0
 
-    return False
+    return 0
 
 
-def too_close(structure: 'Structure', domain: Domain) -> bool:
-    is_too_close = any(
-        [any([_pairwise_dist(poly_1, poly_2, domain) < domain.min_dist for
-              poly_2 in structure.polygons]) for poly_1
-         in structure.polygons])
-    return is_too_close
+def too_close(structure: 'Structure', domain: Domain):
+    polygons = structure.polygons
+    num_poly = len(polygons)
+
+    for i, poly in enumerate(polygons):
+        for j in range(i + 1, num_poly):
+            distance = _pairwise_dist(poly, polygons[j], domain)
+            if distance < domain.min_dist:
+                return 1
+
+    return 0
 
 
 def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain):
     if poly_1 is poly_2 or len(poly_1.points) == 0 or len(poly_2.points) == 0:
         return 9999
 
-    nearest_pts = domain.geometry.nearest_points(poly_1, poly_2)
-    return domain.geometry.distance(nearest_pts[0], nearest_pts[1])
+    return domain.geometry.distance(poly_1, poly_2)
 
 
+# The is simple method indicates that the figure is self-intersecting
 def self_intersection(structure: 'Structure'):
-    return any([len(poly.points) > 2 and
-                _forbidden_validity(explain_validity(GeomPolygon([GeomPoint(pt.x, pt.y) for pt in poly.points])))
-                for poly in structure.polygons])
+    intersected = not any([LineString([GeomPoint(pt.x, pt.y) for pt in poly.points]).is_simple
+                           for poly in structure.polygons])
+    return int(intersected)
 
 
-def unclosed_poly(structure: 'Structure') -> bool:
-    return any([poly.points[0] != poly.points[-1] for poly in structure.polygons])
-
-
-def _forbidden_validity(validity):
-    return validity != 'Valid Geometry' and 'Ring Self-intersection' not in validity
+# Checks for equality of the first and last points
+def unclosed_poly(structure: 'Structure', domain: 'Domain'):
+    if domain.is_closed:
+        return int(any([poly.points[0] != poly.points[-1] for poly in structure.polygons]))
+    else:
+        return 0
