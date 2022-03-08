@@ -95,7 +95,7 @@ def test_get_convex():
     poly_to_structure = Structure([incorrect_poly])
     assert self_intersection(poly_to_structure)
 
-    transformed_poly = geometry.get_convex(*poly_to_structure.polygons)
+    transformed_poly = geometry.get_conv(*poly_to_structure.polygons)
     poly_to_structure = Structure([transformed_poly])
     assert not self_intersection(poly_to_structure)
 
@@ -107,6 +107,8 @@ def test_intersects():
 
 def test_distance():
     """Test for distance function from Geometry2D class"""
-    dist_1 = geometry.min_distance(rectangle_poly,
-                                   triangle_poly)
-    assert np.isclose(dist_1, 0)
+    dist_1 = geometry.distance(rectangle_poly,
+                               rectangle_poly)
+    dist_2 = geometry.distance(rectangle_poly,
+                               rectangle_poly)
+    assert np.isclose(dist_1, dist_2)
