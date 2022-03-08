@@ -74,7 +74,7 @@ def get_random_poly(parent_structure: Optional[Structure],
     geometry = domain.geometry
     try:
         """
-        Function for creation random polygon.
+        Function for create random polygon.
         The main idea is to create centroids along with a neighborhood to locate the polygon.
         Neighborhood sizes range from small to large.
         The main condition for creating a neighborhood is the absence of other polygons in it.
@@ -83,9 +83,9 @@ def get_random_poly(parent_structure: Optional[Structure],
         """
 
         # Centroid with it neighborhood called occupied area
-        occupied_area = create_area(domain,
-                                    parent_structure,
-                                    geometry)
+        occupied_area = create_centroid(domain,
+                                        parent_structure,
+                                        geometry)
         if occupied_area is None:
             # If it was not possible to find the occupied area then returns None
             return None
@@ -115,17 +115,17 @@ def get_random_point(polygon: 'Polygon',
     centroid = domain.geometry.get_centroid(polygon)
     sigma = distance(centroid, structure, domain.geometry) / 3
     point = create_polygon_point(centroid, sigma)
-    max_attempts = 20  # Number of attempts to create in bound point
+    i = 20  # Number of attempts to create in bound point
     while not in_bound(point, domain):
         point = create_polygon_point(centroid, sigma)
-        max_attempts -= 1
-        if max_attempts == 0:
+        i -= 1
+        if i == 0:
             return None
     return point
 
 
 def create_poly(centroid: 'Point',
-                sigma: int,
+                sigma: 'Integer',
                 domain: 'Domain',
                 geometry: 'Geometry'):
     # Creating polygon in the neighborhood of the centroid
@@ -141,14 +141,14 @@ def create_poly(centroid: 'Point',
     if domain.is_closed:
         points.append(points[0])
 
-    poly = geometry.get_convex(Polygon('tmp', points=points))  # avoid self intersection in polygon
+    poly = geometry.get_conv(Polygon('tmp', points=points))  # avoid self intersection in polygon
 
     return poly
 
 
-def create_area(domain: 'Domain',
-                structure: 'Structure',
-                geometry: 'Geometry'):
+def create_centroid(domain: 'Domain',
+                    structure: 'Structure',
+                    geometry: 'Geometry'):
     n_poly = len(structure.polygons)  # Number of already existing polygons
     area_size = np.random.randint(low=3, high=15)  # Neighborhood compression ratio
     sigma = max(domain.max_x - domain.min_x, domain.max_y - domain.min_y) / area_size  # Neighborhood size
@@ -156,22 +156,22 @@ def create_area(domain: 'Domain',
         # In the absence of polygons, the centroid can be located anywhere
         centroid = create_random_point(domain)
     else:
-        """
-        This procedure allows to find a centroid in the neighborhood
+        """   
+        This procedure allows to find a centroid in the neighborhood 
         of which there are no other polygons.
         The minimum distance must be less than 2.5 * sigma.
         """
         centroid = create_random_point(domain)
         min_dist = distance(centroid, structure, geometry)  # Distance to the nearest polygon in the structure
-        max_attempts = 20
+        i = 20
         while min_dist < 2.5 * sigma:
             area_size = np.random.randint(low=3, high=15)
             sigma = max(domain.max_x - domain.min_x, domain.max_y - domain.min_y) / area_size
             centroid = create_random_point(domain)
             min_dist = distance(centroid, structure, geometry)
-            if max_attempts == 0:
+            if i == 0:
                 return None
-            max_attempts -= 1
+            i -= 1
 
     return centroid, sigma
 
@@ -179,15 +179,12 @@ def create_area(domain: 'Domain',
 def create_random_point(domain: 'Domain'):
     point = Point(np.random.uniform(low=domain.min_x, high=domain.max_x),
                   np.random.uniform(low=domain.min_y, high=domain.max_y))
-    while not in_bound(point, domain):
-        point = Point(np.random.uniform(low=domain.min_x, high=domain.max_x),
-                      np.random.uniform(low=domain.min_y, high=domain.max_y))
 
     return point
 
 
 def create_polygon_point(centroid: 'Point',
-                         sigma: int):
+                         sigma: 'Integer'):
     # Creating polygon point inside the neighborhood defined by the centroid
     point = Point(np.random.normal(centroid.x, sigma, 1)[0],
                   np.random.normal(centroid.y, sigma, 1)[0])
@@ -197,8 +194,11 @@ def create_polygon_point(centroid: 'Point',
 
 def in_bound(point: 'Point',
              domain: 'Domain'):
-    poly_domain = Polygon(polygon_id='tmp', points=[Point(c[0], c[1]) for c in domain.allowed_area])
-    return domain.geometry.is_contain_point(poly_domain, point)
+    if point.x < domain.min_x - 2 or point.x > domain.max_x + 2:
+        return 0
+    if point.y < domain.min_y - 2 or point.y > domain.max_y + 2:
+        return 0
+    return 1
 
 
 def distance(point: 'Point',

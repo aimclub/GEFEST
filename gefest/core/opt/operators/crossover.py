@@ -37,14 +37,14 @@ def crossover_worker(args):
     new_structure.polygons = result
 
     # Postprocessing for new structure
-    new_structure = postprocess(new_structure, domain)
+    new_structure = postprocess(new_structure, domain, None)
     constraints = check_constraints(structure=new_structure, domain=domain)
-    max_attempts = 3  # Number of postprocessing attempts
-    while not constraints:
-        new_structure = postprocess(new_structure, domain)
+    i = 3  # Number of postprocessing attempts
+    while constraints is not None:
+        new_structure = postprocess(new_structure, domain, constraints)
         constraints = check_constraints(structure=new_structure, domain=domain)
-        max_attempts -= 1
-        if max_attempts == 0:
+        i -= 1
+        if i == 0:
             # If the number of attempts is over,
             # the transformation is considered unsuccessful
             # and one of the structures is returned

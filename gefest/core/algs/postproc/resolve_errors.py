@@ -11,40 +11,19 @@ Function postprocess makes structures that satisfy the constraints given in vali
 """
 
 
-def postprocess(structure: Structure, domain: Domain):
-    """The method process given :obj:`Structure` step by step while
-    it is not correct.
-    Args:
-        structure: the :obj:`Structure` that need correcting
-        domain: the :obj:`Domain` that determinates the main
-            parameters, it needs there for checking equality between given
-            :obj:`Structure` and set parameters in the :obj:`Domain`
-    Stages of processing:
-    Methods:
-        fixed poly: If ``fixed_points`` in the :obj:`Domain` set, they will be added to the structure
-        too close: Fixing proximity between polygons, for polygons that are closer than the
-            specified threshold, one of them will be removed (exclude fixed polygons)
-        self-intersection: Change self-intersected poly to convex
-        out of allowed area: Cut :obj:`Polygon` that is out of borders by borders, than rescale it
-            down to 80%
-        unclosed polygon: Fix for open polygons by adding first :obj:`Point` to end
-    Returns:
-        checked by rules on stages before and corrected :obj:`Structure`
-    """
+def postprocess(structure: Structure, domain: Domain, constraints: 'dict'):
+    # correct_funcs = [_correct_wrong_point, _correct_closeness, _correct_self_intersection, pass, _correct_unclosed_poly]
     corrected_structure = deepcopy(structure)
 
     # Fixing each polygon in structure
-    try:
-        for i, poly in enumerate(corrected_structure.polygons):
-            local_structure = Structure([poly])
-            if unclosed_poly(local_structure, domain) and domain.is_closed:
-                corrected_structure.polygons[i] = _correct_unclosed_poly(poly)
-            if self_intersection(local_structure):
-                corrected_structure.polygons[i] = _correct_self_intersection(poly, domain)
-            if out_of_bound(local_structure, domain):
-                corrected_structure.polygons[i] = _correct_wrong_point(poly, domain)
-    except AttributeError:
-        return structure
+    for i, poly in enumerate(corrected_structure.polygons):
+        local_structure = Structure([poly])
+        if unclosed_poly(local_structure, domain) and domain.is_closed:
+            corrected_structure.polygons[i] = _correct_unclosed_poly(poly)
+        if self_intersection(local_structure):
+            corrected_structure.polygons[i] = _correct_self_intersection(poly, domain)
+        if out_of_bound(local_structure, domain):
+            corrected_structure.polygons[i] = _correct_wrong_point(poly, domain)
 
     #  Fixing proximity between polygons
     if too_close(structure, domain):
@@ -100,7 +79,7 @@ def _correct_wrong_point(poly: Polygon, domain: Domain):
 
 def _correct_self_intersection(poly: Polygon, domain: Domain):
     # Change self-intersected poly to convex
-    convex_poly = domain.geometry.get_convex(poly)
+    convex_poly = domain.geometry.get_conv(poly)
     return convex_poly
 
 
@@ -117,7 +96,7 @@ def _correct_closeness(structure: Structure, domain: Domain):
         for j in range(i + 1, num_poly):
             distance = _pairwise_dist(polygons[i], polygons[j], domain)
             if distance < domain.min_dist:
-                if polygons[i].id != 'fixed' or 'prohibited':
+                if polygons[i].id != 'fixed':
                     to_delete.append(i)  # Collecting polygon indices for deletion
 
     to_delete_poly = [structure.polygons[i] for i in np.unique(to_delete)]
@@ -129,4 +108,4 @@ def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain):
     if poly_1 is poly_2 or len(poly_1.points) == 0 or len(poly_2.points) == 0:
         return 9999
 
-    return domain.geometry.min_distance(poly_1, poly_2)
+    return domain.geometry.distance(poly_1, poly_2)
