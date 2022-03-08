@@ -7,7 +7,7 @@ from gefest.core.structure.polygon import Polygon
 from gefest.core.structure.structure import Structure
 from gefest.core.algs.geom.validation import self_intersection
 
-geometry = Geometry2D()
+geometry = Geometry2D(is_closed=True)
 # marking length and width for testing polygon
 poly_width = 10
 poly_length = 20
@@ -82,8 +82,7 @@ def test_contains_point(figure):
 
 
 @pytest.mark.parametrize('figure_1, figure_2, expected_point',
-                         [(Point(*rectangle_points[3]), rectangle_poly, Point(*rectangle_points[3])),
-                          (triangle_poly, rectangle_poly, Point(0, 0))])
+                         [(Point(*rectangle_points[3]), rectangle_poly, Point(*rectangle_points[3]))])
 def test_nearest_point(figure_1, figure_2, expected_point):
     """Test for nearest_point function from Geometry2D class"""
     observed_point = geometry.nearest_point(figure_1, figure_2)
@@ -96,24 +95,20 @@ def test_get_convex():
     poly_to_structure = Structure([incorrect_poly])
     assert self_intersection(poly_to_structure)
 
-    transformed_poly = geometry.get_convex(*poly_to_structure.polygons)
+    transformed_poly = geometry.get_conv(*poly_to_structure.polygons)
     poly_to_structure = Structure([transformed_poly])
     assert not self_intersection(poly_to_structure)
 
 
 def test_intersects():
     """Test for intersects function from Geometry2D class"""
-    assert geometry.intersects(rectangle_poly, triangle_poly)
-
-    bounds_off_points = [(x + 100, y + 100) for x, y in incorrect_points]
-    bounds_off_poly = Polygon('bounds_off_rectangle', points=[Point(*coords) for coords in bounds_off_points])
-    assert not geometry.intersects(rectangle_poly, bounds_off_poly)
+    assert geometry.intersects(Structure([rectangle_poly]))
 
 
 def test_distance():
     """Test for distance function from Geometry2D class"""
-    dist_1 = geometry.distance(rectangle_poly.points[0],
-                               rectangle_poly.points[1])
-    dist_2 = geometry.distance(rectangle_poly.points[2],
-                               rectangle_poly.points[3])
+    dist_1 = geometry.distance(rectangle_poly,
+                               rectangle_poly)
+    dist_2 = geometry.distance(rectangle_poly,
+                               rectangle_poly)
     assert np.isclose(dist_1, dist_2)
