@@ -53,10 +53,10 @@ domain = Domain(allowed_area=[(0, 0),
                               (300, 0),
                               (0, 0)],
                 geometry=geometry,
-                max_poly_num=10,
+                max_poly_num=7,
                 min_poly_num=1,
-                max_points_num=50,
-                min_points_num=10,
+                max_points_num=20,
+                min_points_num=5,
                 is_closed=is_closed)
 
 task_setup = Setup(domain=domain)

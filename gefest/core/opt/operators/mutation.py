@@ -202,14 +202,14 @@ def mutate_worker(args):
                     if not (fixed.points == [p.points for p in new_structure.polygons]):
                         new_structure.polygons.append(deepcopy(fixed))
 
-        new_structure = postprocess(new_structure, domain, None)
+        new_structure = postprocess(new_structure, domain)
         constraints = check_constraints(structure=new_structure, domain=domain)
-        i = 3  # Number of attempts to postprocess mutated structures
-        while constraints is not None:
-            new_structure = postprocess(new_structure, domain, constraints)
+        max_attempts = 3  # Number of attempts to postprocess mutated structures
+        while not constraints:
+            new_structure = postprocess(new_structure, domain)
             constraints = check_constraints(structure=new_structure, domain=domain)
-            i -= 1
-            if i == 0:
+            max_attempts -= 1
+            if max_attempts == 0:
                 # If attempts is over,
                 # mutation is considered like unsuccessful
                 return None

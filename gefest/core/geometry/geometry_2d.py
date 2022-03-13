@@ -19,12 +19,12 @@ class Geometry2D(Geometry):
     """
 
     def __init__(self,
-                 is_closed):
+                 is_closed=True):
         self.is_closed = is_closed
 
     def get_coords(self, poly):
         # Transformation from shapely coords to GEFEST points for further analysis
-        if poly.type == 'Polygon':
+        if isinstance(poly, GeomPolygon):
             # Converting  shapely.Polygon to shapely.LineString translation for correct conversion
             poly = LineString(poly.exterior.coords)
         if self.is_closed or len(poly.coords.xy[0]) < 3:
@@ -130,7 +130,7 @@ class Geometry2D(Geometry):
         transform_geom = GeomPolygon([self._pt_to_geom(pt) for pt in transform_poly.points])
         return transform_geom
 
-    def get_conv(self, poly: 'Polygon') -> Polygon:
+    def get_convex(self, poly: 'Polygon') -> Polygon:
         # Obtaining a convex polygon to avoid intersections
         if len(poly.points) < 3:
             return poly
@@ -139,19 +139,6 @@ class Geometry2D(Geometry):
         polygon = Polygon(polygon_id='tmp', points=points)
 
         return polygon
-
-    """
-    def get_convex(self, poly: 'Polygon', domain: 'Domain') -> Polygon:
-        geom_convex = self.bezier_transform(poly)
-        if not domain.is_closed:
-            geom_convex = LineString([(x, y) for x, y in zip(geom_convex.exterior.coords.xy[0][:-1],
-                                                             geom_convex.exterior.coords.xy[1][:-1])])
-
-        convex_points = []
-        points = self.get_coords(geom_convex)
-        _ = [convex_points.append(pt) for pt in points]
-        return Polygon(poly.id, convex_points)
-    """
 
     def get_centroid(self, poly: 'Polygon'):
         # Getting a point that is the center of mass of the polygon
@@ -186,7 +173,7 @@ class Geometry2D(Geometry):
         # Transformation GEFEST point to shapely Point
         return GeomPoint(pt.x, pt.y)
 
-    def distance(self, poly_1: 'Polygon', poly_2: 'Polygon') -> float:
+    def min_distance(self, poly_1: 'Polygon', poly_2: 'Polygon') -> float:
         # Smallest distance between two polygons
         geom_poly_1 = self._poly_to_geom(poly_1)
         geom_poly_2 = self._poly_to_geom(poly_2)

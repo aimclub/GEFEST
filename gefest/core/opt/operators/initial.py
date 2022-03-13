@@ -41,17 +41,17 @@ def initial_pop_random(size: int, domain: Domain, initial_state=None):
 def get_pop_worker(domain):
     # Create a random structure and postprocess it
     structure = get_random_structure(domain=domain)
-    structure = postprocess(structure, domain, None)
+    structure = postprocess(structure, domain)
     constraints = check_constraints(structure=structure, domain=domain)
-    i = 3  # Number of postprocessing attempts
-    while constraints is not None:
-        structure = postprocess(structure, domain, constraints)
+    max_attempts = 3  # Number of postprocessing attempts
+    while not constraints:
+        structure = postprocess(structure, domain)
         constraints = check_constraints(structure=structure, domain=domain)
-        i -= 1
-        if i < 0:
+        max_attempts -= 1
+        if max_attempts < 0:
             # If the number of attempts is over,
             # a new structure is created on which postprocessing is performed
             structure = get_random_structure(domain=domain)
-            structure = postprocess(structure, domain, constraints)
+            structure = postprocess(structure, domain)
             constraints = check_constraints(structure=structure, domain=domain)
     return structure
