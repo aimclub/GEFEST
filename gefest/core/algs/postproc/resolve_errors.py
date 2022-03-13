@@ -11,8 +11,7 @@ Function postprocess makes structures that satisfy the constraints given in vali
 """
 
 
-def postprocess(structure: Structure, domain: Domain, constraints: 'dict'):
-    # correct_funcs = [_correct_wrong_point, _correct_closeness, _correct_self_intersection, pass, _correct_unclosed_poly]
+def postprocess(structure: Structure, domain: Domain):
     corrected_structure = deepcopy(structure)
 
     # Fixing each polygon in structure
@@ -79,7 +78,7 @@ def _correct_wrong_point(poly: Polygon, domain: Domain):
 
 def _correct_self_intersection(poly: Polygon, domain: Domain):
     # Change self-intersected poly to convex
-    convex_poly = domain.geometry.get_conv(poly)
+    convex_poly = domain.geometry.get_convex(poly)
     return convex_poly
 
 
@@ -108,4 +107,4 @@ def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain):
     if poly_1 is poly_2 or len(poly_1.points) == 0 or len(poly_2.points) == 0:
         return 9999
 
-    return domain.geometry.distance(poly_1, poly_2)
+    return domain.geometry.min_distance(poly_1, poly_2)

@@ -43,7 +43,7 @@ class Swan:
         file_to_write.writelines(new_content)
         file_to_write.close()
 
-    def __call__(self, struct: 'Structure'):
+    def evaluate(self, struct: 'Structure'):
         polygons = struct.polygons
 
         file_to_read = open(self.path_to_input, 'r')

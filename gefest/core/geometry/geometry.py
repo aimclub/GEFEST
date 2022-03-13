@@ -43,7 +43,7 @@ class Geometry:
         pass
 
     @abstractmethod
-    def get_conv(self, poly: Polygon):
+    def get_convex(self, poly: Polygon):
         pass
 
     @abstractmethod

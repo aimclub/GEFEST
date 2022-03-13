@@ -15,23 +15,20 @@ out of bound for points in polygon, closeness between polygons and unclosed (for
 def intersection(structure: 'Structure',
                  geometry: 'Geometry'):
     if len(structure.polygons) < 2:
-        return 0
+        return False
     else:
         if geometry.intersects(structure):
-            return 0
-    return 1
+            return False
+    return True
 
 
 def out_of_bound(structure: 'Structure', domain):
+    domain_poly = domain.bound_poly
     for poly in structure.polygons:
-        for pt in poly.points:
-            if pt.x < domain.min_x + 1 or pt.x > domain.max_x - 1:
-                return 1
-            if pt.y < domain.min_y + 1 or pt.y > domain.max_y - 1:
-                return 1
-            return 0
+        if domain.geometry.intersects_poly(poly, domain_poly):
+            return True
 
-    return 0
+    return False
 
 
 def too_close(structure: 'Structure', domain: Domain):
@@ -42,16 +39,16 @@ def too_close(structure: 'Structure', domain: Domain):
         for j in range(i + 1, num_poly):
             distance = _pairwise_dist(poly, polygons[j], domain)
             if distance < domain.min_dist:
-                return 1
+                return True
 
-    return 0
+    return False
 
 
 def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain):
     if poly_1 is poly_2 or len(poly_1.points) == 0 or len(poly_2.points) == 0:
         return 9999
 
-    return domain.geometry.distance(poly_1, poly_2)
+    return domain.geometry.min_distance(poly_1, poly_2)
 
 
 # The is simple method indicates that the figure is self-intersecting
@@ -66,4 +63,4 @@ def unclosed_poly(structure: 'Structure', domain: 'Domain'):
     if domain.is_closed:
         return int(any([poly.points[0] != poly.points[-1] for poly in structure.polygons]))
     else:
-        return 0
+        return False
