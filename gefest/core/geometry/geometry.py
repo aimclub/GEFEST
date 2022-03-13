@@ -43,7 +43,7 @@ class Geometry:
         pass
 
     @abstractmethod
-    def get_conv(self, poly: Polygon):
+    def get_convex(self, poly: Polygon):
         pass
 
     @abstractmethod
@@ -51,7 +51,7 @@ class Geometry:
         pass
 
     @abstractmethod
-    def distance(self, pt_1: 'Point', pt_2: 'Point') -> float:
+    def min_distance(self, pt_1: 'Point', pt_2: 'Point') -> float:
         pass
 
     @abstractmethod

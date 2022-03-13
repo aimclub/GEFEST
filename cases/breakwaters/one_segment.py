@@ -80,7 +80,7 @@ def cost(struct: Structure):
             l = geometry.get_length(poly)
             length += l
 
-    Z, hs = swan(struct)
+    Z, hs = swan.evaluate(struct)
     loss = length / max_length + hs
 
     return loss

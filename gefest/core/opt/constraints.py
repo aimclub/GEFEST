@@ -5,13 +5,6 @@ from gefest.core.structure.structure import Structure
 
 
 def check_constraints(structure: Structure, is_lightweight: bool = False, domain=None, model_func=None):
-    keys = [
-        'out_of_bound',
-        'too_close',
-        'self_intersection',
-        'intersection',
-        'unclosed_poly',
-    ]
     try:
         if any([(poly is None or
                  len(poly.points) == 0 or
@@ -26,14 +19,13 @@ def check_constraints(structure: Structure, is_lightweight: bool = False, domain
                intersection(structure, domain.geometry),
                unclosed_poly(structure, domain)]
         structurally_correct = not any(cts)
-        constraints = dict(zip(keys, cts))
 
-        if structurally_correct:
-            return None
+        if not structurally_correct:
+            return False
     except Exception as ex:
         print(ex)
         import traceback
         print(traceback.format_exc())
         return False
 
-    return constraints
+    return structurally_correct
