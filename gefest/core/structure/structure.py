@@ -156,8 +156,8 @@ def create_area(domain: 'Domain',
         # In the absence of polygons, the centroid can be located anywhere
         centroid = create_random_point(domain)
     else:
-        """   
-        This procedure allows to find a centroid in the neighborhood 
+        """
+        This procedure allows to find a centroid in the neighborhood
         of which there are no other polygons.
         The minimum distance must be less than 2.5 * sigma.
         """
