@@ -37,8 +37,8 @@ def multi_loss(struct: Structure):
     num_polys = len(struct.polygons)
     loss = 0
     for poly in struct.polygons:
-        l = area_length_ratio(poly)
-        loss += l
+        length = area_length_ratio(poly)
+        loss += length
     L = loss + 20 * abs(num_polys - num)
 
     return L
