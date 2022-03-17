@@ -18,12 +18,12 @@ We find structure have three polygons with 20 points and 300 length.
 
 # Loss function for this task
 def len_num_ration(struct: Structure):
-    l = []
+    L = []
     p = []
     for poly in struct.polygons:
-        l.append(geometry.get_length(poly))
+        L.append(geometry.get_length(poly))
         p.append(len(poly.points))
-    length = sum(l)
+    length = sum(L)
     num_poly = len(struct.polygons)
     num_points = sum(p)
 

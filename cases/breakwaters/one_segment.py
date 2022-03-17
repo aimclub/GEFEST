@@ -14,8 +14,8 @@ from gefest.core.opt.analytics import EvoAnalytics
 """
 Here is an example of breakwaters optimization. SWAN model need to be installed.
 You can find our configuration in simulators folder in INPUT file. 
-It consist water area with two fixed breakwaters, bathymetry (specified in bathymetry folder)
-and land. Output file (wave height at each point of the water are) located is in the 'r' folder
+It consist water area with two fixed breakwaters, bathymetry (specified in bathymetry folder) and land. 
+Output file (wave height at each point of the water are) located is in the 'r' folder.
 """
 
 """
@@ -59,11 +59,11 @@ domain = Domain(allowed_area=[(min(coord_X), min(coord_Y)),
 task_setup = Setup(domain=domain)
 
 """
-Here is the preparation of the SWAN model.
-You need to set path to folder with swan.exe file.
+Here is the preparation of the SWAN model
+You need to set path to folder with swan.exe file
 Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of targets
 """
-path = 'C:/Users/jkee2/PycharmProjects/GEFEST/gefest/simulators/swan/swan_model/'
+path = '../../gefest/simulators/swan/swan_model/'
 swan = Swan(path=path,
             targets=targets,
             grid=grid,
@@ -74,14 +74,14 @@ max_length = np.linalg.norm(np.array([max(coord_X) - min(coord_X), max(coord_Y) 
 
 # Cost function defining as sum of cost of structure and wave height at the target points
 def cost(struct: Structure):
-    length = 0
+    lengths = 0
     for poly in struct.polygons:
         if poly.id != 'fixed':
-            l = geometry.get_length(poly)
-            length += l
+            length = geometry.get_length(poly)
+            lengths += length
 
     Z, hs = swan.evaluate(struct)
-    loss = length / max_length + hs
+    loss = lengths / max_length + hs
 
     return loss
 
