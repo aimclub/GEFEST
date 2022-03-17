@@ -13,8 +13,8 @@ from gefest.core.opt.analytics import EvoAnalytics
 
 """
 Here is an example of breakwaters optimization. SWAN model need to be installed.
-You can find our configuration in simulators folder in INPUT file. 
-It consist water area with two fixed breakwaters, bathymetry (specified in bathymetry folder) and land. 
+You can find our configuration in simulators folder in INPUT file.
+It consist water area with two fixed breakwaters, bathymetry (specified in bathymetry folder) and land.
 Output file (wave height at each point of the water are) located is in the 'r' folder.
 """
 
@@ -32,7 +32,7 @@ grid_target_X = 25  # X-grid coordinate of your target
 grid_target_Y = 25  # Y-grid coordinate of your target
 
 """
-Create domain grid and coordinates of your targets. 
+Create domain grid and coordinates of your targets.
 As you can see, in this exampe we consider only one target
 """
 grid = [grid_resolution_x, grid_resolution_y]
@@ -106,7 +106,7 @@ def visualize(struct: 'Structure', ax=plt):
                                                  N=numcolors)
         return cmap
 
-    Z, hs = swan(struct)
+    Z, hs = swan.evaluate(struct)
     polygons = struct.polygons
 
     Z_new = []
