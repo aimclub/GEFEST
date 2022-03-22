@@ -9,9 +9,11 @@ class Domain:
     def __init__(self, name='main', allowed_area: Optional[List[Tuple]] = None,
                  max_poly_num=4, min_poly_num=2,
                  max_points_num=50, min_points_num=20,
-                 min_dist=15, fixed_points: Optional[List[Tuple]] = None,
+                 fixed_points=None,
+                 is_closed=True,
                  geometry=None):
         self.name = name
+        self.is_closed = is_closed
         if geometry is None:
             self.geometry = Geometry2D()
         else:
@@ -33,26 +35,27 @@ class Domain:
         self.max_points_num = max_points_num
         self.min_points_num = min_points_num
 
-        self.min_dist = min_dist
+        self.min_dist = max(self.max_x - self.min_x, self.max_y - self.min_y) / 35
 
-        self.fixed_points = [Point(p[0], p[1]) for p in fixed_points] \
+        self.fixed_points = [Polygon(polygon_id='fixed', points=[Point(p[0], p[1]) for p in poly]) for poly in
+                             fixed_points] \
             if fixed_points is not None else []
 
     @property
     def min_x(self):
-        return min(p[0] for p in self.allowed_area) + self.min_dist
+        return min(p[0] for p in self.allowed_area)
 
     @property
     def max_x(self):
-        return max(p[0] for p in self.allowed_area) - self.min_dist
+        return max(p[0] for p in self.allowed_area)
 
     @property
     def min_y(self):
-        return min(p[1] for p in self.allowed_area) + self.min_dist
+        return min(p[1] for p in self.allowed_area)
 
     @property
     def max_y(self):
-        return max(p[1] for p in self.allowed_area) - self.min_dist
+        return max(p[1] for p in self.allowed_area)
 
     @property
     def len_x(self):

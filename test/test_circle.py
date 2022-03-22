@@ -7,8 +7,12 @@ from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import Structure
 
 
+"""
+Test for synthetic case with isoperimetric task
+"""
+
 def test_fast():
-    geometry = Geometry2D()
+    geometry = Geometry2D(is_closed=True)
 
     def area_length_ratio(struct: Structure):
         poly = struct.polygons[0]
@@ -31,7 +35,8 @@ def test_fast():
                     max_poly_num=1,
                     min_poly_num=1,
                     max_points_num=30,
-                    min_points_num=20)
+                    min_points_num=20,
+                    is_closed=True)
 
     task_setup = Setup(domain=domain)
 

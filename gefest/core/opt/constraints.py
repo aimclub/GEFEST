@@ -1,9 +1,10 @@
-from gefest.core.algs.geom.validation import out_of_bound, self_intersection, too_close
-from gefest.core.algs.postproc.resolve_errors import postprocess
+import copy
+
+from gefest.core.algs.geom.validation import out_of_bound, self_intersection, too_close, intersection, unclosed_poly
 from gefest.core.structure.structure import Structure
 
 
-def check_constraints(structure: Structure, is_lightweight: bool = False, domain=None, model_func=None) -> bool:
+def check_constraints(structure: Structure, is_lightweight: bool = False, domain=None, model_func=None):
     try:
         if any([(poly is None or
                  len(poly.points) == 0 or
@@ -12,18 +13,12 @@ def check_constraints(structure: Structure, is_lightweight: bool = False, domain
             print('Wrong structure - problems with points')
             return False
 
-        # final postprocessing
-        structure = postprocess(structure, domain)
-
         cts = [out_of_bound(structure, domain),
                too_close(structure, domain),
-               self_intersection(structure)]
+               self_intersection(structure),
+               intersection(structure, domain.geometry),
+               unclosed_poly(structure, domain)]
         structurally_correct = not any(cts)
-
-        if structurally_correct and not is_lightweight:
-            print('Check heavy constraint')
-            obj, _, _ = model_func(structure)
-            return -obj < 0
 
         if not structurally_correct:
             return False

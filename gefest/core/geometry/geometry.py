@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
+from shapely.geometry import Point as GeomPoint, LineString
 
 from typing import List, Union
 
@@ -8,6 +8,12 @@ from gefest.core.structure.polygon import Polygon
 
 
 class Geometry:
+    """
+    Abstract geometry class.
+    Сlass contains basic transformations of geometries, geometry properties.
+    Each of the methods is overridden for a particular dimension of the geometry.
+    """
+
     @abstractmethod
     def __init__(self):
         pass
@@ -24,7 +30,7 @@ class Geometry:
         if len(polygon.points) < 1:
             return 0
 
-        geom_polygon = GeomPolygon([GeomPoint(pt.x, pt.y) for pt in polygon.points])
+        geom_polygon = LineString([GeomPoint(pt.x, pt.y) for pt in polygon.points])
 
         return geom_polygon.length
 
@@ -45,9 +51,9 @@ class Geometry:
         pass
 
     @abstractmethod
-    def distance(self, pt_1: 'Point', pt_2: 'Point') -> float:
+    def min_distance(self, pt_1: 'Point', pt_2: 'Point') -> float:
         pass
-    
+
     @abstractmethod
     def nearest_point(self, nearest_obj: Union[Point, Polygon], poly: Polygon) -> Point:
         pass

@@ -13,9 +13,9 @@ class BaseGA:
     def __init__(self, params, calculate_objectives,
                  evolutionary_operators, task_setup: Setup,
                  visualiser=None):
-        '''
+        """
          Genetic algorithm (GA)
-        '''
+        """
 
         self.params = params
 
