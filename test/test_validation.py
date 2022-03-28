@@ -7,11 +7,11 @@ from gefest.core.algs.geom.validation import *
 
 domain = Domain()
 geometry = Geometry()
-#allowed area for Domain() is [(0, 0),
-#                              (0, 100),
-#                              (100, 100),
-#                              (100, 0)]
-
+"""allowed area for Domain() is [(0, 0),
+                                (0, 100),
+                                (100, 100),
+                                (100, 0)]
+"""
 poly_width = -10
 poly_length = -20
 
@@ -28,14 +28,18 @@ structure = Structure([rectangle_poly, triangle_poly])
 def test_intersection():
     assert intersection(structure, geometry)
 
+
 def test_out_off_bound():
     assert out_of_bound(structure, domain)
+
 
 def test_too_close():
     assert too_close(structure, domain)
 
+
 def test_self_intersection():
     assert not self_intersection(structure)
+
 
 def test_unclosed_poly():
     assert unclosed_poly(structure, domain)
