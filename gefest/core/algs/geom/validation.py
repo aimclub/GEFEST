@@ -2,6 +2,8 @@ from shapely.geometry import Point as GeomPoint, LineString
 
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.polygon import Polygon
+from gefest.core.geometry.geometry import Geometry
+from gefest.core.structure.structure import Structure
 
 min_dist_from_boundary = 0.01
 
@@ -17,7 +19,7 @@ def intersection(structure: 'Structure',
     if len(structure.polygons) < 2:
         return False
     else:
-        if geometry.intersects(structure):
+        if geometry.intersects(*structure.polygons):
             return False
     return True
 
