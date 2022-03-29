@@ -1,3 +1,5 @@
+from itertools import permutations
+
 from shapely.geometry import Point as GeomPoint, LineString
 
 from gefest.core.structure.domain import Domain
@@ -14,40 +16,33 @@ out of bound for points in polygon, closeness between polygons and unclosed (for
 """
 
 
-def intersection(structure: 'Structure',
-                 geometry: 'Geometry'):
-    if len(structure.polygons) < 2:
+def intersection(structure: 'Structure', geometry: 'Geometry'):
+    polygons = structure.polygons
+    if len(polygons) < 2:
         return False
-    else:
-        if geometry.intersects(*structure.polygons):
-            return False
-    return True
 
-
-def out_of_bound(structure: 'Structure', domain):
-    domain_poly = domain.bound_poly
-    for poly in structure.polygons:
-        if domain.geometry.intersects_poly(poly, domain_poly):
+    for poly_1, poly_2 in permutations(polygons, 2):
+        if geometry.intersects_poly(poly_1, poly_2):
             return True
 
-    return False
+
+def out_of_bound(structure: 'Structure', domain: 'Domain'):
+    domain_poly = domain.bound_poly
+    for poly in structure.polygons:
+        if not domain.geometry.is_contain_poly(poly, domain_poly):
+            return True
 
 
 def too_close(structure: 'Structure', domain: Domain):
     polygons = structure.polygons
-    num_poly = len(polygons)
-
-    for i, poly in enumerate(polygons):
-        for j in range(i + 1, num_poly):
-            distance = _pairwise_dist(poly, polygons[j], domain)
-            if distance < domain.min_dist:
-                return True
-
-    return False
+    for poly_1, poly_2 in permutations(polygons, 2):
+        distance = _pairwise_dist(poly_1, poly_2, domain)
+        if distance < domain.min_dist:
+            return True
 
 
 def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain):
-    if poly_1 is poly_2 or len(poly_1.points) == 0 or len(poly_2.points) == 0:
+    if len(poly_1.points) == 0 or len(poly_2.points) == 0:
         return 9999
 
     return domain.geometry.min_distance(poly_1, poly_2)

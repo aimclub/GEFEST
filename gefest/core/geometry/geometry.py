@@ -47,6 +47,10 @@ class Geometry:
         pass
 
     @abstractmethod
+    def intersects_poly(self, poly_1: Polygon, poly_2: Polygon) -> bool:
+        pass
+
+    @abstractmethod
     def intersects(self, poly_1: Polygon, poly_2: Polygon) -> bool:
         pass
 
