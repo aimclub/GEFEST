@@ -24,14 +24,13 @@ def intersection(structure: 'Structure',
     return True
 
 
-def out_of_bound(structure: 'Structure', domain):
+def out_of_bound(structure: 'Structure', domain: 'Domain'):
     domain_poly = domain.bound_poly
     for poly in structure.polygons:
-        if domain.geometry.intersects_poly(poly, domain_poly):
+        if domain.geometry.is_contain_poly(poly, domain_poly):
+            return False
+        else:
             return True
-
-    return False
-
 
 def too_close(structure: 'Structure', domain: Domain):
     polygons = structure.polygons

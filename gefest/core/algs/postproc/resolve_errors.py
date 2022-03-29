@@ -3,7 +3,9 @@ from copy import deepcopy
 
 from gefest.core.algs.geom.validation import out_of_bound, self_intersection, too_close, unclosed_poly, intersection
 from gefest.core.structure.domain import Domain
-from gefest.core.structure.structure import Polygon, Structure, Point
+from gefest.core.structure.point import Point
+from gefest.core.structure.polygon import Polygon
+from gefest.core.structure.structure import Structure
 
 """
 Defines methods to correct wrong structures (not satisfying the constraints)
