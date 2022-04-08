@@ -1,9 +1,13 @@
 import numpy as np
 from copy import deepcopy
+from itertools import permutations
+from collections import Counter
 
 from gefest.core.algs.geom.validation import out_of_bound, self_intersection, too_close, unclosed_poly, intersection
 from gefest.core.structure.domain import Domain
-from gefest.core.structure.structure import Polygon, Structure, Point
+from gefest.core.structure.point import Point
+from gefest.core.structure.polygon import Polygon
+from gefest.core.structure.structure import Structure
 
 """
 Defines methods to correct wrong structures (not satisfying the constraints)
@@ -14,25 +18,23 @@ Function postprocess makes structures that satisfy the constraints given in vali
 def postprocess(structure: Structure, domain: Domain):
     corrected_structure = deepcopy(structure)
 
+    # If you set fixed polygons in the domain, they will be added to the structure
+    for fixed_poly in domain.fixed_points:
+        corrected_structure.polygons.insert(0, deepcopy(fixed_poly))
+
+    # Fixing proximity between polygons
+    while too_close(corrected_structure, domain):
+        corrected_structure = _correct_closeness(corrected_structure, domain)
+
     # Fixing each polygon in structure
     for i, poly in enumerate(corrected_structure.polygons):
         local_structure = Structure([poly])
-        if unclosed_poly(local_structure, domain) and domain.is_closed:
-            corrected_structure.polygons[i] = _correct_unclosed_poly(poly)
         if self_intersection(local_structure):
             corrected_structure.polygons[i] = _correct_self_intersection(poly, domain)
-        if out_of_bound(local_structure, domain):
+        elif out_of_bound(local_structure, domain):
             corrected_structure.polygons[i] = _correct_wrong_point(poly, domain)
-
-    #  Fixing proximity between polygons
-    if too_close(structure, domain):
-        corrected_structure = _correct_closeness(corrected_structure, domain)
-
-    # If you set fixed polygons in the domain, here they are added to the structure
-    if len(corrected_structure.polygons) > 0:
-        for fixed in domain.fixed_points:
-            if not (fixed.points == [p.points for p in corrected_structure.polygons]):
-                corrected_structure.polygons.append(deepcopy(fixed))
+        elif unclosed_poly(local_structure, domain) and domain.is_closed:
+            corrected_structure.polygons[i] = _correct_unclosed_poly(poly)
 
     return corrected_structure
 
@@ -88,23 +90,20 @@ def _correct_closeness(structure: Structure, domain: Domain):
     one of them will be removed
     """
     polygons = structure.polygons
-    num_poly = len(polygons)
-    to_delete = []
+    matching = {}
+    for poly_1, poly_2 in permutations(polygons, 2):
+        distance = _pairwise_dist(poly_1, poly_2, domain)
+        if distance < domain.min_dist and poly_2.id != 'fixed':
+            matching[poly_1.id] = poly_2.id
 
-    for i in range(num_poly - 1):
-        for j in range(i + 1, num_poly):
-            distance = _pairwise_dist(polygons[i], polygons[j], domain)
-            if distance < domain.min_dist:
-                if polygons[i].id != 'fixed':
-                    to_delete.append(i)  # Collecting polygon indices for deletion
+    to_delete = Counter(matching.values()).most_common(1)[0][0]
+    corrected_structure = Structure([poly for poly in structure.polygons if poly.id != to_delete])
 
-    to_delete_poly = [structure.polygons[i] for i in np.unique(to_delete)]
-    corrected_structure = Structure(polygons=[poly for poly in structure.polygons if poly not in to_delete_poly])
     return corrected_structure
 
 
 def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain):
-    if poly_1 is poly_2 or len(poly_1.points) == 0 or len(poly_2.points) == 0:
+    if len(poly_1.points) == 0 or len(poly_2.points) == 0:
         return 9999
 
     return domain.geometry.min_distance(poly_1, poly_2)

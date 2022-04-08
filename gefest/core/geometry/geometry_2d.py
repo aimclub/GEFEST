@@ -89,6 +89,12 @@ class Geometry2D(Geometry):
         geom_pt = GeomPoint(point.x, point.y)
         return geom_poly_allowed.contains(geom_pt)
 
+    def is_contain_poly(self, poly_1: 'Polygon', poly_2: 'Polygon'):
+        # Checking if a poly_1 is inside into poly_2
+        geom_poly_allowed = GeomPolygon([self._pt_to_geom(pt) for pt in poly_2.points])
+        geom_poly = GeomPolygon([self._pt_to_geom(pt) for pt in poly_1.points])
+        return geom_poly_allowed.covers(geom_poly)
+
     def nearest_point(self, point: Point, poly: Polygon) -> Point:
         # Calculating closest point between input point and polygon.
         geom_poly = self._poly_to_geom(poly)
