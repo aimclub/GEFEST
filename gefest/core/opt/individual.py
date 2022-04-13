@@ -1,10 +1,17 @@
 from copy import deepcopy
 
+from fedot.core.optimisers.gp_comp.individual import Individual as FedotIndividual
 
-class Individual:
+
+class Individual(FedotIndividual):
     def __init__(self, genotype):
-        self.objectives = ()
-        self.analytics_objectives = []
         self.fitness = None
         self.genotype = deepcopy(genotype)
-        self.population_number = 0
+
+    @property
+    def genotype(self):
+        return self.graph
+
+    @genotype.setter
+    def genotype(self, value):
+        self.graph = value

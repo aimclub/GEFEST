@@ -4,16 +4,18 @@ from copy import deepcopy
 from multiprocessing import Pool
 
 import numpy as np
+from fedot.core.optimisers.opt_history import ParentOperator
 
 from gefest.core.algs.postproc.resolve_errors import postprocess
 from gefest.core.opt.constraints import check_constraints
+from gefest.core.opt.individual import Individual
 from gefest.core.opt.operators.initial import MAX_ITER, NUM_PROC, get_pop_worker
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import Structure, get_random_poly, get_random_point
 from gefest.core.structure.point import Point
 
 
-def mutation(structure: Structure, domain: Domain, rate=0.6):
+def mutation(individual: Individual, domain: Domain, rate=0.6):
     """
     We divide mutations into two types: points mutations and polygons mutations
     Points mutation: add/delete points, change position
@@ -23,15 +25,15 @@ def mutation(structure: Structure, domain: Domain, rate=0.6):
     random_val = random.random()
 
     if random_val > rate:
-        return structure
+        return individual
 
     is_correct = False
 
-    changes_num = len(structure.polygons)
+    changes_num = len(individual.genotype.polygons)
 
     n_iter = 0
 
-    new_structure = structure
+    new_structure = individual.genotype
 
     while not is_correct and n_iter < MAX_ITER:
         n_iter += 1
@@ -59,7 +61,7 @@ def mutation(structure: Structure, domain: Domain, rate=0.6):
     return new_structure
 
 
-def polygons_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: Domain):
+def _polygons_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: Domain):
     # Weights for each type of mutation
     polygon_drop_mutation_prob = 0.2
     polygon_add_mutation_prob = 0.2
@@ -93,7 +95,7 @@ def polygons_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: D
     return new_structure
 
 
-def add_delete_point_mutation(new_structure: Structure, polygon_to_mutate_idx, mutate_point_idx, domain):
+def _add_delete_point_mutation(new_structure: Structure, polygon_to_mutate_idx, mutate_point_idx, domain):
     # Weight for add and delete point
     point_drop_mutation_prob = 0.5
     point_add_mutation_prob = 0.5
@@ -126,7 +128,7 @@ def add_delete_point_mutation(new_structure: Structure, polygon_to_mutate_idx, m
     return new_structure
 
 
-def pos_change_point_mutation(new_structure: Structure, polygon_to_mutate_idx, mutate_point_idx, domain):
+def _pos_change_point_mutation(new_structure: Structure, polygon_to_mutate_idx, mutate_point_idx, domain):
     # Neighborhood to reposition
     eps_x = round(domain.len_x / 10)
     eps_y = round(domain.len_y / 10)
@@ -157,7 +159,7 @@ def pos_change_point_mutation(new_structure: Structure, polygon_to_mutate_idx, m
     return structure
 
 
-def points_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: Domain):
+def _points_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: Domain):
     # Choosing type of points mutation, polygon to mutate and point to mutate
 
     polygon_to_mutate = new_structure.polygons[polygon_to_mutate_idx]
@@ -169,28 +171,28 @@ def points_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: Dom
 
     case = random.randint(0, 1)
     if case == 0:
-        new_structure = add_delete_point_mutation(new_structure, polygon_to_mutate_idx, mutate_point_idx, domain)
+        new_structure = _add_delete_point_mutation(new_structure, polygon_to_mutate_idx, mutate_point_idx, domain)
     else:
-        new_structure = pos_change_point_mutation(new_structure, polygon_to_mutate_idx, mutate_point_idx, domain)
+        new_structure = _pos_change_point_mutation(new_structure, polygon_to_mutate_idx, mutate_point_idx, domain)
 
     return new_structure
 
 
 def mutate_worker(args):
-    structure, changes_num, domain = args[0], args[1], args[2]
+    individual, changes_num, domain = args[0], args[1], args[2]
     polygon_mutation_probab = 0.5
 
     try:
-        new_structure = copy.deepcopy(structure)
+        new_structure = copy.deepcopy(individual.genotype)
 
         for _ in range(changes_num):
             polygon_to_mutate_idx = random.randint(0, len(new_structure.polygons) - 1)
             case = random.random()
 
             if case < polygon_mutation_probab:
-                new_structure = polygons_mutation(new_structure, polygon_to_mutate_idx, domain)
+                new_structure = _polygons_mutation(new_structure, polygon_to_mutate_idx, domain)
             else:
-                new_structure = points_mutation(new_structure, polygon_to_mutate_idx, domain)
+                new_structure = _points_mutation(new_structure, polygon_to_mutate_idx, domain)
 
             if new_structure is None:
                 continue
@@ -214,7 +216,17 @@ def mutate_worker(args):
                 # mutation is considered like unsuccessful
                 return None
 
-        return new_structure
+        new_individual = Individual(new_structure)
+        operator = ParentOperator(operator_type='mutation',
+                                  operator_name='mutation',
+                                  parent_individuals=[
+                                      individual,
+                                  ])
+        new_individual.parent_operators = []
+        new_individual.parent_operators.extend(deepcopy((individual.parent_operators)))
+        new_individual.parent_operators.append(operator)
+
+        return new_individual
     except Exception as ex:
         print(f'Mutation error: {ex}')
         import traceback

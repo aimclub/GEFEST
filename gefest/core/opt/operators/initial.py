@@ -1,8 +1,11 @@
 from copy import deepcopy
 from multiprocessing import Pool
 
+from typing import List
+
 from gefest.core.algs.postproc.resolve_errors import postprocess
 from gefest.core.opt.constraints import check_constraints
+from gefest.core.opt.individual import Individual
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import get_random_structure
 
@@ -10,8 +13,14 @@ MAX_ITER = 50000
 NUM_PROC = 1
 
 
-def initial_pop_random(size: int, domain: Domain, initial_state=None):
-    # Method for initialization of population
+def initial_pop_random(size: int, domain: Domain, initial_state=None) -> List[Individual]:
+    """
+    Initialises the first population
+    :param size: population dise
+    :param domain: description of domain
+    :param initial_state: pre-defined initial assumption for population
+    :return: population
+    """
 
     print('Start init')
     population_new = []
@@ -35,6 +44,7 @@ def initial_pop_random(size: int, domain: Domain, initial_state=None):
     else:
         for _ in range(size):
             population_new.append(deepcopy(initial_state))
+    population_new = [Individual(genotype=gen) for gen in population_new]
     return population_new
 
 

@@ -3,6 +3,7 @@ import math
 from random import randint
 
 import numpy as np
+from fedot.core.optimisers.opt_history import OptHistory
 
 from gefest.core.opt.individual import Individual
 from gefest.core.opt.setup import Setup
@@ -27,9 +28,12 @@ class BaseGA:
         self.__init_operators()
         self.__init_populations()
 
-        self.visualiser = StructVizualizer(self.task_setup.domain)
+        self.visualiser = StructVizualizer(self.task_setup.domain) \
+            if not visualiser else visualiser
 
         self.generation_number = 0
+        self.history = OptHistory()
+        self.history.clean_results()
 
     def __init_operators(self):
         self.init_population = self.operators.init_population
@@ -37,9 +41,8 @@ class BaseGA:
         self.mutation = self.operators.mutation
 
     def __init_populations(self):
+        self._pop = self.init_population(self.params.pop_size, self.task_setup.domain)
 
-        gens = self.init_population(self.params.pop_size, self.task_setup.domain)
-        self._pop = [Individual(genotype=gen) for gen in gens]
 
     class Params:
         def __init__(self, max_gens, pop_size, crossover_rate, mutation_rate, mutation_value_rate):
@@ -88,17 +91,16 @@ class BaseGA:
             p1 = selected[pair_index]
             p2 = selected[pair_index + 1]
 
-            child_gen = self.crossover(s1=p1.genotype, s2=p2.genotype,
+            child = self.crossover(s1=p1.genotype, s2=p2.genotype,
                                        domain=self.task_setup.domain,
                                        rate=self.params.crossover_rate)
 
-            child_gen = self.mutation(structure=child_gen,
+            child = self.mutation(structure=child,
                                       domain=self.task_setup.domain,
                                       rate=self.params.mutation_rate)
 
-            if str(child_gen) != str(p1.genotype) and str(child_gen) != str(p2.genotype):
-                child = Individual(genotype=copy.deepcopy(child_gen))
+            if str(child.genotype) != str(p1.genotype) and str(child.genotype) != str(p2.genotype):
                 child.generation_number = self.generation_number
-                children.append(child)
+                children.append(deepcopy(child))
 
         return children
