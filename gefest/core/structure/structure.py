@@ -1,5 +1,5 @@
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from random import randint
 from typing import List, Optional
 
@@ -13,7 +13,7 @@ from gefest.core.structure.polygon import Polygon
 
 @dataclass
 class Structure:
-    polygons: List[Polygon]
+    polygons: List[Polygon] = field(default_factory=lambda: [])
 
     def __str__(self):
         out_str = ''
@@ -43,9 +43,9 @@ class Structure:
     def size(self):
         return sum([len(p.points) for p in self.polygons])
 
-    def plot(self, structure, domain=None, title=None):
-        x = [point._x for point in structure.polygons[0].points]
-        y = [point._y for point in structure.polygons[0].points]
+    def plot(self, title=None):
+        x = [point._x for point in self.polygons[0].points]
+        y = [point._y for point in self.polygons[0].points]
         plt.plot(x, y)
         plt.title(title)
         plt.show()

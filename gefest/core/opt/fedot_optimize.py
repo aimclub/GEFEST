@@ -18,13 +18,22 @@ from fedot.core.optimisers.graph import OptGraph, OptNode
 from fedot.core.optimisers.optimizer import GraphGenerationParams
 from fedot.core.pipelines.convert import graph_structure_as_nx_graph
 from fedot.core.utils import fedot_project_root
+from typing import Callable
+
+from gefest.core.opt.fedot_adapter import StructureAdapter
+from gefest.core.opt.operators.initial import initial_pop_random
+from gefest.core.opt.operators.mutation import mutate_worker
+from gefest.core.opt.operators.operators import default_operators
+from gefest.core.opt.setup import Setup
+from gefest.core.structure.point import Point
+from gefest.core.structure.structure import Structure
 
 random.seed(1)
 np.random.seed(1)
 
 
 def custom_metric(structure: Structure):
-    structure.show()
+    structure.plot()
     return [0]
 
 def custom_mutation(graph: OptGraph, **kwargs):
@@ -47,13 +56,13 @@ def custom_mutation(graph: OptGraph, **kwargs):
     return graph
 
 
-def optimize(task_setup: Setup, objective_function: Callable, max_gens, pop_size):
+def fedot_optimize(task_setup: Setup, objective_function: Callable, max_gens, pop_size):
     rules = [has_no_self_cycled_nodes]
 
     initial = initial_pop_random(size = pop_size, domain = task_setup.domain)
     requirements = PipelineComposerRequirements(
-        primary=nodes_types,
-        secondary=nodes_types, max_arity=1,
+        primary=['point'],
+        secondary=['point'], max_arity=1,
         max_depth=100, pop_size=5, num_of_generations=5,
         crossover_prob=0.8, mutation_prob=0.9, timeout=None)
 
@@ -64,7 +73,7 @@ def optimize(task_setup: Setup, objective_function: Callable, max_gens, pop_size
         regularization_type=RegularizationTypesEnum.none)
 
     graph_generation_params = GraphGenerationParams(
-        adapter=StructureToGraphAdapter(base_graph_class=CustomGraphModel, base_node_class=CustomGraphNode),
+        adapter=StructureAdapter(),
         rules_for_constraint=rules)
 
     optimiser = EvoGraphOptimiser(
@@ -72,20 +81,9 @@ def optimize(task_setup: Setup, objective_function: Callable, max_gens, pop_size
         metrics=[],
         parameters=optimiser_parameters,
         requirements=requirements, initial_graph=initial,
-        log=default_log(logger_name='Bayesian', verbose_level=1))
+        log=default_log(logger_name='Structural', verbose_level=1))
 
-    optimized_graph = optimiser.optimise(partial(custom_metric, data=data))
-    optimized_network = optimiser.graph_generation_params.adapter.restore(optimized_graph)
+    optimized_graph = optimiser.optimise(partial(custom_metric))
+    optimized_structure = optimiser.graph_generation_params.adapter.restore(optimized_graph)
 
-    # operators = default_operators()
-    #
-    # params = GA.Params(max_gens=max_gens, pop_size=pop_size,
-    #                    crossover_rate=0.6, mutation_rate=0.6,
-    #                    mutation_value_rate=[])
-    #
-    # _, best = GA(
-    #     params=params,
-    #     calculate_objectives=partial(calculate_objectives, model_func=objective_function),
-    #     evolutionary_operators=operators, task_setup=task_setup).solution(verbose=False)
-
-    return best.genotype
+    return optimized_structure

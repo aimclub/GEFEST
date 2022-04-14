@@ -5,7 +5,7 @@ import numpy as np
 
 from gefest.core.geometry.geometry_2d import Geometry2D, create_circle
 from gefest.core.opt.analytics import EvoAnalytics
-from gefest.core.opt.optimize import optimize
+from gefest.core.opt.fedot_optimize import fedot_optimize
 from gefest.core.opt.setup import Setup
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import Structure
@@ -63,10 +63,10 @@ task_setup = Setup(domain=domain)
 
 # Optimizing stage
 start = timeit.default_timer()
-optimized_structure = optimize(task_setup=task_setup,
-                               objective_function=multi_loss,
-                               pop_size=100,
-                               max_gens=220)
+optimized_structure = fedot_optimize(task_setup=task_setup,
+                                     objective_function=multi_loss,
+                                     pop_size=10,
+                                     max_gens=10)
 spend_time = timeit.default_timer() - start
 
 # Visualization optimized structure
