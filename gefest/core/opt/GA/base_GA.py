@@ -1,5 +1,5 @@
-import copy
 import math
+from copy import deepcopy
 from random import randint
 
 import numpy as np
@@ -41,8 +41,7 @@ class BaseGA:
         self.mutation = self.operators.mutation
 
     def __init_populations(self):
-        self._pop = self.init_population(self.params.pop_size, self.task_setup.domain)
-
+        self._pop = [Individual(s) for s in self.init_population(self.params.pop_size, self.task_setup.domain)]
 
     class Params:
         def __init__(self, max_gens, pop_size, crossover_rate, mutation_rate, mutation_value_rate):
@@ -92,15 +91,16 @@ class BaseGA:
             p2 = selected[pair_index + 1]
 
             child = self.crossover(s1=p1.genotype, s2=p2.genotype,
-                                       domain=self.task_setup.domain,
-                                       rate=self.params.crossover_rate)
+                                   domain=self.task_setup.domain,
+                                   rate=self.params.crossover_rate)
 
             child = self.mutation(structure=child,
-                                      domain=self.task_setup.domain,
-                                      rate=self.params.mutation_rate)
+                                  domain=self.task_setup.domain,
+                                  rate=self.params.mutation_rate)
 
-            if str(child.genotype) != str(p1.genotype) and str(child.genotype) != str(p2.genotype):
-                child.generation_number = self.generation_number
-                children.append(deepcopy(child))
+            if str(child) != str(p1) and str(child) != str(p2):
+                child_ind = Individual(deepcopy(child))
+                child_ind.generation_number = self.generation_number
+                children.append(child_ind)
 
         return children

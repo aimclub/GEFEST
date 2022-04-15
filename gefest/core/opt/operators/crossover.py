@@ -11,13 +11,17 @@ MAX_ITER = 50000
 NUM_PROC = 1
 
 
-def crossover_worker(args):
+def crossover_worker(*args):
     """
     One point crossover between two selected structures
     Polygons are exchanged between structures
     """
-
-    s1, s2, domain = args[0], args[1], args[2]
+    if len(args) > 0:
+        s1 = args[0]
+        s2 = args[1]
+        domain = args[2].domain
+    else:
+        s1, s2, domain = args[0][0], args[0][1], args[0][2]
 
     new_structure = copy.deepcopy(s1)
 
@@ -49,7 +53,7 @@ def crossover_worker(args):
             # the transformation is considered unsuccessful
             # and one of the structures is returned
             return s1
-    return new_structure
+    return [new_structure]
 
 
 def crossover(s1: Structure, s2: Structure, domain: Domain, rate=0.4):

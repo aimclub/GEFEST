@@ -8,9 +8,6 @@ from gefest.core.structure.polygon import Polygon
 from gefest.core.structure.structure import Structure
 
 
-
-
-
 class StructureAdapter(BaseOptimizationAdapter):
     def __init__(self, log=None):
         """
@@ -29,9 +26,9 @@ class StructureAdapter(BaseOptimizationAdapter):
 
             node = OptNode(content=content)
             node.content['params'] = {
-                           'x': point.x,
-                           'y': point.y
-                       }
+                'x': point.x,
+                'y': point.y
+            }
             return node
 
     def adapt(self, adaptee: Structure):

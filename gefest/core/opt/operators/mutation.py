@@ -15,7 +15,7 @@ from gefest.core.structure.structure import Structure, get_random_poly, get_rand
 from gefest.core.structure.point import Point
 
 
-def mutation(individual: Individual, domain: Domain, rate=0.6):
+def mutation(structure: Structure, domain: Domain, rate=0.6):
     """
     We divide mutations into two types: points mutations and polygons mutations
     Points mutation: add/delete points, change position
@@ -25,15 +25,15 @@ def mutation(individual: Individual, domain: Domain, rate=0.6):
     random_val = random.random()
 
     if random_val > rate:
-        return individual
+        return structure
 
     is_correct = False
 
-    changes_num = len(individual.genotype.polygons)
+    changes_num = len(structure.polygons)
 
     n_iter = 0
 
-    new_structure = individual.genotype
+    new_structure = deepcopy(structure)
 
     while not is_correct and n_iter < MAX_ITER:
         n_iter += 1
@@ -178,9 +178,14 @@ def _points_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: Do
     return new_structure
 
 
-def mutate_worker(structure, requirements, params, *args, **kwargs):
-    changes_num = 2
-    domain = params.domain
+def mutate_worker(*args, **kwargs):
+    if 'params' in kwargs:
+        domain = kwargs['params'].domain
+        structure = args[0]
+        changes_num = 2
+    else:
+        structure, changes_num, domain = args[0][0], args[0][1], args[0][2]
+
     polygon_mutation_probab = 0.5
 
     try:

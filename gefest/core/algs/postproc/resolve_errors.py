@@ -33,7 +33,7 @@ def postprocess(structure: Structure, domain: Domain):
             corrected_structure.polygons[i] = _correct_self_intersection(poly, domain)
         elif out_of_bound(local_structure, domain):
             corrected_structure.polygons[i] = _correct_wrong_point(poly, domain)
-        elif unclosed_poly(local_structure, domain) and domain.is_closed:
+        elif unclosed_poly(local_structure, domain) and domain.geometry.is_closed:
             corrected_structure.polygons[i] = _correct_unclosed_poly(poly)
 
     return corrected_structure

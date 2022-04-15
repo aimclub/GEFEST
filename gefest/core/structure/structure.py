@@ -138,7 +138,7 @@ def create_poly(centroid: 'Point',
         while not in_bound(point, domain):  # checking if a point is in domain
             point = create_polygon_point(centroid, sigma)
         points.append(point)
-    if domain.is_closed:
+    if domain.geometry.is_closed:
         points.append(points[0])
 
     poly = geometry.get_convex(Polygon('tmp', points=points))  # avoid self intersection in polygon

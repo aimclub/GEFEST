@@ -10,10 +10,8 @@ class Domain:
                  max_poly_num=4, min_poly_num=2,
                  max_points_num=50, min_points_num=20,
                  fixed_points=None,
-                 is_closed=True,
                  geometry=None):
         self.name = name
-        self.is_closed = is_closed
         if geometry is None:
             self.geometry = Geometry2D()
         else:

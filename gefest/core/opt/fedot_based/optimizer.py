@@ -20,7 +20,10 @@ from fedot.core.pipelines.convert import graph_structure_as_nx_graph
 from fedot.core.utils import fedot_project_root
 from typing import Callable
 
-from gefest.core.opt.fedot_adapter import StructureAdapter
+from gefest.core.opt.fedot_based.adapter import StructureAdapter
+
+from gefest.core.opt.constraints import check_constraints
+from gefest.core.opt.operators.crossover import crossover_worker
 from gefest.core.opt.operators.initial import initial_pop_random
 from gefest.core.opt.operators.mutation import mutate_worker
 from gefest.core.opt.operators.operators import default_operators
@@ -32,8 +35,8 @@ random.seed(1)
 np.random.seed(1)
 
 
-def fedot_optimize(task_setup: Setup, objective_function: Callable, max_gens, pop_size):
-    rules = []
+def optimize(task_setup: Setup, objective_function: Callable, max_gens, pop_size):
+    rules = [partial(check_constraints, domain=task_setup.domain)]
 
     initial = initial_pop_random(size=pop_size, domain=task_setup.domain)
     requirements = PipelineComposerRequirements(
@@ -45,7 +48,7 @@ def fedot_optimize(task_setup: Setup, objective_function: Callable, max_gens, po
     optimiser_parameters = GPGraphOptimiserParameters(
         genetic_scheme_type=GeneticSchemeTypesEnum.steady_state,
         mutation_types=[mutate_worker],
-        crossover_types=[CrossoverTypesEnum.none],
+        crossover_types=[crossover_worker],
         regularization_type=RegularizationTypesEnum.none)
 
     graph_generation_params = GraphGenerationParams(

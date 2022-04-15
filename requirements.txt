@@ -1,4 +1,4 @@
-fedot==0.5.2
+https://github.com/nccr-itmo/FEDOT/archive/exotic-use.zip
 cython
 pandas==1.1.0
 dataclasses==0.7; python_version < '3.7'

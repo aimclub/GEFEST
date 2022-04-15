@@ -5,7 +5,7 @@ import numpy as np
 
 from gefest.core.geometry.geometry_2d import Geometry2D, create_circle
 from gefest.core.opt.analytics import EvoAnalytics
-from gefest.core.opt.fedot_optimize import fedot_optimize
+from gefest.core.opt.fedot_based.optimizer import optimize as fedot_optimize
 from gefest.core.opt.setup import Setup
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import Structure
@@ -39,12 +39,13 @@ def multi_loss(struct: Structure):
     for poly in struct.polygons:
         length = area_length_ratio(poly)
         loss += length
-    L = loss + 20 * abs(num_polys - num)
+    loss = loss + 20 * abs(num_polys - num)
 
-    return [L]
+    return loss
 
 
-# Usual GEFEST procedure for initialization domain, geometry (with closed or unclosed polygons) and task_setup
+# Usual GEFEST procedure for initialization domain,
+# geometry (with closed or unclosed polygons) and task_setup
 is_closed = True
 geometry = Geometry2D(is_closed=is_closed)
 domain = Domain(allowed_area=[(0, 0),
@@ -56,8 +57,7 @@ domain = Domain(allowed_area=[(0, 0),
                 max_poly_num=7,
                 min_poly_num=1,
                 max_points_num=20,
-                min_points_num=5,
-                is_closed=is_closed)
+                min_points_num=5)
 
 task_setup = Setup(domain=domain)
 
@@ -65,8 +65,8 @@ task_setup = Setup(domain=domain)
 start = timeit.default_timer()
 optimized_structure = fedot_optimize(task_setup=task_setup,
                                      objective_function=multi_loss,
-                                     pop_size=10,
-                                     max_gens=10)
+                                     pop_size=100,
+                                     max_gens=100)
 spend_time = timeit.default_timer() - start
 
 # Visualization optimized structure
@@ -74,7 +74,7 @@ visualiser = StructVizualizer(task_setup.domain)
 plt.figure(figsize=(7, 7))
 
 info = {'spend_time': spend_time,
-        'fitness': multi_loss(optimized_structure)[0],
+        'fitness': multi_loss(optimized_structure),
         'type': 'prediction'}
 visualiser.plot_structure(optimized_structure, info)
 
