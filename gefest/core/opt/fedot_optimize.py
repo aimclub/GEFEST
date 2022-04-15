@@ -32,38 +32,14 @@ random.seed(1)
 np.random.seed(1)
 
 
-def custom_metric(structure: Structure):
-    structure.plot()
-    return [0]
-
-def custom_mutation(graph: OptGraph, **kwargs):
-    num_mut = 10
-    try:
-        for _ in range(num_mut):
-            rid = random.choice(range(len(graph.nodes)))
-            random_node = graph.nodes[rid]
-            other_random_node = graph.nodes[random.choice(range(len(graph.nodes)))]
-            nodes_not_cycling = (random_node.descriptive_id not in
-                                 [n.descriptive_id for n in other_random_node.ordered_subnodes_hierarchy()] and
-                                 other_random_node.descriptive_id not in
-                                 [n.descriptive_id for n in random_node.ordered_subnodes_hierarchy()])
-            if random_node.nodes_from is not None and len(random_node.nodes_from) == 0:
-                random_node.nodes_from = None
-            if nodes_not_cycling:
-                graph.operator.connect_nodes(random_node, other_random_node)
-    except Exception as ex:
-        graph.log.warn(f'Incorrect connection: {ex}')
-    return graph
-
-
 def fedot_optimize(task_setup: Setup, objective_function: Callable, max_gens, pop_size):
-    rules = [has_no_self_cycled_nodes]
+    rules = []
 
-    initial = initial_pop_random(size = pop_size, domain = task_setup.domain)
+    initial = initial_pop_random(size=pop_size, domain=task_setup.domain)
     requirements = PipelineComposerRequirements(
         primary=['point'],
         secondary=['point'], max_arity=1,
-        max_depth=100, pop_size=5, num_of_generations=5,
+        max_depth=100, pop_size=50, num_of_generations=50,
         crossover_prob=0.8, mutation_prob=0.9, timeout=None)
 
     optimiser_parameters = GPGraphOptimiserParameters(
@@ -75,6 +51,7 @@ def fedot_optimize(task_setup: Setup, objective_function: Callable, max_gens, po
     graph_generation_params = GraphGenerationParams(
         adapter=StructureAdapter(),
         rules_for_constraint=rules)
+    graph_generation_params.domain = task_setup.domain
 
     optimiser = EvoGraphOptimiser(
         graph_generation_params=graph_generation_params,
@@ -83,7 +60,7 @@ def fedot_optimize(task_setup: Setup, objective_function: Callable, max_gens, po
         requirements=requirements, initial_graph=initial,
         log=default_log(logger_name='Structural', verbose_level=1))
 
-    optimized_graph = optimiser.optimise(partial(custom_metric))
+    optimized_graph = optimiser.optimise(objective_function)
     optimized_structure = optimiser.graph_generation_params.adapter.restore(optimized_graph)
 
     return optimized_structure

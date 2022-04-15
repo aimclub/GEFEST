@@ -41,7 +41,7 @@ def multi_loss(struct: Structure):
         loss += length
     L = loss + 20 * abs(num_polys - num)
 
-    return L
+    return [L]
 
 
 # Usual GEFEST procedure for initialization domain, geometry (with closed or unclosed polygons) and task_setup
@@ -74,7 +74,7 @@ visualiser = StructVizualizer(task_setup.domain)
 plt.figure(figsize=(7, 7))
 
 info = {'spend_time': spend_time,
-        'fitness': multi_loss(optimized_structure),
+        'fitness': multi_loss(optimized_structure)[0],
         'type': 'prediction'}
 visualiser.plot_structure(optimized_structure, info)
 

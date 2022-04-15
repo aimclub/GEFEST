@@ -178,12 +178,13 @@ def _points_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: Do
     return new_structure
 
 
-def mutate_worker(args):
-    individual, changes_num, domain = args[0], args[1], args[2]
+def mutate_worker(structure, requirements, params, *args, **kwargs):
+    changes_num = 2
+    domain = params.domain
     polygon_mutation_probab = 0.5
 
     try:
-        new_structure = copy.deepcopy(individual.genotype)
+        new_structure = copy.deepcopy(structure)
 
         for _ in range(changes_num):
             polygon_to_mutate_idx = random.randint(0, len(new_structure.polygons) - 1)
@@ -203,8 +204,10 @@ def mutate_worker(args):
                     # they must be added back
                     if not (fixed.points == [p.points for p in new_structure.polygons]):
                         new_structure.polygons.append(deepcopy(fixed))
-
-        new_structure = postprocess(new_structure, domain)
+        if new_structure is not None:
+            new_structure = postprocess(new_structure, domain)
+        else:
+            new_structure = copy.deepcopy(structure)
         constraints = check_constraints(structure=new_structure, domain=domain)
         max_attempts = 3  # Number of attempts to postprocess mutated structures
         while not constraints:
@@ -216,17 +219,7 @@ def mutate_worker(args):
                 # mutation is considered like unsuccessful
                 return None
 
-        new_individual = Individual(new_structure)
-        operator = ParentOperator(operator_type='mutation',
-                                  operator_name='mutation',
-                                  parent_individuals=[
-                                      individual,
-                                  ])
-        new_individual.parent_operators = []
-        new_individual.parent_operators.extend(deepcopy((individual.parent_operators)))
-        new_individual.parent_operators.append(operator)
-
-        return new_individual
+        return new_structure
     except Exception as ex:
         print(f'Mutation error: {ex}')
         import traceback
