@@ -35,8 +35,7 @@ def test_fast():
                     max_poly_num=1,
                     min_poly_num=1,
                     max_points_num=30,
-                    min_points_num=20,
-                    is_closed=True)
+                    min_points_num=20)
 
     task_setup = Setup(domain=domain)
 

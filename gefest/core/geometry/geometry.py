@@ -15,7 +15,7 @@ class Geometry:
     """
 
     @abstractmethod
-    def __init__(self):
+    def __init__(self, is_closed):
         pass
 
     @abstractmethod

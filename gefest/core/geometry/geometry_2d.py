@@ -18,9 +18,9 @@ class Geometry2D(Geometry):
     The input receives information about the closeness of the polygon
     """
 
-    def __init__(self,
-                 is_closed=True):
+    def __init__(self, is_closed=True):
         self.is_closed = is_closed
+        super().__init__(is_closed)
 
     def get_coords(self, poly):
         # Transformation from shapely coords to GEFEST points for further analysis
