@@ -32,8 +32,6 @@ class BaseGA:
             if not visualiser else visualiser
 
         self.generation_number = 0
-        self.history = OptHistory()
-        self.history.clean_results()
 
     def __init_operators(self):
         self.init_population = self.operators.init_population
@@ -90,16 +88,16 @@ class BaseGA:
             p1 = selected[pair_index]
             p2 = selected[pair_index + 1]
 
-            child = self.crossover(s1=p1.genotype, s2=p2.genotype,
-                                   domain=self.task_setup.domain,
-                                   rate=self.params.crossover_rate)
+            child_gen = self.crossover(s1=p1.genotype, s2=p2.genotype,
+                                       domain=self.task_setup.domain,
+                                       rate=self.params.crossover_rate)
 
-            child = self.mutation(structure=child,
-                                  domain=self.task_setup.domain,
-                                  rate=self.params.mutation_rate)
+            child_gen = self.mutation(structure=child_gen,
+                                      domain=self.task_setup.domain,
+                                      rate=self.params.mutation_rate)
 
-            if str(child) != str(p1) and str(child) != str(p2):
-                child_ind = Individual(deepcopy(child))
+            if str(child_gen) != str(p1) and str(child_gen) != str(p2):
+                child_ind = Individual(deepcopy(child_gen))
                 child_ind.generation_number = self.generation_number
                 children.append(child_ind)
 

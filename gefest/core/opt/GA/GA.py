@@ -9,7 +9,6 @@ class GA(BaseGA):
 
         self.fitness()
         best = None
-        self.history.add_to_history(self._pop)
 
         while self.generation_number <= self.params.max_gens:
             print(f'Generation {self.generation_number}')
@@ -31,7 +30,7 @@ class GA(BaseGA):
             best = sorted(self._pop, key=lambda x: x.fitness)[0]
 
             print(f'Best fitness is {best.fitness}')
-            self.history.add_to_history(self._pop)
+
             self.generation_number += 1
 
         return self._pop, best
