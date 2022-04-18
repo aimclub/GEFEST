@@ -66,4 +66,4 @@ def optimize(task_setup: Setup, objective_function: Callable, max_gens, pop_size
     optimized_graph = optimiser.optimise(objective_function)
     optimized_structure = optimiser.graph_generation_params.adapter.restore(optimized_graph)
 
-    return optimized_structure
+    return optimized_structure, optimiser.history

@@ -63,11 +63,13 @@ task_setup = Setup(domain=domain)
 
 # Optimizing stage
 start = timeit.default_timer()
-optimized_structure = fedot_optimize(task_setup=task_setup,
-                                     objective_function=multi_loss,
-                                     pop_size=100,
-                                     max_gens=100)
+optimized_structure, history = fedot_optimize(task_setup=task_setup,
+                                              objective_function=multi_loss,
+                                              pop_size=100,
+                                              max_gens=100)
 spend_time = timeit.default_timer() - start
+
+history.show()
 
 # Visualization optimized structure
 visualiser = StructVizualizer(task_setup.domain)
@@ -86,4 +88,4 @@ info = {'spend_time': spend_time,
 visualiser.plot_structure(true_circle, info)
 
 plt.show()
-EvoAnalytics.create_boxplot()
+# EvoAnalytics.create_boxplot()

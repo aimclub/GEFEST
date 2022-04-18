@@ -192,6 +192,7 @@ def mutate_worker(*args, **kwargs):
         new_structure = copy.deepcopy(structure)
 
         for _ in range(changes_num):
+            new_structure = copy.deepcopy(structure) if new_structure is None else new_structure
             polygon_to_mutate_idx = random.randint(0, len(new_structure.polygons) - 1)
             case = random.random()
 
@@ -222,7 +223,7 @@ def mutate_worker(*args, **kwargs):
             if max_attempts == 0:
                 # If attempts is over,
                 # mutation is considered like unsuccessful
-                return None
+                return deepcopy(structure)
 
         return new_structure
     except Exception as ex:
