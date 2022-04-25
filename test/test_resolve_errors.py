@@ -18,7 +18,7 @@ out_bounds_rectangle_poly = Polygon('rectangle', points=[Point(*coords) for coor
 triangle_points = [(1, 1), (poly_width, poly_length), (1, poly_length)]
 unclosed_triangle_poly = Polygon('triangle', points=[Point(*coords) for coords in triangle_points])
 
-incorrect_points = [(3, 3), (3, poly_length), (poly_width, poly_length), (3, poly_length), (poly_width, 5)]
+incorrect_points = [(5, 5), (5, poly_length), (8, poly_length), (5, 5), (5, 30)]
 incorrect_poly = Polygon('incorrect_poly', points=[Point(*coords) for coords in incorrect_points])
 
 domain = Domain()
