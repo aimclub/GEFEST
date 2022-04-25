@@ -24,6 +24,7 @@ def intersection(structure: 'Structure', geometry: 'Geometry'):
     for poly_1, poly_2 in permutations(polygons, 2):
         if geometry.intersects_poly(poly_1, poly_2):
             return True
+    return False
 
 
 def out_of_bound(structure: 'Structure', domain: 'Domain'):
@@ -31,6 +32,7 @@ def out_of_bound(structure: 'Structure', domain: 'Domain'):
     for poly in structure.polygons:
         if not domain.geometry.is_contain_poly(poly, domain_poly):
             return True
+    return False
 
 
 def too_close(structure: 'Structure', domain: Domain):
@@ -39,6 +41,7 @@ def too_close(structure: 'Structure', domain: Domain):
         distance = _pairwise_dist(poly_1, poly_2, domain)
         if distance < domain.min_dist:
             return True
+    return False
 
 
 def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain):
