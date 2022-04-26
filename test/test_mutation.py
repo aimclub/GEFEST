@@ -10,7 +10,7 @@ domain = Domain()
 x = 5
 y = 5
 rectangle_points = [(x, y), (x, y+5), (x+5, y+5), (x+5, y), (x, y)]
-structure = Structure([Polygon(f'rectangle from {x,y}', points=[Point(*coords) for coords in rectangle_points])])
+structure = Structure([Polygon(f'rectangle', points=[Point(*coords) for coords in rectangle_points])])
 
 
 def test_mutation_true():

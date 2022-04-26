@@ -55,7 +55,7 @@ def crossover_worker(args):
 def crossover(s1: Structure, s2: Structure, domain: Domain, rate=0.4):
     random_val = random.random()
     if random_val >= rate or len(s1.polygons) == 1 or len(s2.polygons) == 1:
-        # In the case when any structures consist of only one polygon,
+        # In the case when any of structures consist of only one polygon,
         # the transformation is not performed
         if random.random() > 0.5:
             return s1
