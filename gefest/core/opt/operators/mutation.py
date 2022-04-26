@@ -69,27 +69,39 @@ def polygons_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: D
     geometry = domain.geometry
     idx = polygon_to_mutate_idx
 
-    if random.random() < polygon_drop_mutation_prob and len(new_structure.polygons) > 1:
+
+    def _drop_poly():
+        if random.random() < polygon_drop_mutation_prob and len(new_structure.polygons) > 1:
         # if drop polygon from structure
-        polygon_to_remove = new_structure.polygons[idx]
-        new_structure.polygons.remove(polygon_to_remove)
-    elif random.random() < polygon_add_mutation_prob and \
+            polygon_to_remove = new_structure.polygons[idx]
+            new_structure.polygons.remove(polygon_to_remove)
+
+    def _add_poly():
+        if random.random() < polygon_add_mutation_prob and \
             len(new_structure.polygons) < domain.max_poly_num:
         # if add polygon to structure
-        new_poly = get_random_poly(parent_structure=new_structure,
-                                   domain=domain)
+            new_poly = get_random_poly(parent_structure=new_structure,
+                                    domain=domain)
         if new_poly is None:
             return new_structure
         new_structure.polygons.append(new_poly)
-    elif random.random() < polygon_rotate_mutation_prob:
+
+    def _rotate_poly():
+        if random.random() < polygon_rotate_mutation_prob:
         # if rotate polygon
-        angle = float(random.randint(-120, 120))
-        new_structure.polygons[idx] = geometry.rotate_poly(new_structure.polygons[idx], angle)
-    elif random.random() < polygon_reshape_mutation_prob:
+            angle = float(random.randint(-120, 120))
+            new_structure.polygons[idx] = geometry.rotate_poly(new_structure.polygons[idx], angle)
+
+    def _resize_poly():
+        if random.random() < polygon_reshape_mutation_prob:
         # if resize polygon
-        new_structure.polygons[idx] = geometry.resize_poly(new_structure.polygons[idx],
-                                                           x_scale=np.random.uniform(0.25, 3, 1)[0],
-                                                           y_scale=np.random.uniform(0.25, 3, 1)[0])
+            new_structure.polygons[idx] = geometry.resize_poly(new_structure.polygons[idx],
+                                                               x_scale=np.random.uniform(0.25, 3, 1)[0],
+                                                               y_scale=np.random.uniform(0.25, 3, 1)[0])
+
+    mutation_list = [_drop_poly, _add_poly, _rotate_poly, _resize_poly]
+    mutation_func = random.choice(mutation_list)
+    mutation_func()
 
     return new_structure
 

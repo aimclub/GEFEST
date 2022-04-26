@@ -4,31 +4,51 @@ from gefest.core.structure.point import Point
 from gefest.core.structure.polygon import Polygon
 from gefest.core.structure.structure import Structure
 from gefest.core.structure.domain import Domain
+from test.test_crossover import create_rectangle
 
 
-domain = Domain()
-x = 5
-y = 5
-rectangle_points = [(x, y), (x, y+5), (x+5, y+5), (x+5, y), (x, y)]
-structure = Structure([Polygon(f'rectangle', points=[Point(*coords) for coords in rectangle_points])])
+domain = Domain(min_poly_num=1, max_poly_num=3)
+geometry = domain.geometry
+structure = Structure([create_rectangle(5, 5), create_rectangle(5, 15)])
 
 
-def test_mutation_true():
+def test_mutation_poly():
+    count_del_poly = 0
+    count_add_poly = 0
+    count_rotated_poly = 0
+    count_resize_poly = 0
 
     for i in range(100):
-        mutated_structure = mutation(structure, domain)
+        mutated_structure = mutation(structure, domain, rate=0.999)
+        mutated_ids = [poly.id for poly in mutated_structure.polygons]
+        count_mutated_points = [len(p.points) for p in mutated_structure.polygons]
+        mutated_square = [geometry.get_square(poly) for poly in mutated_structure.polygons]
+        
+        if len(mutated_structure.polygons) < 2:
+            count_del_poly += 1
+        elif 'tmp' in mutated_ids:
+            count_add_poly +=1
+        
+        count_initial_points = [len(p.points) for p in structure.polygons]
+        initial_square = [geometry.get_square(poly) for poly in structure.polygons]
+        compared_points = []
+        compared_square = []
+        min_numb_polys = min(len(mutated_structure.polygons),
+                             len(structure.polygons))
+        for idx in range(min_numb_polys):
+            compared_points.append(count_initial_points[idx] == count_mutated_points[idx])
+            compared_square.append(initial_square[idx] == mutated_square[idx])
 
-        mutated_points = mutated_structure.polygons[0].points
-        initial_points = structure.polygons[0].points
-        mutated_square = domain.geometry.get_square(mutated_structure.polygons[0])
-        initial_square = domain.geometry.get_square(structure.polygons[0])
+        if any(compared_points) and any(compared_square):
+            count_rotated_poly += 1
+        elif any(compared_points) and not any(compared_square):
+            count_resize_poly += 1
 
-        if all([mutated_points != initial_points,
-                mutated_square != initial_square]):
-            assert True
+    assert all([count_del_poly > 0, count_add_poly > 0,
+                count_rotated_poly > 0, count_resize_poly > 0])
 
 
-def test_mutation_false():
+def test_mutation_not_passed():
 
     mutated_structure = mutation(structure, domain, rate=0.001)
 
