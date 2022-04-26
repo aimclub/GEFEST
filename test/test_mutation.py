@@ -23,12 +23,12 @@ def test_mutation_poly():
         mutated_ids = [poly.id for poly in mutated_structure.polygons]
         count_mutated_points = [len(p.points) for p in mutated_structure.polygons]
         mutated_square = [geometry.get_square(poly) for poly in mutated_structure.polygons]
-        
+
         if len(mutated_structure.polygons) < 2:
             count_del_poly += 1
         elif 'tmp' in mutated_ids:
-            count_add_poly +=1
-        
+            count_add_poly += 1
+
         count_initial_points = [len(p.points) for p in structure.polygons]
         initial_square = [geometry.get_square(poly) for poly in structure.polygons]
         compared_points = []

@@ -69,7 +69,6 @@ def polygons_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: D
     geometry = domain.geometry
     idx = polygon_to_mutate_idx
 
-
     def _drop_poly():
         if random.random() < polygon_drop_mutation_prob and len(new_structure.polygons) > 1:
         # if drop polygon from structure
@@ -81,7 +80,7 @@ def polygons_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: D
             len(new_structure.polygons) < domain.max_poly_num:
         # if add polygon to structure
             new_poly = get_random_poly(parent_structure=new_structure,
-                                    domain=domain)
+                                       domain=domain)
         if new_poly is None:
             return new_structure
         new_structure.polygons.append(new_poly)

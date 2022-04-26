@@ -36,7 +36,7 @@ def test_crossover_passed():
                     new_structure.polygons[1].points == expected_poly_positions[1],
                     observed_square == expected_square]):
                 crossover_counts += 1
-        
+
     assert crossover_counts > 0
 
 
