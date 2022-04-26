@@ -7,33 +7,41 @@ from gefest.core.structure.domain import Domain
 
 
 domain = Domain()
+geometry = domain.geometry
 
 
-def create_rectangle(x, y):
-    rectangle_points = [(x, y), (x, y+5), (x+5, y+5), (x+5, y), (x, y)]
+def create_rectangle(x, y, dim=5):
+    rectangle_points = [(x, y), (x, y+dim), (x+dim, y+dim), (x+dim, y), (x, y)]
     rectangle_poly = Polygon(f'rectangle_from_{x,y}', points=[Point(*coords) for coords in rectangle_points])
     return rectangle_poly
 
 
-structure_1 = Structure([create_rectangle(5, 5), create_rectangle(5, 15)])
-structure_2 = Structure([create_rectangle(15, 5), create_rectangle(15, 15)])
+structure_large = Structure([create_rectangle(5, 5), create_rectangle(5, 15)])
+structure_small = Structure([create_rectangle(15, 5, 3), create_rectangle(15, 15, 3)])
 
 
 def test_crossover_passed():
 
-    expected_poly_positions = [structure_1.polygons[0].points, structure_2.polygons[1].points]
+    expected_poly_positions = [structure_large.polygons[0].points, structure_small.polygons[1].points]
+    expected_square = geometry.get_square(structure_large.polygons[0]) + \
+                      geometry.get_square(structure_small.polygons[0])
     crossover_counts = 0
 
     for i in range(100):
-        new_structure = crossover(structure_1, structure_2, domain)
-        if all([new_structure.polygons[0].points == expected_poly_positions[0],
-                new_structure.polygons[1].points == expected_poly_positions[1]]):
-            crossover_counts += 1
+        new_structure = crossover(structure_large, structure_small, domain)
+        if len(new_structure.polygons) == 2:
+            observed_square = geometry.get_square(new_structure.polygons[0]) + \
+                              geometry.get_square(new_structure.polygons[1])
+            if all([new_structure.polygons[0].points == expected_poly_positions[0],
+                    new_structure.polygons[1].points == expected_poly_positions[1],
+                    observed_square == expected_square]):
+                crossover_counts += 1
+        
     assert crossover_counts > 0
 
 
 def test_crossover_not_passed():
 
-    new_structure = crossover(structure_1, structure_2, domain, rate=0.001)
+    new_structure = crossover(structure_large, structure_small, domain, rate=0.001)
 
-    assert any([new_structure == structure_1, new_structure == structure_2])
+    assert any([new_structure == structure_large, new_structure == structure_small])
