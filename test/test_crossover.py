@@ -28,7 +28,7 @@ def test_crossover_passed():
         new_structure = crossover(structure_1, structure_2, domain)
         if all([new_structure.polygons[0].points == expected_poly_positions[0],
                 new_structure.polygons[1].points == expected_poly_positions[1]]):
-                crossover_counts += 1
+            crossover_counts += 1
     assert crossover_counts > 0
 
 
