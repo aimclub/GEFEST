@@ -1,7 +1,5 @@
 import pytest
 from gefest.core.opt.operators.mutation import mutation
-from gefest.core.structure.point import Point
-from gefest.core.structure.polygon import Polygon
 from gefest.core.structure.structure import Structure
 from gefest.core.structure.domain import Domain
 from test.test_crossover import create_rectangle
@@ -18,7 +16,7 @@ def test_mutation_poly():
     count_rotated_poly = 0
     count_resize_poly = 0
 
-    for i in range(100):
+    for i in range(1000):
         mutated_structure = mutation(structure, domain, rate=0.999)
         mutated_ids = [poly.id for poly in mutated_structure.polygons]
         count_mutated_points = [len(p.points) for p in mutated_structure.polygons]
@@ -31,21 +29,23 @@ def test_mutation_poly():
 
         count_initial_points = [len(p.points) for p in structure.polygons]
         initial_square = [geometry.get_square(poly) for poly in structure.polygons]
-        compared_points = []
-        compared_square = []
+        compared_point_counts = []
+        compared_squares = []
         min_numb_polys = min(len(mutated_structure.polygons),
                              len(structure.polygons))
         for idx in range(min_numb_polys):
-            compared_points.append(count_initial_points[idx] == count_mutated_points[idx])
-            compared_square.append(initial_square[idx] == mutated_square[idx])
+            compared_point_counts.append(count_initial_points[idx] == count_mutated_points[idx])
+            compared_squares.append(initial_square[idx] == mutated_square[idx])
 
-        if any(compared_points) and any(compared_square):
+        if any(compared_point_counts) and any(compared_squares):
             count_rotated_poly += 1
-        elif any(compared_points) and not any(compared_square):
+        elif not any(compared_point_counts) and not any(compared_squares):
             count_resize_poly += 1
 
-    assert all([count_del_poly > 0, count_add_poly > 0,
-                count_rotated_poly > 0, count_resize_poly > 0])
+        if all([count_del_poly > 0, count_add_poly > 0,
+                count_rotated_poly > 0, count_resize_poly > 0]):
+                assert True
+                break
 
 
 def test_mutation_not_passed():
