@@ -40,12 +40,8 @@ class Structure:
         return sum([p.length for p in self.polygons])
 
     @property
-    def size(self):
-        return sum([len(p.points) for p in self.polygons])
-
-    @property
-    def size(self):
-        return sum([len(p.points) for p in self.polygons])
+    def total_points(self):
+        return [len(p.points) for p in self.polygons]
 
     def plot(self, structure, domain=None, title=None):
         x = [point._x for point in structure.polygons[0].points]
