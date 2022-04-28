@@ -23,9 +23,9 @@ from typing import Callable
 from gefest.core.opt.fedot_based.adapter import StructureAdapter
 
 from gefest.core.opt.constraints import check_constraints
-from gefest.core.opt.operators.crossover import crossover_worker
+from gefest.core.opt.operators.crossover import one_point_crossover
 from gefest.core.opt.operators.initial import initial_pop_random
-from gefest.core.opt.operators.mutation import mutate_worker
+from gefest.core.opt.operators.mutation import mutation
 from gefest.core.opt.operators.operators import default_operators
 from gefest.core.opt.setup import Setup
 from gefest.core.structure.point import Point
@@ -47,14 +47,14 @@ def optimize(task_setup: Setup, objective_function: Callable, max_gens, pop_size
 
     optimiser_parameters = GPGraphOptimiserParameters(
         genetic_scheme_type=GeneticSchemeTypesEnum.steady_state,
-        mutation_types=[mutate_worker],
-        crossover_types=[crossover_worker],
+        mutation_types=[mutation],
+        crossover_types=[one_point_crossover],
         regularization_type=RegularizationTypesEnum.none)
 
     graph_generation_params = GraphGenerationParams(
         adapter=StructureAdapter(),
         rules_for_constraint=rules)
-    graph_generation_params.domain = task_setup.domain
+    graph_generation_params.custom['domain'] = task_setup.domain
 
     optimiser = EvoGraphOptimiser(
         graph_generation_params=graph_generation_params,

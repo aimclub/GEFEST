@@ -35,7 +35,7 @@ class BaseGA:
 
     def __init_operators(self):
         self.init_population = self.operators.init_population
-        self.crossover = self.operators.crossover
+        self.crossover = self.operators.one_point_crossover
         self.mutation = self.operators.mutation
 
     def __init_populations(self):

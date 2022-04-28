@@ -2,7 +2,9 @@ import copy
 import random
 from multiprocessing import Pool
 
-from gefest.core.algs.postproc.resolve_errors import postprocess
+from fedot.core.optimisers.optimizer import GraphGenerationParams
+
+from gefest.core.algs.postproc.resolve_errors import postprocess, iterative_postprocess
 from gefest.core.opt.constraints import check_constraints
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import Structure
@@ -11,17 +13,15 @@ MAX_ITER = 50000
 NUM_PROC = 1
 
 
-def crossover_worker(*args):
+def one_point_crossover(**kwargs):
     """
     One point crossover between two selected structures
     Polygons are exchanged between structures
     """
-    if len(args) > 0:
-        s1 = args[0]
-        s2 = args[1]
-        domain = args[2].domain
-    else:
-        s1, s2, domain = args[0][0], args[0][1], args[0][2]
+
+    s1 = kwargs['graph_first']
+    s2 = kwargs['graph_second']
+    domain = kwargs['params'].custom['domain']
 
     new_structure = copy.deepcopy(s1)
 
@@ -41,44 +41,7 @@ def crossover_worker(*args):
     new_structure.polygons = result
 
     # Postprocessing for new structure
-    new_structure = postprocess(new_structure, domain)
-    constraints = check_constraints(structure=new_structure, domain=domain)
-    max_attempts = 3  # Number of postprocessing attempts
-    while not constraints:
-        new_structure = postprocess(new_structure, domain)
-        constraints = check_constraints(structure=new_structure, domain=domain)
-        max_attempts -= 1
-        if max_attempts == 0:
-            # If the number of attempts is over,
-            # the transformation is considered unsuccessful
-            # and one of the structures is returned
-            return s1
+    new_structure = iterative_postprocess(new_structure=new_structure, default_structure=s1,
+                                          domain=domain,
+                                          max_attempts=4)
     return [new_structure]
-
-
-def crossover(s1: Structure, s2: Structure, domain: Domain, rate=0.4):
-    random_val = random.random()
-    if random_val >= rate or len(s1.polygons) == 1 or len(s2.polygons) == 1:
-        # In the case when the structures consist of only one polygon,
-        # the transformation is not performed
-        if random.random() > 0.5:
-            return s1
-        else:
-            return s2
-
-    new_structure = s1
-
-    if NUM_PROC > 1:
-        # Calculations on different processor cores
-        with Pool(NUM_PROC) as p:
-            new_items = p.map(crossover_worker,
-                              [[s1, s2, domain] for _ in range(NUM_PROC)])
-    else:
-        new_items = [crossover_worker([s1, s2, domain]) for _ in range(NUM_PROC)]
-
-    for structure in new_items:
-        if structure is not None:
-            new_structure = structure
-            break
-
-    return new_structure
