@@ -9,9 +9,40 @@ from gefest.core.algs.postproc.resolve_errors import postprocess
 from gefest.core.opt.constraints import check_constraints
 from gefest.core.opt.operators.initial import MAX_ITER, NUM_PROC, get_pop_worker
 from gefest.core.structure.domain import Domain
+from gefest.core.structure.polygon import Polygon
 from gefest.core.structure.structure import Structure, get_random_poly, get_random_point
 from gefest.core.structure.point import Point
 
+
+def drop_poly(poly_to_mutate: Polygon, domain: Domain):
+    polygon_drop_mutation_prob = 0.2
+    if random.random() < polygon_drop_mutation_prob:
+        return None
+    else:
+        return poly_to_mutate
+
+def add_poly(poly_to_mutate: Polygon, domain: Domain):
+    polygon_add_mutation_prob = 0.2
+    if random.random() < polygon_add_mutation_prob:
+    # if add polygon to structure
+        new_poly = get_random_poly(parent_structure=new_structure,
+                                    domain=domain)
+    if new_poly is None:
+        return new_structure
+    new_structure.polygons.append(new_poly)
+
+def rotate_poly():
+    if random.random() < polygon_rotate_mutation_prob:
+    # if rotate polygon
+        angle = float(random.randint(-120, 120))
+        new_structure.polygons[idx] = geometry.rotate_poly(new_structure.polygons[idx], angle)
+
+def resize_poly():
+    if random.random() < polygon_reshape_mutation_prob:
+    # if resize polygon
+        new_structure.polygons[idx] = geometry.resize_poly(new_structure.polygons[idx],
+                                                            x_scale=np.random.uniform(0.25, 3, 1)[0],
+                                                            y_scale=np.random.uniform(0.25, 3, 1)[0])
 
 def mutation(structure: Structure, domain: Domain, rate=0.6):
     """
@@ -59,50 +90,20 @@ def mutation(structure: Structure, domain: Domain, rate=0.6):
     return new_structure
 
 
-def polygons_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: Domain):
+def polygons_mutation(poly_to_mutate: Polygon, domain: Domain):
     # Weights for each type of mutation
-    polygon_drop_mutation_prob = 0.2
-    polygon_add_mutation_prob = 0.2
+    
+
     polygon_rotate_mutation_prob = 0.5
     polygon_reshape_mutation_prob = 0.5
 
     geometry = domain.geometry
-    idx = polygon_to_mutate_idx
 
-    def _drop_poly():
-        if random.random() < polygon_drop_mutation_prob and len(new_structure.polygons) > 1:
-        # if drop polygon from structure
-            polygon_to_remove = new_structure.polygons[idx]
-            new_structure.polygons.remove(polygon_to_remove)
-
-    def _add_poly():
-        if random.random() < polygon_add_mutation_prob and \
-            len(new_structure.polygons) < domain.max_poly_num:
-        # if add polygon to structure
-            new_poly = get_random_poly(parent_structure=new_structure,
-                                       domain=domain)
-        if new_poly is None:
-            return new_structure
-        new_structure.polygons.append(new_poly)
-
-    def _rotate_poly():
-        if random.random() < polygon_rotate_mutation_prob:
-        # if rotate polygon
-            angle = float(random.randint(-120, 120))
-            new_structure.polygons[idx] = geometry.rotate_poly(new_structure.polygons[idx], angle)
-
-    def _resize_poly():
-        if random.random() < polygon_reshape_mutation_prob:
-        # if resize polygon
-            new_structure.polygons[idx] = geometry.resize_poly(new_structure.polygons[idx],
-                                                               x_scale=np.random.uniform(0.25, 3, 1)[0],
-                                                               y_scale=np.random.uniform(0.25, 3, 1)[0])
-
-    mutation_list = [_drop_poly, _add_poly, _rotate_poly, _resize_poly]
+    mutation_list = [drop_poly, add_poly, rotate_poly, resize_poly]
     mutation_func = random.choice(mutation_list)
-    mutation_func()
+    mutation_func
 
-    return new_structure
+    return mutation_func(poly_to_mutate, domain)
 
 
 def add_delete_point_mutation(new_structure: Structure, polygon_to_mutate_idx, mutate_point_idx, domain):
@@ -190,19 +191,30 @@ def points_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: Dom
 
 def mutate_worker(args):
     structure, changes_num, domain = args[0], args[1], args[2]
-    polygon_mutation_probab = 0.5
-
+    # polygon_mutation_probab = 0.5
+    mutation_ways = [polygons_mutation, points_mutation]
+    
     try:
         new_structure = copy.deepcopy(structure)
 
-        for _ in range(changes_num):
-            polygon_to_mutate_idx = random.randint(0, len(new_structure.polygons) - 1)
-            case = random.random()
+        for polygon_to_mutate_idx in range(changes_num):
 
-            if case < polygon_mutation_probab:
-                new_structure = polygons_mutation(new_structure, polygon_to_mutate_idx, domain)
-            else:
-                new_structure = points_mutation(new_structure, polygon_to_mutate_idx, domain)
+            choosen_mutation_way = random.choice(mutation_ways)
+            poly_for_mutation = new_structure.polygons[polygon_to_mutate_idx]
+            new_structure.polygons[polygon_to_mutate_idx] = choosen_mutation_way(
+                                                                                poly_for_mutation,
+                                                                                domain
+                                                                                )
+        
+            
+        #     case = random.random()
+
+        #     if case < polygon_mutation_probab:
+        #         new_structure = polygons_mutation(new_structure, polygon_to_mutate_idx, domain)
+        #     else:
+        #         new_structure = points_mutation(new_structure, polygon_to_mutate_idx, domain)
+
+
 
             if new_structure is None:
                 continue

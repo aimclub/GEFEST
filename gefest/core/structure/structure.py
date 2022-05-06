@@ -36,10 +36,6 @@ class Structure:
         return out_str
 
     @property
-    def length(self):
-        return sum([p.length for p in self.polygons])
-
-    @property
     def total_points(self):
         return [len(p.points) for p in self.polygons]
 
@@ -85,7 +81,7 @@ def get_random_poly(parent_structure: Optional[Structure],
         # Centroid with it neighborhood called occupied area
         occupied_area = create_area(domain,
                                     parent_structure,
-                                    geometry)
+                                    geometry),
         if occupied_area is None:
             # If it was not possible to find the occupied area then returns None
             return None
