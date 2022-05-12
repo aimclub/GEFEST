@@ -41,7 +41,7 @@ def mutation(structure: Structure, domain: Domain, rate=0.6):
                     p.map(mutate_worker,
                           [[new_structure, domain] for _ in range(NUM_PROC)])
         else:
-            new_items = [mutate_worker([new_structure, domain]) for _ in range(NUM_PROC)]
+            new_items = [mutate_worker(new_structure, domain) for _ in range(NUM_PROC)]
 
         for structure in new_items:
             if structure is not None:

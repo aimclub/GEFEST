@@ -47,7 +47,7 @@ class Structure:
         plt.show()
 
 
-def get_random_structure(domain) -> Structure:
+def get_random_structure(domain: 'Domain') -> Structure:
     # Creating structure with random number of polygons
 
     structure = Structure(polygons=[])
@@ -81,13 +81,12 @@ def get_random_poly(parent_structure: Optional[Structure],
         # Centroid with it neighborhood called occupied area
         occupied_area = create_area(domain,
                                     parent_structure,
-                                    geometry),
+                                    geometry)
         if occupied_area is None:
             # If it was not possible to find the occupied area then returns None
             return None
         else:
-            centroid = occupied_area[0]
-            sigma = occupied_area[1]  # Size of neighborhood
+            centroid, sigma = occupied_area # Size of neighborhood
             # The polygon is created relative to the centroid
             # and the size of the neighborhood
             polygon = create_poly(centroid,
