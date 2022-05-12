@@ -69,7 +69,7 @@ def mutate_worker(structure: Structure, domain: Domain):
         for polygon_to_mutate in structure.polygons:
 
             choosen_mutation_way = random.choice(mutation_ways)
-            mutated_poly = choosen_mutation_way(polygon_to_mutate)
+            mutated_poly = choosen_mutation_way(polygon_to_mutate, domain)
             restriction = any([mutated_poly is None,
                                len(new_polygons) > domain.max_poly_num])
             if not restriction:
@@ -108,11 +108,11 @@ def mutate_worker(structure: Structure, domain: Domain):
         return None
 
 
-def polygons_mutation(poly_to_mutate: Polygon):
+def polygons_mutation(poly_to_mutate: Polygon, domain: Domain):
 
     mutation_way = [drop_poly, add_poly, rotate_poly, resize_poly]
     choosen_way = random.choice(mutation_way)
-    new_poly = choosen_way(poly_to_mutate)
+    new_poly = choosen_way(poly_to_mutate, domain)
 
     return new_poly
 
@@ -192,8 +192,8 @@ def drop_poly(poly_to_mutate: Polygon, domain: Domain):
 
 
 def add_poly(poly_to_mutate: Polygon, domain: Domain):
-
-    new_poly = get_random_poly(domain=domain)
+    structure = Structure(polygons=[])
+    new_poly = get_random_poly(structure, domain)
     return new_poly
 
 
