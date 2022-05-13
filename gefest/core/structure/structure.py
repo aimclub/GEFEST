@@ -86,7 +86,7 @@ def get_random_poly(parent_structure: Optional[Structure],
             # If it was not possible to find the occupied area then returns None
             return None
         else:
-            centroid, sigma = occupied_area # Size of neighborhood
+            centroid, sigma = occupied_area  # Size of neighborhood
             # The polygon is created relative to the centroid
             # and the size of the neighborhood
             polygon = create_poly(centroid,
