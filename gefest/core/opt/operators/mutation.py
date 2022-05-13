@@ -62,7 +62,7 @@ def mutate_worker(structure: Structure, domain: Domain):
 
     # polygon_mutation_probab = 0.5
     mutation_ways = [polygons_mutation, points_mutation]
-    
+
     try:
         new_polygons = []
 
@@ -74,7 +74,6 @@ def mutate_worker(structure: Structure, domain: Domain):
                                len(new_polygons) > domain.max_poly_num])
             if not restriction:
                 new_polygons.append(mutated_poly)
-            
 
         new_structure = Structure(new_polygons)
         if new_structure is None:
@@ -100,7 +99,7 @@ def mutate_worker(structure: Structure, domain: Domain):
                 return None
 
         return new_structure
-        
+
     except Exception as ex:
         print(f'Mutation error: {ex}')
         import traceback
@@ -123,7 +122,7 @@ def points_mutation(poly_to_mutate: Polygon, domain: Domain):
     point_to_mutate = poly_to_mutate.points[mutate_point_idx]
     if point_to_mutate in domain.fixed_points:
         return poly_to_mutate
-    
+
     mutation_way = [remove_point, add_point, change_position_point]
     choosen_way = random.choice(mutation_way)
     new_poly = choosen_way(poly_to_mutate, mutate_point_idx, domain)

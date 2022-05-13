@@ -44,8 +44,8 @@ def test_mutation_poly():
 
         if all([count_del_poly > 0, count_add_poly > 0,
                 count_rotated_poly > 0, count_resize_poly > 0]):
-                assert True
-                break
+            assert True
+            break
     assert all([count_del_poly > 0, count_add_poly > 0,
                 count_rotated_poly > 0, count_resize_poly > 0])
 

@@ -23,8 +23,8 @@ structure_small = Structure([create_rectangle(15, 5, 3), create_rectangle(15, 15
 def test_crossover_passed():
 
     expected_poly_positions = [structure_large.polygons[0].points, structure_small.polygons[1].points]
-    expected_square = geometry.get_square(structure_large.polygons[0]) + \
-                      geometry.get_square(structure_small.polygons[0])
+    expected_square = geometry.get_square(structure_large.polygons[0])\
+        + geometry.get_square(structure_small.polygons[0])
 
     for i in range(100):
         new_structure = crossover(structure_large, structure_small, domain)
