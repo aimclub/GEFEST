@@ -46,7 +46,8 @@ def test_mutation_poly():
                 count_rotated_poly > 0, count_resize_poly > 0]):
                 assert True
                 break
-    assert False
+    assert all([count_del_poly > 0, count_add_poly > 0,
+                count_rotated_poly > 0, count_resize_poly > 0])
 
 
 def test_mutation_not_passed():
