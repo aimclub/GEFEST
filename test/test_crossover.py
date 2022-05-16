@@ -31,11 +31,12 @@ def test_crossover_passed():
         if len(new_structure.polygons) == 2:
             observed_square = geometry.get_square(new_structure.polygons[0]) + \
                               geometry.get_square(new_structure.polygons[1])
-            if all([new_structure.polygons[0].points == expected_poly_positions[0],
-                    new_structure.polygons[1].points == expected_poly_positions[1],
-                    observed_square == expected_square]):
-                assert True
+            condition = all([new_structure.polygons[0].points == expected_poly_positions[0],
+                            new_structure.polygons[1].points == expected_poly_positions[1],
+                            observed_square == expected_square])
+            if condition:
                 break
+    assert condition
 
 
 def test_crossover_not_passed():

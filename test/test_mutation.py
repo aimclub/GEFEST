@@ -42,12 +42,11 @@ def test_mutation_poly():
         elif not any(compared_point_counts) and not any(compared_squares):
             count_resize_poly += 1
 
-        if all([count_del_poly > 0, count_add_poly > 0,
-                count_rotated_poly > 0, count_resize_poly > 0]):
-            assert True
+        condition = all([count_del_poly > 0, count_add_poly > 0,
+                        count_rotated_poly > 0, count_resize_poly > 0])
+        if condition:
             break
-    assert all([count_del_poly > 0, count_add_poly > 0,
-                count_rotated_poly > 0, count_resize_poly > 0])
+    assert condition
 
 
 def test_mutation_not_passed():
