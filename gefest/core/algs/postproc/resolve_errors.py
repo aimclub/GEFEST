@@ -26,7 +26,6 @@ def postprocess(structure: Structure, domain: Domain):
     while too_close(corrected_structure, domain):
         corrected_structure = _correct_closeness(corrected_structure, domain)
 
-    # Fixing each polygon in structure
     for i, poly in enumerate(corrected_structure.polygons):
         local_structure = Structure([poly])
         if self_intersection(local_structure):

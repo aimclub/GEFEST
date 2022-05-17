@@ -36,12 +36,8 @@ class Structure:
         return out_str
 
     @property
-    def length(self):
-        return sum([p.length for p in self.polygons])
-
-    @property
-    def size(self):
-        return sum([len(p.points) for p in self.polygons])
+    def total_points(self):
+        return [len(p.points) for p in self.polygons]
 
     def plot(self, structure, domain=None, title=None):
         x = [point._x for point in structure.polygons[0].points]
@@ -51,7 +47,7 @@ class Structure:
         plt.show()
 
 
-def get_random_structure(domain) -> Structure:
+def get_random_structure(domain: 'Domain') -> Structure:
     # Creating structure with random number of polygons
 
     structure = Structure(polygons=[])
@@ -90,8 +86,7 @@ def get_random_poly(parent_structure: Optional[Structure],
             # If it was not possible to find the occupied area then returns None
             return None
         else:
-            centroid = occupied_area[0]
-            sigma = occupied_area[1]  # Size of neighborhood
+            centroid, sigma = occupied_area  # Size of neighborhood
             # The polygon is created relative to the centroid
             # and the size of the neighborhood
             polygon = create_poly(centroid,

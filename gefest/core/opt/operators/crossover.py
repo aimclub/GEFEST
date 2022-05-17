@@ -21,13 +21,13 @@ def crossover_worker(args):
 
     new_structure = copy.deepcopy(s1)
 
-    crossover_point = random.randint(1, len(new_structure.polygons))  # Choosing crossover point randomly
+    crossover_point = random.randint(1, min(len(s1.polygons), len(s2.polygons)))  # Choosing crossover point randomly
 
     # Crossover conversion
-    part_1 = s1.polygons[0:crossover_point]
+    part_1 = s1.polygons[:crossover_point]
     if not isinstance(part_1, list):
         part_1 = [part_1]
-    part_2 = s2.polygons[crossover_point:len(s1.polygons)]
+    part_2 = s2.polygons[crossover_point:]
     if not isinstance(part_2, list):
         part_2 = [part_2]
 
@@ -55,7 +55,7 @@ def crossover_worker(args):
 def crossover(s1: Structure, s2: Structure, domain: Domain, rate=0.4):
     random_val = random.random()
     if random_val >= rate or len(s1.polygons) == 1 or len(s2.polygons) == 1:
-        # In the case when the structures consist of only one polygon,
+        # In the case when any of structures consist of only one polygon,
         # the transformation is not performed
         if random.random() > 0.5:
             return s1
