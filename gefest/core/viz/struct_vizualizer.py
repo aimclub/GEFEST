@@ -26,5 +26,4 @@ class StructVizualizer:
         x = [pt.x for pt in poly.points]
         y = [pt.y for pt in poly.points]
 
-        plt.plot(x, y, label=f'{type}, fitness = {fitness:.3f}')
-        plt.legend()
+        plt.plot(x, y)#, label=f'{type}, fitness = {fitness:.3f}')

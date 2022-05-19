@@ -32,7 +32,7 @@ def test_fast():
                                   (100, 0),
                                   (0, 0)],
                     geometry=geometry,
-                    max_poly_num=1,
+                    max_poly_num=100,
                     min_poly_num=1,
                     max_points_num=30,
                     min_points_num=20,
