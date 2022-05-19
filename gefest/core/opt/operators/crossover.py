@@ -17,46 +17,50 @@ def crossover_worker(args):
     Polygons are exchanged between structures
     """
 
-    s1, s2, domain = args[0], args[1], args[2]
+    try:
+        s1, s2, domain = args[0], args[1], args[2]
 
-    new_structure = copy.deepcopy(s1)
-    s1 = copy.deepcopy(s1)
-    s2 = copy.deepcopy(s2)
+        new_structure = copy.deepcopy(s1)
+        s1 = copy.deepcopy(s1)
+        s2 = copy.deepcopy(s2)
 
-    # Checking if at least one Structure does not have any polygons
-    if not all([len(s1.polygons), len(s2.polygons)]):
-        # All polygons are shuffling between Structures in random way
-        s1, s2 = shuffle_structures(s1, s2)
+        # Checking if at least one Structure does not have any polygons
+        if not all([len(s1.polygons), len(s2.polygons)]):
+            # All polygons are shuffling between Structures in random way
+            s1, s2 = shuffle_structures(s1, s2)
 
-    crossover_point = random.randint(1, min(len(s1.polygons), len(s2.polygons)))  # Choosing crossover point randomly
+            crossover_point = random.randint(1, min(len(s1.polygons), len(s2.polygons)))  # Choosing crossover point randomly
 
-    # Crossover conversion
-    part_1 = s1.polygons[:crossover_point]
-    if not isinstance(part_1, list):
-        part_1 = [part_1]
-    part_2 = s2.polygons[crossover_point:]
-    if not isinstance(part_2, list):
-        part_2 = [part_2]
+            # Crossover conversion
+            part_1 = s1.polygons[:crossover_point]
+            if not isinstance(part_1, list):
+                part_1 = [part_1]
+            part_2 = s2.polygons[crossover_point:]
+            if not isinstance(part_2, list):
+                part_2 = [part_2]
 
-    result = copy.deepcopy(part_1)
-    result.extend(copy.deepcopy(part_2))
+            result = copy.deepcopy(part_1)
+            result.extend(copy.deepcopy(part_2))
 
-    new_structure.polygons = result
+            new_structure.polygons = result
 
-    # Postprocessing for new structure
-    new_structure = postprocess(new_structure, domain)
-    constraints = check_constraints(structure=new_structure, domain=domain)
-    max_attempts = 3  # Number of postprocessing attempts
-    while not constraints:
-        new_structure = postprocess(new_structure, domain)
-        constraints = check_constraints(structure=new_structure, domain=domain)
-        max_attempts -= 1
-        if max_attempts == 0:
-            # If the number of attempts is over,
-            # the transformation is considered unsuccessful
-            # and one of the structures is returned
-            return s1
-    return new_structure
+            # Postprocessing for new structure
+            new_structure = postprocess(new_structure, domain)
+            constraints = check_constraints(structure=new_structure, domain=domain)
+            max_attempts = 3  # Number of postprocessing attempts
+            while not constraints:
+                new_structure = postprocess(new_structure, domain)
+                constraints = check_constraints(structure=new_structure, domain=domain)
+                max_attempts -= 1
+                if max_attempts == 0:
+                    # If the number of attempts is over,
+                    # the transformation is considered unsuccessful
+                    # and one of the structures is returned
+                    return s1
+            return new_structure
+    except Exception as ex:
+        print(ex)
+        return s1
 
 
 def crossover(s1: Structure, s2: Structure, domain: Domain, rate: float = 0.4) -> Structure:

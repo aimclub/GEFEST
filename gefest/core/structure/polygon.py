@@ -1,4 +1,5 @@
-from typing import List
+from typing import List, Optional
+from uuid import uuid4
 
 from gefest.core.structure.point import Point
 
@@ -31,6 +32,8 @@ class Polygon:
         Polygon: ``Polygon(List[Point])``
     """
 
-    def __init__(self, polygon_id: str, points: List[Point]):
+    def __init__(self, polygon_id: str = str(uuid4()), points: Optional[List[Point]] = None):
+        if points is None:
+            points = []
         self.id = polygon_id
         self.points = points
