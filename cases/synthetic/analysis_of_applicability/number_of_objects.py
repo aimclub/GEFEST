@@ -3,14 +3,15 @@ from functools import partial
 
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 
-from gefest.core.geometry.geometry_2d import Geometry2D, create_circle
-from gefest.core.opt.analytics import EvoAnalytics
+from gefest.core.geometry.geometry_2d import Geometry2D
 from gefest.core.opt.optimize import optimize
 from gefest.core.opt.setup import Setup
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import Structure
 from gefest.core.viz.struct_vizualizer import StructVizualizer
+import pandas as pd
 
 """
 This file contains synthetic example for closed polygons, we solve isoperimetric task. The global optimum is circle.
@@ -37,64 +38,76 @@ def multi_loss(struct: Structure, expected_poly_num: int):
     num_polys = len(struct.polygons)
     penalty = 20
     loss = 0
+
+    if len(struct.polygons) == 0:
+        return None
+
     for poly in struct.polygons:
-        length = area_length_ratio(poly)
-        if length is None:
+        quality_of_poly = area_length_ratio(poly)
+        if quality_of_poly is None:
             return None
-        loss += length
+        loss += quality_of_poly
+    loss = loss / len(struct.polygons)
     L = loss + penalty * abs(num_polys - expected_poly_num)
 
     return L
 
 
-fint = []
 
 expected_poly_nums = list(range(1, 10))
 
+fint = []
+
+num_iters = 10
 for expected_poly_num in expected_poly_nums:
-    # Usual GEFEST procedure for initialization domain, geometry (with closed or unclosed polygons) and task_setup
-    is_closed = True
-    geometry = Geometry2D(is_closed=is_closed)
-    domain = Domain(allowed_area=[(0, 0),
-                                  (0, 300),
-                                  (300, 300),
-                                  (300, 0),
-                                  (0, 0)],
-                    geometry=geometry,
-                    max_poly_num=20,
-                    min_poly_num=1,
-                    max_points_num=20,
-                    min_points_num=5,
-                    is_closed=is_closed)
+    local_fint = []
+    for iter in range(num_iters):
+        # Usual GEFEST procedure for initialization domain, geometry (with closed or unclosed polygons) and task_setup
+        is_closed = True
+        geometry = Geometry2D(is_closed=is_closed)
+        domain = Domain(allowed_area=[(0, 0),
+                                      (0, 300),
+                                      (300, 300),
+                                      (300, 0),
+                                      (0, 0)],
+                        geometry=geometry,
+                        max_poly_num=20,
+                        min_poly_num=1,
+                        max_points_num=20,
+                        min_points_num=5,
+                        is_closed=is_closed)
 
-    task_setup = Setup(domain=domain)
+        task_setup = Setup(domain=domain)
 
-    # Optimizing stage
-    start = timeit.default_timer()
-    optimized_structure = optimize(task_setup=task_setup,
-                                   objective_function=partial(multi_loss,
-                                                              expected_poly_num=expected_poly_num),
-                                   pop_size=100,
-                                   max_gens=100)
-    spend_time = timeit.default_timer() - start
+        # Optimizing stage
+        start = timeit.default_timer()
+        optimized_structure = optimize(task_setup=task_setup,
+                                       objective_function=partial(multi_loss,
+                                                                  expected_poly_num=expected_poly_num),
+                                       pop_size=100,
+                                       max_gens=100)
+        spend_time = timeit.default_timer() - start
 
-    # Visualization optimized structure
-    visualiser = StructVizualizer(task_setup.domain)
-    plt.figure(figsize=(7, 7))
+        # Visualization optimized structure
+        visualiser = StructVizualizer(task_setup.domain)
+        plt.figure(figsize=(7, 7))
 
-    info = {'spend_time': spend_time,
-            'fitness': multi_loss(optimized_structure, expected_poly_num),
-            'type': 'prediction'}
-    visualiser.plot_structure(optimized_structure, info)
+        info = {'spend_time': spend_time,
+                'fitness': multi_loss(optimized_structure, expected_poly_num),
+                'type': 'prediction'}
+        #visualiser.plot_structure(optimized_structure, info)
 
-    fint.append((info['fitness']))
-    plt.title(f'Expected structures: {expected_poly_num}')
-    plt.show()
-    #EvoAnalytics.create_boxplot()
+        local_fint.append((info['fitness']))
+        #plt.title(f'Expected structures: {expected_poly_num}')
+        #plt.show()
+    fint.append(local_fint)
 
 print(fint)
 
-plt.plot(expected_poly_nums, fint)
-plt.xlabel('Expected number of structures')
-plt.ylabel('Obtained design error')
+
+sns.boxplot(x=expected_poly_nums, y=fint)
 plt.show()
+# plt.plot(expected_poly_nums, fint)
+# plt.xlabel('Expected number of structures')
+# plt.ylabel('Obtained design error')
+# plt.show()
