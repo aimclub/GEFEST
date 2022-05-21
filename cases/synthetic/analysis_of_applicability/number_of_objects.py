@@ -11,7 +11,6 @@ from gefest.core.opt.setup import Setup
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import Structure
 from gefest.core.viz.struct_vizualizer import StructVizualizer
-import pandas as pd
 
 """
 This file contains synthetic example for closed polygons, we solve isoperimetric task. The global optimum is circle.
@@ -53,7 +52,6 @@ def multi_loss(struct: Structure, expected_poly_num: int):
     return L
 
 
-
 expected_poly_nums = list(range(1, 10))
 
 fint = []
@@ -81,13 +79,18 @@ for expected_poly_num in expected_poly_nums:
 
         # Optimizing stage
         start = timeit.default_timer()
-        optimized_structure = optimize(task_setup=task_setup,
-                                       objective_function=partial(multi_loss,
-                                                                  expected_poly_num=expected_poly_num),
-                                       pop_size=100,
-                                       max_gens=100)
+        result = optimize(task_setup=task_setup,
+                          objective_function=partial(multi_loss,
+                                                     expected_poly_num=expected_poly_num),
+                          pop_size=100,
+                          max_gens=100)
+        optimized_structure = result.best_structure
         spend_time = timeit.default_timer() - start
+        result.name = f'exp1_{expected_poly_num}_{iter}'
+        result.metadata['time'] = spend_time
+        result.fitness = multi_loss(optimized_structure, expected_poly_num)
 
+        result.save(f'{result.name}.json')
         # Visualization optimized structure
         visualiser = StructVizualizer(task_setup.domain)
         plt.figure(figsize=(7, 7))
@@ -95,15 +98,14 @@ for expected_poly_num in expected_poly_nums:
         info = {'spend_time': spend_time,
                 'fitness': multi_loss(optimized_structure, expected_poly_num),
                 'type': 'prediction'}
-        #visualiser.plot_structure(optimized_structure, info)
+        # visualiser.plot_structure(optimized_structure, info)
 
         local_fint.append((info['fitness']))
-        #plt.title(f'Expected structures: {expected_poly_num}')
-        #plt.show()
+        # plt.title(f'Expected structures: {expected_poly_num}')
+        # plt.show()
     fint.append(local_fint)
 
 print(fint)
-
 
 sns.boxplot(x=expected_poly_nums, y=fint)
 plt.show()
