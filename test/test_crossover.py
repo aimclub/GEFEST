@@ -39,8 +39,23 @@ def test_crossover_passed():
     assert condition
 
 
-def test_crossover_not_passed():
+def test_crossover_fail():
 
     new_structure = crossover(structure_large, structure_small, domain, rate=0.001)
-
     assert any([new_structure == structure_large, new_structure == structure_small])
+
+    empty_structure = Structure(polygons=[])
+    structure_with_one_poly = Structure(polygons=[create_rectangle(5, 5)])
+    new_structure = crossover(empty_structure, structure_with_one_poly, domain, rate=0.999)
+    assert any([new_structure == empty_structure, new_structure == structure_with_one_poly])
+
+
+
+def test_crossover_empty_structure():
+    empty_structure = Structure(polygons=[])
+    structure_with_polygons = Structure(polygons=[create_rectangle(5, 5), create_rectangle(5, 15),
+                                                  create_rectangle(15, 5, 3), create_rectangle(15, 15, 3)])
+    observed_structure = crossover(empty_structure, structure_with_polygons, domain, rate=0.999)
+
+    assert all([len(observed_structure.polygons) > 0,
+                len(observed_structure.polygons) < len(structure_with_polygons.polygons)])
