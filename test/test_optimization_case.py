@@ -46,7 +46,7 @@ domain = Domain(allowed_area=[(0, 0),
                 max_poly_num=20,
                 min_poly_num=1,
                 max_points_num=20,
-                min_points_num=5,
+                min_points_num=4,
                 is_closed=is_closed)
 
 task_setup = Setup(domain=domain)
@@ -56,7 +56,7 @@ def test_optimization():
 
     optimized_structure = optimize(task_setup=task_setup,
                                    objective_function=multi_loss,
-                                   pop_size=100,
-                                   max_gens=100)
+                                   pop_size=30,
+                                   max_gens=3)
     assert all([isinstance(optimized_structure, Structure),
                 len(optimized_structure.polygons) > 0])
