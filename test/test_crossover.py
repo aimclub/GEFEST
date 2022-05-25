@@ -50,7 +50,6 @@ def test_crossover_fail():
     assert any([new_structure == empty_structure, new_structure == structure_with_one_poly])
 
 
-
 def test_crossover_empty_structure():
     empty_structure = Structure(polygons=[])
     structure_with_polygons = Structure(polygons=[create_rectangle(5, 5), create_rectangle(5, 15),
