@@ -27,24 +27,24 @@ def crossover_worker(args):
         all_polygons = s1.polygons
         all_polygons.extend(s2.polygons)
 
-        s1_idx = random.randint(0, len(all_polygons)-1)
-        s1.polygons = [all_polygons[s1_idx]]
-        del all_polygons[s1_idx]
+        choosen_1 = random.choice(all_polygons)
+        s1.polygons = [choosen_1]
+        all_polygons.remove(choosen_1)
 
-        s2_idx = random.randint(0, len(all_polygons)-1)
-        s2.polygons = [all_polygons[s2_idx]]
-        del all_polygons[s2_idx]
+        choosen_2 = random.choice(all_polygons)
+        s2.polygons = [choosen_2]
+        all_polygons.remove(choosen_2)
 
+        #  Distribution Polygons between Structures if their number > 2
         while all_polygons:
-            choosen_poly = random.choice([s1, s2])
-            idx = random.randint(0, len(all_polygons)-1)
-            if not isinstance(choosen_poly.polygons, list):
-                temp_poly_list = [choosen_poly.polygons]
-            else:
-                temp_poly_list = choosen_poly.polygons
-            temp_poly_list.extend([all_polygons[idx]])
-            choosen_poly.polygons = temp_poly_list
-            del all_polygons[idx]
+            choosen_structure = random.choice([s1, s2])
+            choosen_poly = random.choice(all_polygons)
+
+            temp_poly_list = choosen_structure.polygons
+            temp_poly_list.extend([choosen_poly])
+
+            choosen_structure.polygons = temp_poly_list
+            all_polygons.remove(choosen_poly)
 
     crossover_point = random.randint(1, min(len(s1.polygons), len(s2.polygons)))  # Choosing crossover point randomly
 
