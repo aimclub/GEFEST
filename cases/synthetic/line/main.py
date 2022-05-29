@@ -19,9 +19,8 @@ parser.add_argument('--is_closed', type=bool, default=False, help='type of polyg
 opt = parser.parse_args()
 
 # ------------
-# GEFEST tools configuration_de
+# GEFEST tools configuration
 # ------------
-
 domain, task_setup = line_domain.configurate_domain(poly_num=opt.n_polys,
                                                     points_num=opt.n_points,
                                                     is_closed=opt.is_closed)
@@ -36,7 +35,6 @@ optimizer = line_optimizer.configurate_optimizer(pop_size=opt.pop_size,
 # ------------
 # Generative design stage
 # ------------
-
 start = timeit.default_timer()
 optimized_pop = design(n_steps=opt.n_steps,
                        pop_size=opt.pop_size,
@@ -48,7 +46,6 @@ spend_time = timeit.default_timer() - start
 # ------------
 # Visualization optimized structure
 # ------------
-
 with open(f'HistoryFiles/performance_{opt.n_steps - 1}.pickle', 'rb') as f:
     performance = pickle.load(f)
 

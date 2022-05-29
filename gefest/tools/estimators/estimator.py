@@ -16,7 +16,7 @@ class Estimator:
     def estimate(self, population: List[Structure]):
         """
         Estimation of performance
-        :param population: List(Structure) population of structures for estimation
+        :param population: List(Structure) population of structures for estimating
         :return: List(Float) performance of population
         """
         performance = []

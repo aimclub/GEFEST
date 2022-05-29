@@ -2,10 +2,6 @@ from gefest.tools.optimizers.GA.base_GA import BaseGA
 
 
 class GA(BaseGA):
-    """The class uses genetic algorithm during optimization process.
-    Args:
-        BaseGA (Callable): parent abstract class with main optimization methods
-    """
 
     def step(self, population, performance, verbose=True, **kwargs):
         self.init_populations(population)
