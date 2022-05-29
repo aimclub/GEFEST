@@ -7,7 +7,7 @@ import numpy as np
 
 from gefest.core.algs.postproc.resolve_errors import postprocess
 from gefest.core.opt.constraints import check_constraints
-from gefest.core.opt.operators.initial import MAX_ITER, NUM_PROC, get_pop_worker
+from gefest.tools.samplers.standard.standard import MAX_ITER, NUM_PROC, StandardSampler
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.polygon import Polygon
 from gefest.core.structure.structure import Structure, get_random_poly, get_random_point
@@ -60,7 +60,7 @@ def mutation(structure: Structure, domain: Domain, rate: float = 0.6) -> Structu
                 # if the mutation did not return anything,
                 # then it is considered unsuccessful,
                 # in which case a random structure is generated
-                new_structure = get_pop_worker(domain=domain)
+                new_structure = StandardSampler().get_pop_worker(domain=domain)
                 is_correct = True
                 break
     return new_structure

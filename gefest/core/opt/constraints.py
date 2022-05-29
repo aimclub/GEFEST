@@ -1,6 +1,7 @@
 import copy
 
-from gefest.core.algs.geom.validation import out_of_bound, self_intersection, too_close, intersection, unclosed_poly
+from gefest.core.algs.geom.validation import out_of_bound, self_intersection, too_close, intersection, unclosed_poly, \
+    is_contain
 from gefest.core.structure.structure import Structure
 
 
@@ -15,8 +16,9 @@ def check_constraints(structure: Structure, is_lightweight: bool = False, domain
 
         cts = [out_of_bound(structure, domain),
                too_close(structure, domain),
+               is_contain(structure, domain),
                self_intersection(structure),
-               intersection(structure, domain.geometry),
+               intersection(structure, domain),
                unclosed_poly(structure, domain)]
         structurally_correct = not any(cts)
 
