@@ -1,7 +1,7 @@
 import numpy as np
 
 from gefest.core.geometry.geometry_2d import Geometry2D
-from gefest.core.opt.optimize import optimize
+from gefest.core.opt.gen_design import optimize
 from gefest.core.opt.setup import Setup
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import Structure

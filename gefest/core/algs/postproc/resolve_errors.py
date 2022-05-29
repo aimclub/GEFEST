@@ -15,14 +15,17 @@ def postprocess(structure: Structure, domain: Domain):
     corrected_structure = deepcopy(structure)
 
     # Fixing each polygon in structure
-    for i, poly in enumerate(corrected_structure.polygons):
-        local_structure = Structure([poly])
-        if unclosed_poly(local_structure, domain) and domain.is_closed:
-            corrected_structure.polygons[i] = _correct_unclosed_poly(poly)
-        if self_intersection(local_structure):
-            corrected_structure.polygons[i] = _correct_self_intersection(poly, domain)
-        if out_of_bound(local_structure, domain):
-            corrected_structure.polygons[i] = _correct_wrong_point(poly, domain)
+    try:
+        for i, poly in enumerate(corrected_structure.polygons):
+            local_structure = Structure([poly])
+            if unclosed_poly(local_structure, domain) and domain.is_closed:
+                corrected_structure.polygons[i] = _correct_unclosed_poly(poly)
+            if self_intersection(local_structure):
+                corrected_structure.polygons[i] = _correct_self_intersection(poly, domain)
+            if out_of_bound(local_structure, domain):
+                corrected_structure.polygons[i] = _correct_wrong_point(poly, domain)
+    except AttributeError:
+        return structure
 
     #  Fixing proximity between polygons
     if too_close(structure, domain):
@@ -95,7 +98,7 @@ def _correct_closeness(structure: Structure, domain: Domain):
         for j in range(i + 1, num_poly):
             distance = _pairwise_dist(polygons[i], polygons[j], domain)
             if distance < domain.min_dist:
-                if polygons[i].id != 'fixed':
+                if polygons[i].id != 'fixed' or 'prohibited':
                     to_delete.append(i)  # Collecting polygon indices for deletion
 
     to_delete_poly = [structure.polygons[i] for i in np.unique(to_delete)]
