@@ -5,7 +5,7 @@ from multiprocessing import Pool
 from gefest.core.algs.postproc.resolve_errors import postprocess
 from gefest.core.opt.constraints import check_constraints
 from gefest.core.structure.domain import Domain
-from gefest.core.structure.structure import Structure
+from gefest.core.structure.structure import Structure, shuffle_structures
 
 MAX_ITER = 50000
 NUM_PROC = 1
@@ -23,28 +23,10 @@ def crossover_worker(args):
     s1 = copy.deepcopy(s1)
     s2 = copy.deepcopy(s2)
 
+    # Checking if at least one Structure does not have any polygons
     if not all([len(s1.polygons), len(s2.polygons)]):
-        all_polygons = s1.polygons
-        all_polygons.extend(s2.polygons)
-
-        choosen_1 = random.choice(all_polygons)
-        s1.polygons = [choosen_1]
-        all_polygons.remove(choosen_1)
-
-        choosen_2 = random.choice(all_polygons)
-        s2.polygons = [choosen_2]
-        all_polygons.remove(choosen_2)
-
-        #  Distribution Polygons between Structures if their number > 2
-        while all_polygons:
-            choosen_structure = random.choice([s1, s2])
-            choosen_poly = random.choice(all_polygons)
-
-            temp_poly_list = choosen_structure.polygons
-            temp_poly_list.extend([choosen_poly])
-
-            choosen_structure.polygons = temp_poly_list
-            all_polygons.remove(choosen_poly)
+        # All polygons are shuffling between Structures in random way
+        s1, s2 = shuffle_structures(s1, s2)
 
     crossover_point = random.randint(1, min(len(s1.polygons), len(s2.polygons)))  # Choosing crossover point randomly
 
