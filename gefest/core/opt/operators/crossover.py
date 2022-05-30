@@ -5,7 +5,7 @@ from multiprocessing import Pool
 from gefest.core.algs.postproc.resolve_errors import postprocess
 from gefest.core.opt.constraints import check_constraints
 from gefest.core.structure.domain import Domain
-from gefest.core.structure.structure import Structure
+from gefest.core.structure.structure import Structure, shuffle_structures
 
 MAX_ITER = 50000
 NUM_PROC = 1
@@ -20,6 +20,13 @@ def crossover_worker(args):
     s1, s2, domain = args[0], args[1], args[2]
 
     new_structure = copy.deepcopy(s1)
+    s1 = copy.deepcopy(s1)
+    s2 = copy.deepcopy(s2)
+
+    # Checking if at least one Structure does not have any polygons
+    if not all([len(s1.polygons), len(s2.polygons)]):
+        # All polygons are shuffling between Structures in random way
+        s1, s2 = shuffle_structures(s1, s2)
 
     crossover_point = random.randint(1, min(len(s1.polygons), len(s2.polygons)))  # Choosing crossover point randomly
 
@@ -54,15 +61,12 @@ def crossover_worker(args):
 
 def crossover(s1: Structure, s2: Structure, domain: Domain, rate=0.4):
     random_val = random.random()
-    if random_val >= rate or len(s1.polygons) == 1 or len(s2.polygons) == 1:
-        # In the case when any of structures consist of only one polygon,
+    if random_val >= rate or all([len(s1.polygons) <= 1, len(s2.polygons) <= 1]):
+        # In the case when all of structures consist one polygon or less,
         # the transformation is not performed
-        if random.random() > 0.5:
-            return s1
-        else:
-            return s2
+        return random.choice([s1, s2])
 
-    new_structure = s1
+    new_structure = copy.deepcopy(s1)
 
     if NUM_PROC > 1:
         # Calculations on different processor cores

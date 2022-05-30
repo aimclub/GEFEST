@@ -1,4 +1,6 @@
 import json
+import copy
+import random
 from dataclasses import dataclass
 from random import randint
 from typing import List, Optional
@@ -206,3 +208,37 @@ def distance(point: 'Point',
         distances.append(d)
 
     return min(distances)
+
+
+def shuffle_structures(structure_1: Structure, structure_2: Structure):
+    """Shuffling polygons between structures in random way.
+    Every Structure has one polygon at least"""
+
+    s1 = copy.deepcopy(structure_1)
+    s2 = copy.deepcopy(structure_2)
+
+    all_polygons = s1.polygons
+    all_polygons.extend(s2.polygons)
+
+    choosen_1 = random.choice(all_polygons)
+    s1.polygons = [choosen_1]
+    all_polygons.remove(choosen_1)
+
+    choosen_2 = random.choice(all_polygons)
+    s2.polygons = [choosen_2]
+    all_polygons.remove(choosen_2)
+
+    #  Distribution Polygons between Structures if their number > 2
+    max_iter = 50
+    while all([all_polygons, max_iter > 0]):
+        choosen_structure = random.choice([s1, s2])
+        choosen_poly = random.choice(all_polygons)
+
+        temp_poly_list = choosen_structure.polygons
+        temp_poly_list.extend([choosen_poly])
+
+        choosen_structure.polygons = temp_poly_list
+        all_polygons.remove(choosen_poly)
+        max_iter -= 1
+
+    return s1, s2
