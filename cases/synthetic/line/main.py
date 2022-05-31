@@ -19,7 +19,7 @@ parser.add_argument('--is_closed', type=bool, default=False, help='type of polyg
 opt = parser.parse_args()
 
 # ------------
-# GEFEST tools configuration
+# GEFEST tools configuration_de
 # ------------
 domain, task_setup = line_domain.configurate_domain(poly_num=opt.n_polys,
                                                     points_num=opt.n_points,

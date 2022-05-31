@@ -81,6 +81,6 @@ class Swan:
         subprocess.run('swan.exe', shell=True, cwd=self.path_to_model)
 
         Z = np.loadtxt(self.path_to_hs)
-        hs_target = np.mean([Z[target[0], target[1]] for target in self.targets])
+        hs_target = np.sum([Z[target[0], target[1]] for target in self.targets])
 
         return Z, hs_target

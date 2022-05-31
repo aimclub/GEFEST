@@ -3,7 +3,7 @@ import numpy as np
 from gefest.core.structure.structure import Structure
 from gefest.tools.estimators.simulators.swan.swan_interface import Swan
 from gefest.tools.estimators.estimator import Estimator
-import cases.breakwaters.configuration.bw_domain as area
+import cases.breakwaters.configuration_de.bw_domain as area
 
 
 def configurate_estimator(domain):
@@ -28,7 +28,7 @@ def configurate_estimator(domain):
                 lengths += length
 
         _, hs = estimator.estimate(struct)
-        l_f = 2 * lengths / max_length + hs
+        l_f = lengths / (2 * max_length) + hs
 
         return l_f
 

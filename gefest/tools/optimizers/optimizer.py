@@ -14,7 +14,7 @@ class Optimizer:
         """
         Making one optimizing step
         :param population: (List[Structure]), input population
-        :param performance: (List(float)), performance of input population
+        :param performance: (List(float)), performance of input population obtained by estimator
         :return: (List[Structure]), optimized population
         """
         population = self.optimizer.step(population, performance)

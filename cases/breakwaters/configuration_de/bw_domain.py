@@ -47,7 +47,7 @@ def configurate_domain(poly_num: int,
                        points_num: int,
                        is_closed: bool):
     # ------------
-    # GEFEST domain based on user-defined configuration
+    # GEFEST domain based on user-defined configuration_de
     # ------------
     if is_closed:
         min_points_num = 3
