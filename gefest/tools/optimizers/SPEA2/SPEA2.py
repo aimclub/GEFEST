@@ -1,5 +1,4 @@
 import numpy as np
-import pickle
 
 from gefest.tools.optimizers.GA.base_GA import BaseGA
 
@@ -135,19 +134,31 @@ class SPEA2(BaseGA):
 
         # Second case, deleting using truncation procedure
         elif len(self.archive) > self.arch_size:
-            arch_obj = sorted([(ind.objectives[0], ind) for ind in self._pop])[:self.arch_size]
-            self.archive = [ind[1] for ind in arch_obj]
+            k = 0
+            distance_and_idx = []
+            for i in range(len(self.archive)):
+                distance = []
+                first_point = np.array(self._pop[i].objectives)
+                for j in range(len(self.archive)):
+                    if j == i:
+                        continue
+                    second_point = np.array(self._pop[j].objectives)
+                    distance.append(np.linalg.norm(first_point - second_point))
+                sort_dist = sorted(distance)
+                distance_and_idx.append((sort_dist[k], i))
 
-    def _save_archive(self, n):
-        with open(f'HistoryFiles/archive_{n}.pickle', 'wb') as handle:
-            pickle.dump(self.archive, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            sorted_distance_and_idx = sorted(distance_and_idx)
 
-    def step(self, population, performance, n_step, is_last=False):
+            idx = 0
+            while len(self.archive) != self.arch_size:
+                self.archive.pop(sorted_distance_and_idx[idx][1])
+                idx += 1
+
+    def step(self, population, performance, is_last=False):
         """
         One step of optimization procedure
         :param population: (List[Structure]) population of structures
         :param performance: (List[List]) multi dimension performance
-        :param n_step: (Int) number of step
         :param is_last: (Optional(Bool)) check for last step in generative design procedure
         :return: (List[Structure]) optimized population
         """
@@ -164,8 +175,6 @@ class SPEA2(BaseGA):
         # Step 2, environmental selection
         self.environmental_selection()
 
-        self._save_archive(n_step)
-
         # Step 3, check for last step (termination)
         if is_last:
             return self.archive
@@ -179,7 +188,7 @@ class SPEA2(BaseGA):
         self._pop = \
             [un_pop.add(str(ind.genotype)) or ind for ind in self._pop
              if str(ind.genotype) not in un_pop]
-        self._pop = self.reproduce(self._pop)
+        self._pop.extend(self.reproduce(self._pop))
 
         population = [ind.genotype for ind in self._pop]
 

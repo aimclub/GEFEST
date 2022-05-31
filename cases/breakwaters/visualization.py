@@ -2,11 +2,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from gefest.core.structure.structure import Structure
-import cases.breakwaters.configuration.bw_estimator as cost
-import cases.breakwaters.configuration.bw_domain as area
+import cases.breakwaters.configuration_de.bw_domain as area
+from gefest.tools.estimators.simulators.swan.swan_interface import Swan
 
 
-def visualize(struct: 'Structure', ax=plt):
+def visualize(struct: 'Structure', domain, ax=plt):
+    path = '../../gefest/tools/estimators/simulators/swan/swan_model/'
+    swan = Swan(path=path,
+                targets=area.targets,
+                grid=area.grid,
+                domain=domain)
+
     def custom_div_cmap(numcolors=2, name='custom_div_cmap',
                         mincol='black', maxcol='red'):
         from matplotlib.colors import LinearSegmentedColormap
@@ -16,10 +22,11 @@ def visualize(struct: 'Structure', ax=plt):
                                                  N=numcolors)
         return cmap
 
-    Z, hs = cost.swan.evaluate(struct)
+    X, Y = np.meshgrid(area.coord_X, area.coord_Y)
+    Z, hs = swan.estimate(struct)
     polygons = struct.polygons
 
-    poly_area = area.domain.prohibited_area.polygons
+    poly_area = domain.prohibited_area.polygons
 
     polygons = polygons + poly_area
 
@@ -54,10 +61,11 @@ def visualize(struct: 'Structure', ax=plt):
                     label='fixed bw')
 
     custom_map = custom_div_cmap(250, mincol='white', maxcol='black')
-    graph = ax.pcolormesh(area.X, area.Y, Z_new, cmap=custom_map, shading='auto', vmax=2.5)
+    graph = ax.pcolormesh(X, Y, Z_new, cmap=custom_map, shading='auto', vmax=2.5)
 
     for target in area.targets:
-        ax.scatter(area.X[target[0], target[1]], area.Y[target[0], target[1]], marker='s', s=20, color='green',
+        ax.scatter(X[target[0], target[1]], Y[target[0], target[1]], marker='s', s=20,
+                   color='green',
                    label='target=' + str(round(hs, 3)))
 
     ax.axis('off')
@@ -65,3 +73,4 @@ def visualize(struct: 'Structure', ax=plt):
     ax.axis(ymin=0, ymax=max(area.coord_Y))
     ax.colorbar(graph)
     ax.legend(fontsize=9)
+    ax.show()

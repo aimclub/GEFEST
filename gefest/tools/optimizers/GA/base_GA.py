@@ -72,7 +72,6 @@ class BaseGA:
         return chosen
 
     def reproduce(self, selected):
-
         children = []
         np.random.shuffle(selected)
         for pair_index in range(0, len(selected) - 1):
