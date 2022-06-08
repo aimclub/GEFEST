@@ -62,7 +62,7 @@ def mutation(structure: Structure, domain: Domain, rate=0.6):
 def polygons_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: Domain):
     # Weights for each type of mutation
     polygon_drop_mutation_prob = 0.2
-    polygon_add_mutation_prob = 0.2
+    polygon_add_mutation_prob = 0.6
     polygon_rotate_mutation_prob = 0.5
     polygon_reshape_mutation_prob = 0.5
 
