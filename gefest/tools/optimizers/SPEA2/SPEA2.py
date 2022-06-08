@@ -1,4 +1,5 @@
 import numpy as np
+import pickle
 
 from gefest.tools.optimizers.GA.base_GA import BaseGA
 
@@ -138,27 +139,33 @@ class SPEA2(BaseGA):
             distance_and_idx = []
             for i in range(len(self.archive)):
                 distance = []
-                first_point = np.array(self._pop[i].objectives)
+                first_point = np.array(self.archive[i].objectives)
                 for j in range(len(self.archive)):
                     if j == i:
                         continue
-                    second_point = np.array(self._pop[j].objectives)
+                    second_point = np.array(self.archive[j].objectives)
                     distance.append(np.linalg.norm(first_point - second_point))
                 sort_dist = sorted(distance)
                 distance_and_idx.append((sort_dist[k], i))
 
             sorted_distance_and_idx = sorted(distance_and_idx)
 
-            idx = 0
-            while len(self.archive) != self.arch_size:
-                self.archive.pop(sorted_distance_and_idx[idx][1])
-                idx += 1
+            length = len(self.archive)
+            idx_for_delete = [idx[1] for idx in sorted_distance_and_idx][:(length - self.arch_size)]
 
-    def step(self, population, performance, is_last=False):
+            arch_selected = [self.archive[idx] for idx in range(length) if idx not in idx_for_delete]
+            self.archive = arch_selected
+
+    def _save_archive(self, n):
+        with open(f'HistoryFiles/archive_{n}.pickle', 'wb') as handle:
+            pickle.dump(self.archive, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    def step(self, population, performance, n_step, is_last=False):
         """
         One step of optimization procedure
         :param population: (List[Structure]) population of structures
         :param performance: (List[List]) multi dimension performance
+        :param n_step: (Int) number of step
         :param is_last: (Optional(Bool)) check for last step in generative design procedure
         :return: (List[Structure]) optimized population
         """
@@ -175,6 +182,11 @@ class SPEA2(BaseGA):
         # Step 2, environmental selection
         self.environmental_selection()
 
+        best = sorted(self.archive, key=lambda x: x.objectives[1])[0]
+        print(f'\n Best objective is {best.objectives[1]}')
+
+        self._save_archive(n_step)
+
         # Step 3, check for last step (termination)
         if is_last:
             return self.archive
@@ -188,7 +200,7 @@ class SPEA2(BaseGA):
         self._pop = \
             [un_pop.add(str(ind.genotype)) or ind for ind in self._pop
              if str(ind.genotype) not in un_pop]
-        self._pop.extend(self.reproduce(self._pop))
+        self._pop = self.reproduce(self._pop)
 
         population = [ind.genotype for ind in self._pop]
 

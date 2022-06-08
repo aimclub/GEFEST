@@ -1,16 +1,15 @@
 import timeit
 import pickle
 import argparse
-import pickle
 
-from cases.breakwaters.visualization import visualize
 from gefest.core.opt.gen_design import design
-from cases.breakwaters.configuration_de import bw_domain
-from cases.breakwaters.configuration_spea2 import bw_estimator, bw_sampler, bw_optimizer
+from cases.breakwaters.configuration_de import bw_domain, bw_sampler
+from cases.breakwaters.configuration_surrogate import bw_estimator
+from cases.breakwaters.configuration_spea2 import bw_optimizer
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--pop_size", type=int, default=5, help='number of individs in population')
-parser.add_argument("--n_steps", type=int, default=10, help='number of generative design steps')
+parser.add_argument("--pop_size", type=int, default=30, help='number of individs in population')
+parser.add_argument("--n_steps", type=int, default=80, help='number of generative design steps')
 parser.add_argument('--n_polys', type=int, default=5, help='maximum number of polygons in structure')
 parser.add_argument('--n_points', type=int, default=15, help='maximum number of points in polygon')
 parser.add_argument('--c_rate', type=float, default=0.6, help='crossover rate')
@@ -19,7 +18,7 @@ parser.add_argument('--is_closed', type=bool, default=False, help='type of polyg
 opt = parser.parse_args()
 
 # ------------
-# GEFEST tools configuration_de
+# GEFEST tools configuration
 # ------------
 domain, task_setup = bw_domain.configurate_domain(poly_num=opt.n_polys,
                                                   points_num=opt.n_points,
@@ -35,6 +34,7 @@ optimizer = bw_optimizer.configurate_optimizer(pop_size=opt.pop_size,
 # ------------
 # Generative design stage
 # ------------
+
 start = timeit.default_timer()
 optimized_pop = design(n_steps=opt.n_steps,
                        pop_size=opt.pop_size,
@@ -43,19 +43,3 @@ optimized_pop = design(n_steps=opt.n_steps,
                        optimizer=optimizer)
 spend_time = timeit.default_timer() - start
 print(f'spent time {spend_time} sec')
-
-"""
-with open(f'HistoryFiles/performance_{79}.pickle', 'rb') as f:
-    performance = pickle.load(f)
-
-with open(f'HistoryFiles/population_{79}.pickle', 'rb') as f:
-    population = pickle.load(f)
-
-m = min(performance)
-print(m)
-
-idx_of_min = performance.index(m)
-struct = population[idx_of_min]
-
-visualize(struct, domain)
-"""
