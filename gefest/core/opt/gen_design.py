@@ -1,7 +1,6 @@
 import os
 import shutil
 import pickle
-import sys
 from tqdm import tqdm
 
 
@@ -37,6 +36,9 @@ def design(n_steps: int,
         with open(f'{path}/population_{i}.pickle', 'wb') as handle:
             pickle.dump(samples, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-        samples = optimizer.step(population=samples, performance=performance)
+        samples = optimizer.step(population=samples, performance=performance, n_step=i)
+
+        #extra_samples = sampler.sample(n_samples=int(pop_size/3))
+        #samples = samples + extra_samples
 
     return samples
