@@ -1,5 +1,4 @@
 import numpy as np
-from pathlib import Path
 
 from gefest.core.structure.structure import Structure
 from gefest.tools.estimators.DL.bw_surrogate.bw_cnn import CNN
@@ -8,26 +7,17 @@ from gefest.tools.estimators.estimator import Estimator
 import cases.breakwaters.configuration_de.bw_domain as area
 
 
-def configurate_estimator(domain, path_sim=False, path_sur=False):
+def configurate_estimator(domain):
     # ------------
     # User-defined estimator
     # it should be created as object with .estimate() method
     # ------------
-    if not path_sim:
-        root_path = Path(__file__).parent.parent.parent.parent
-        path_sim = f'{root_path}/gefest/tools/estimators/simulators/swan/swan_model/'
-
-    if not path_sur:
-        root_path = Path(__file__).parent.parent.parent.parent
-        path_sur = f'{root_path}/gefest/tools/estimators/DL/bw_surrogate/bw_surrogate_700_train.h5'
-
-    swan = Swan(path=path_sim,
+    path = '../../gefest/tools/estimators/simulators/swan/swan_model/'
+    swan = Swan(path=path,
                 targets=area.targets,
                 grid=area.grid,
                 domain=domain)
-
     cnn = CNN(domain=domain,
-              path=path_sur,
               main_model=swan)
 
     # Multi-criteria loss function, in our case - HW and cost of structure
@@ -41,7 +31,7 @@ def configurate_estimator(domain, path_sim=False, path_sur=False):
                 lengths += length
 
         hs = estimator.estimate(struct)
-        l_f = [hs, 2 * lengths / max_length]
+        l_f = [2 * lengths / max_length, hs]
 
         return l_f
 

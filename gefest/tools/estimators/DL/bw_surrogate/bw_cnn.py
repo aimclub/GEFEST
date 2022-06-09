@@ -1,9 +1,6 @@
 import matplotlib
 import matplotlib.pyplot as plt
 import tensorflow as tf
-import os
-import shutil
-
 from tensorflow import keras
 from typing import Optional
 
@@ -18,30 +15,16 @@ class CNN:
     Surrogate model for breakwaters task
     """
 
-    def __init__(self, path, domain: Domain, main_model: Optional = None):
+    def __init__(self, domain: Domain, main_model: Optional = None):
         super(CNN, self).__init__()
 
         self.domain = domain
-        self.model = keras.models.load_model(path)
+        self.model = keras.models.load_model("../../gefest/tools/estimators/DL/bw_surrogate/bw_surrogate_700_train.h5")
         self.main_model = main_model
 
-        self._create_temp_path()
         self.img_name = 'tmp_images/0.png'
         self.img_size = 128
         self.rate = 6
-
-    def _create_temp_path(self):
-        """
-        Creation of temporary folder for images
-        :return: None
-        """
-        path = 'tmp_images'
-
-        if os.path.exists(path):
-            shutil.rmtree(path)
-        os.makedirs(path)
-
-        return
 
     def _save_as_fig(self, struct: Structure, ax=plt):
         """
