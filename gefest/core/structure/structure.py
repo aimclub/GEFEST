@@ -124,7 +124,7 @@ def get_random_poly(parent_structure: Optional[Structure],
     geometry = domain.geometry
     try:
         """
-        Function for create random polygon.
+        Function for creation random polygon.
         The main idea is to create centroids along with a neighborhood to locate the polygon.
         Neighborhood sizes range from small to large.
         The main condition for creating a neighborhood is the absence of other polygons in it.
@@ -228,6 +228,9 @@ def create_area(domain: 'Domain',
 def create_random_point(domain: 'Domain'):
     point = Point(np.random.uniform(low=domain.min_x, high=domain.max_x),
                   np.random.uniform(low=domain.min_y, high=domain.max_y))
+    while not in_bound(point, domain):
+        point = Point(np.random.uniform(low=domain.min_x, high=domain.max_x),
+                      np.random.uniform(low=domain.min_y, high=domain.max_y))
 
     return point
 
@@ -243,11 +246,8 @@ def create_polygon_point(centroid: 'Point',
 
 def in_bound(point: 'Point',
              domain: 'Domain'):
-    if point.x < domain.min_x or point.x > domain.max_x:
-        return False
-    if point.y < domain.min_y or point.y > domain.max_y:
-        return False
-    return True
+    poly_domain = Polygon(polygon_id='tmp', points=[Point(c[0], c[1]) for c in domain.allowed_area])
+    return domain.geometry.is_contain_point(poly_domain, point)
 
 
 def distance(point: 'Point',
