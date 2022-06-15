@@ -1,7 +1,7 @@
 Validation
 ========
 
-.. automodule:: gefest.core.algs.validation
+.. automodule:: gefest.core.algs
    :members:
    :undoc-members:
    :show-inheritance:
