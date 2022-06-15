@@ -12,6 +12,7 @@ Content
    :maxdepth: 1
 
    gefest/index
+   modules/index
    contribution
    faq
    about
