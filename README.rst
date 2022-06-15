@@ -1,4 +1,4 @@
-.. image:: docs/gefest_logo.png
+.. image:: /docs/img/gefest_logo.png
    :alt: Logo of GEFEST framework
 
 .. start-badges
@@ -23,8 +23,10 @@ It uses: (1) numerical modelling to simulate the interaction between object and 
 The basic abstractions in GEFEST are Point, Polygon, Structure and Domain.
 
 The workflow of the generative design is the following:
-.. image:: docs/img/workflow.png
+
+.. image:: /docs/img/workflow.png
    :alt: workflow
+
 
 Acknowledgments
 ==============
@@ -65,5 +67,5 @@ preprint arXiv:2004.03010}, year={2020} }
    :target: https://github.com/ITMO-NSS-team/GEFEST/blob/main/LICENSE.md
 
 .. |tg| image:: https://img.shields.io/badge/Telegram-Group-blue.svg
-          :target: https://t.me/gefest_helpdesk
-          :alt: Telegram Chat
+   :target: https://t.me/gefest_helpdesk
+   :alt: Telegram Chat
