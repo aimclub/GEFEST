@@ -64,7 +64,7 @@ preprint arXiv:2004.03010}, year={2020} }
 
 .. |license| image:: https://img.shields.io/github/license/nccr-itmo/GEFEST
    :alt: Supported Python Versions
-   :target: https://github.com/ITMO-NSS-team/GEFEST/blob/main/LICENSE.md
+   :target: https://github.com/ITMO-NSS-team/GEFEST/blob/LICENSE
 
 .. |tg| image:: https://img.shields.io/badge/Telegram-Group-blue.svg
    :target: https://t.me/gefest_helpdesk
