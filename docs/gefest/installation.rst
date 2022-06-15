@@ -8,7 +8,7 @@ Installation from GitHub
 or full installation
 
   | git clone https://github.com/ITMO-NSS-team/GEFEST.git
-  | cd FEDOT
+  | cd GEFEST
   | pip install .[extra]
   | pytest -s test/
 

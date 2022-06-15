@@ -14,7 +14,7 @@ any major contributions.
 Instructions
 -----------------
 
-There is a presentation to help you to take your first steps to become a FEDOT contributor below.
+There is a presentation to help you to take your first steps to become a GEFEST contributor below.
 
 :download:`Want to implement a custom operation in GEFEST <path to guide file>`
 
@@ -75,7 +75,7 @@ to record your changes in Git, then push them to GitHub with:
 
           $ git push -u origin my-contribution
 
-Finally, go to the web page of your fork of the FEDOT repo, and click
+Finally, go to the web page of your fork of the GEFEST repo, and click
 'Pull Request' (PR) to send your changes to the maintainers for review.
 
 (If it looks confusing to you, then look up the `Git
