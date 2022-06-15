@@ -5,7 +5,7 @@ GEFEST
 
 .. toctree::
    :glob:
-   :maxdepth: 1
+   :maxdepth: 2
 
    gefest
    installation
