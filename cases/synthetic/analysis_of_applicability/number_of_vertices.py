@@ -35,8 +35,8 @@ def area_length_ratio(poly):
 
 
 # Adding fine for structures containing imprecise polygons
-def multi_loss(struct: Structure, expected_poly_num: int):
-    num_polys = len(struct.polygons)
+def multi_loss(struct: Structure, expected_vertices_num: int):
+    num_vertices = sum([len(poly.points) for poly in struct.polygons])
     loss = 0
 
     if len(struct.polygons) == 0:
@@ -48,17 +48,17 @@ def multi_loss(struct: Structure, expected_poly_num: int):
             return None
         loss += quality_of_poly
     loss = loss / len(struct.polygons)
-    L = loss + loss * 0.05 * abs(num_polys - expected_poly_num)
+    L = loss + loss * 0.05 * abs(num_vertices - expected_vertices_num)
 
     return L
 
 
-expected_poly_nums = list(range(1, 50))
+expected_vertices_nums = list(range(3, 50))
 
 fint = []
 
 num_iters = 10
-for expected_poly_num in expected_poly_nums:
+for expected_vertices_num in expected_vertices_nums:
     local_fint = []
     for iter in range(num_iters):
         # Usual GEFEST procedure for initialization domain, geometry (with closed or unclosed polygons) and task_setup
@@ -70,14 +70,14 @@ for expected_poly_num in expected_poly_nums:
                                       (300, 0),
                                       (0, 0)],
                         geometry=geometry,
-                        max_poly_num=50,
+                        max_poly_num=2,
                         min_poly_num=1,
-                        max_points_num=20,
-                        min_points_num=5,
+                        max_points_num=50,
+                        min_points_num=4,
                         is_closed=is_closed)
 
         task_setup = Setup(domain=domain)
-        res_id = f'exp2_{expected_poly_num}_{iter}'
+        res_id = f'exp3_{expected_vertices_num}_{iter}'
         spend_time = 0
         if os.path.exists(f'{res_id}.json'):
             result = Result.load(f'{res_id}.json')
@@ -89,14 +89,14 @@ for expected_poly_num in expected_poly_nums:
             start = timeit.default_timer()
             result = optimize(task_setup=task_setup,
                               objective_function=partial(multi_loss,
-                                                         expected_poly_num=expected_poly_num),
+                                                         expected_vertices_num=expected_vertices_num),
                               pop_size=100,
                               max_gens=100)
             optimized_structure = result.best_structure
             spend_time = timeit.default_timer() - start
             result.name = res_id
             result.metadata['time'] = spend_time
-            result.fitness = multi_loss(optimized_structure, expected_poly_num)
+            result.fitness = multi_loss(optimized_structure, expected_vertices_num)
 
             result.save(f'{result.name}.json')
             # Visualization optimized structure
@@ -104,7 +104,7 @@ for expected_poly_num in expected_poly_nums:
             plt.figure(figsize=(7, 7))
 
         info = {'spend_time': spend_time,
-                'fitness': multi_loss(optimized_structure, expected_poly_num),
+                'fitness': multi_loss(optimized_structure, expected_vertices_num),
                 'type': 'prediction'}
         # visualiser.plot_structure(optimized_structure, info)
 
@@ -115,8 +115,8 @@ for expected_poly_num in expected_poly_nums:
 
 print(fint)
 
-sns.boxplot(x=expected_poly_nums, y=fint)
-plt.xlabel('Expected number of structures')
+sns.boxplot(x=expected_vertices_nums, y=fint)
+plt.xlabel('Expected number of vertices')
 plt.xticks(rotation=45)
 plt.ylabel('Error for best structure')
 plt.show()
