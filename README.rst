@@ -62,9 +62,9 @@ preprint arXiv:2004.03010}, year={2020} }
    :target: https://gefest.readthedocs.io/en/latest/
    :alt: Documentation Status
 
-.. |license| image:: https://img.shields.io/github/license/nccr-itmo/GEFEST
+.. |license| image:: https://img.shields.io/github/license/nccr-itmo/FEDOT
    :alt: Supported Python Versions
-   :target: ./LICENSE
+   :target: ./LICENSE.md
 
 .. |tg| image:: https://img.shields.io/badge/Telegram-Group-blue.svg
    :target: https://t.me/gefest_helpdesk
