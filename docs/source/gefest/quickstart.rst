@@ -17,6 +17,7 @@ How to designed your own polygon in manual way
 Loss function for finding a polygon that seems like circle showed below. 
 
 .. code:: python
+
  import numpy as np
  from gefest.core.geometry.geometry_2d import Geometry2D
 
@@ -40,6 +41,7 @@ Loss function for finding a polygon that seems like circle showed below.
 Put the *Domain* to *Setup()* class for creating a task variable.
 
 .. code:: python
+
  from gefest.core.structure.domain import Domain
  from gefest.core.opt.setup import Setup
 
@@ -69,6 +71,7 @@ Put the *Domain* to *Setup()* class for creating a task variable.
 Structure will contain number of polygons that previously specified in *Domain*
 
 .. code:: python
+
  from gefest.core.opt.optimize import optimize
 
  optimized_structure = optimize(task_setup=task_setup,
@@ -82,6 +85,7 @@ Structure will contain number of polygons that previously specified in *Domain*
 -  **Step 4**. Create visualization of designed structure.
 
 .. code:: python
+    
  from gefest.core.viz.struct_vizualizer import StructVizualizer
 
  visualiser = StructVizualizer(task_setup.domain)
