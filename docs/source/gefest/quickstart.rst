@@ -7,13 +7,9 @@ How to install
 --------------
 .. code::
 
- git clone https://github.com/ITMO-NSS-team/GEFEST.git
- cd GEFEST
- pip install -r requirements.txt
- pytest -s test/
+ pip install https://github.com/ITMO-NSS-team/GEFEST/archive/master.zip
 
-
-How to designed your own polygon in manual way
+How to design your own polygon in manual way
 ----------------------------------------------------
 
 -  **Step 1**. Create loss function or simulator of the physical process.
