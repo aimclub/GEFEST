@@ -58,8 +58,8 @@ preprint arXiv:2004.03010}, year={2020} }
 
 
 
-.. |docs| image:: https://readthedocs.org/projects/ebonite/badge/?style=flat
-   :target: https://gefest.readthedocs.io/en/latest/
+.. |docs| image:: https://readthedocs.org/projects/gefest/badge/?version=latest
+   :target: https://gefest.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 
 .. |license| image:: https://img.shields.io/github/license/nccr-itmo/FEDOT
