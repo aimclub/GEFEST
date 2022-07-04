@@ -7,8 +7,7 @@ import setuptools
 HERE = Path(__file__).parent.resolve()
 
 # The text of the README file
-NAME = 'fedot'
-VERSION = '0.5.2'
+NAME = 'gefest'
 AUTHOR = 'NSS Lab'
 SHORT_DESCRIPTION = 'The toolbox for the generative design of physical objects'
 README = Path(HERE, 'README.rst').read_text()
@@ -34,7 +33,6 @@ def _get_requirements(req_name: str):
 
 setuptools.setup(
     name=NAME,
-    version=VERSION,
     author=AUTHOR,
     author_email='itmo.nss.team@gmail.com',
     description=SHORT_DESCRIPTION,
