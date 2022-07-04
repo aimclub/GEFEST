@@ -21,8 +21,8 @@ project = 'GEFEST'
 copyright = '2021-2022, NSS Lab'
 author = 'NSS Lab'
 
-# # The full version, including alpha/beta/rc tags
-# release = '0.0.1'
+# The full version, including alpha/beta/rc tags
+release = '0.0.1'
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
