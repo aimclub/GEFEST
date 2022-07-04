@@ -7,7 +7,10 @@ How to install
 --------------
 .. code::
 
- pip install gefest
+ git clone https://github.com/ITMO-NSS-team/GEFEST.git
+ cd GEFEST
+ pip install -r requirements.txt
+ pytest -s test/
 
 
 How to designed your own polygon in manual way
@@ -67,8 +70,8 @@ Put the *Domain* to *Setup()* class for creating a task variable.
 
  task_setup = Setup(domain=domain)
 
--  **Step 3**. Create optimized structure with *optimize* method. 
-Structure will contain number of polygons that previously specified in *Domain*
+-  **Step 3**. Create an optimized structure via *optimize* method. 
+The structure will contain number of polygons that previously specified in *Domain*
 
 .. code:: python
 
