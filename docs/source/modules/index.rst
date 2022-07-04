@@ -8,4 +8,5 @@ GEFEST's modules
    :maxdepth: 2
 
    validation
+   point
    

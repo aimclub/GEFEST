@@ -1,7 +1,7 @@
-Validation
+Point
 ========
 
-.. automodule:: gefest.core.algs
+.. automodule:: gefest.core.structure.point
    :members:
    :undoc-members:
    :show-inheritance:

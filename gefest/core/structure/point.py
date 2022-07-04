@@ -3,6 +3,18 @@ from dataclasses import dataclass
 
 @dataclass
 class Point:
+    """
+    The smallest object in GEFEST
+
+    Args:
+        x(float): set the **x** coordinate of Point()
+        y(float): set the **y** coordinate of Point()
+        z(float): set the **z** coordinate of Point(), by default z = 0.0
+
+    Returns:
+        Point: Point(x,y,z)
+    """
+
     _x: float
     _y: float
     _z: float = 0.0
