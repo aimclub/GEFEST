@@ -5,7 +5,7 @@ We welcome you to `check the existing
 issues <https://github.com/ITMO-NSS-team/GEFEST/issues>`__ for bugs or
 enhancements to work on. If you have an idea for an extension to GEFEST,
 please `file a new
-issue <https://github.com/ITMO-NSS-team/GEFEST/issues/new`__ so we can
+issue <https://github.com/ITMO-NSS-team/GEFEST/issues/new>`__ so we can
 discuss it.
 
 Make sure to familiarize yourself with the project layout before making
