@@ -17,9 +17,12 @@ class Point:
         The Z coordinate.
     """
 
-    # _x: float
-    # _y: float
-    # _z: float = 0.0
+# : :meta hide-value:
+    _x: float
+# : :meta hide-value:
+    _y: float
+#: :meta hide-value:
+    _z: float = 0.0
 
     @property
     def x(self):
