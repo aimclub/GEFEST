@@ -21,8 +21,7 @@ class Point:
     """
     :meta hide-value:
     """
-# : :meta hide-value:
-    _y: float
+    _y: float  #: :meta hide-value:
 #: :meta hide-value:
     _z: float = 0.0
 
