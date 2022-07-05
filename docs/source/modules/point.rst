@@ -2,6 +2,6 @@ Points
 ========
 
 .. autoclass:: gefest.core.structure.point.Point
-   :members:
    :no-undoc-members:
    :no-private-members:
+   .. automethod:: coords(Point(x,y,z))

@@ -48,8 +48,7 @@ class Point:
 
     def coords(self):
         """
-        Returns:
-            list: coordinates of **Point**
+            Returned type(list) with spatial coordinates of **Point**
         """
         return [self.x, self.y, self.z]
 
