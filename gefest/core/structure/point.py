@@ -5,7 +5,7 @@ from typing import List
 @dataclass
 class Point:
     """
-    The smallest object which consists spatial information of point
+    The smallest geometrical object which consists spatial information of point
 
     Attributes
     ----------
@@ -17,8 +17,10 @@ class Point:
         The Z coordinate.
     """
 
-# : :meta hide-value:
     _x: float
+    """
+    :meta hide-value:
+    """
 # : :meta hide-value:
     _y: float
 #: :meta hide-value:
