@@ -21,6 +21,12 @@ class Point:
 
     @property
     def x(self):
+        """
+        Coordinate **x**
+
+        Returns:
+            float: value of **x** coordinate
+        """
         return round(self._x)
 
     @x.setter
@@ -29,6 +35,12 @@ class Point:
 
     @property
     def y(self):
+        """
+        Coordinate **y**
+
+        Returns:
+            float: value of **y** coordinate
+        """
         return round(self._y)
 
     @y.setter
@@ -37,6 +49,12 @@ class Point:
 
     @property
     def z(self):
+        """
+        Coordinate **z**
+
+        Returns:
+            float: value of **z** coordinate
+        """
         return round(self._z)
 
     @z.setter
@@ -44,6 +62,12 @@ class Point:
         self._z = value
 
     def coords(self):
+        """
+        Coordinate **z**
+
+        Returns:
+            list: coordinates of **Point**
+        """
         return [self.x, self.y, self.z]
 
 

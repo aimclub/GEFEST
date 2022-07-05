@@ -1,10 +1,6 @@
-Point
+Points
 ========
 
-.. automodule:: gefest.core.structure.point
+.. autoclass:: gefest.core.structure.point.Point
    :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. toctree::
-   :glob:
+   :no-undoc-members:
