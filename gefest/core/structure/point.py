@@ -1,12 +1,11 @@
 from dataclasses import dataclass
+from typing import List
 
 
 @dataclass
 class Point:
     """
     The smallest object which consists spatial information of point
-
-    ...
 
     Attributes
     ----------
@@ -18,9 +17,9 @@ class Point:
         The Z coordinate.
     """
 
-    _x: float
-    _y: float
-    _z: float = 0.0
+    # _x: float
+    # _y: float
+    # _z: float = 0.0
 
     @property
     def x(self):
@@ -46,9 +45,9 @@ class Point:
     def z(self, value):
         self._z = value
 
-    def coords(self):
+    def coords(self) -> list:
         """
-            Returned type(list) with spatial coordinates of **Point**
+            Returned the list with spatial coordinates of **Point**
         """
         return [self.x, self.y, self.z]
 
