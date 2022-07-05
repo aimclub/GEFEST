@@ -8,8 +8,8 @@ class Point:
 
     Args:
         _x (float): the X coordinate of ``Point``.
-        _x (float): the Y coordinate of ``Point``.
-        _x (float): the Z coordinate of ``Point``.
+        _y (float): the Y coordinate of ``Point``.
+        _z (float): the Z coordinate of ``Point``.
 
     Returns:
         ``Point``: **Point**
