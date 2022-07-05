@@ -4,15 +4,18 @@ from dataclasses import dataclass
 @dataclass
 class Point:
     """
-    The smallest object in GEFEST
+    The smallest object which consists spatial information of point
 
-    Args:
-        x(float): set the **x** coordinate of Point()
-        y(float): set the **y** coordinate of Point()
-        z(float): set the **z** coordinate of Point(), by default z = 0.0
+    ...
 
-    Returns:
-        Point: Point(x,y,z)
+    Attributes
+    ----------
+    x : float
+        The X coordinate.
+    y : float
+        The Y coordinate.
+    z : float
+        The Z coordinate.
     """
 
     _x: float
@@ -21,12 +24,6 @@ class Point:
 
     @property
     def x(self):
-        """
-        Coordinate **x**
-
-        Returns:
-            float: value of **x** coordinate
-        """
         return round(self._x)
 
     @x.setter
@@ -35,12 +32,6 @@ class Point:
 
     @property
     def y(self):
-        """
-        Coordinate **y**
-
-        Returns:
-            float: value of **y** coordinate
-        """
         return round(self._y)
 
     @y.setter
@@ -49,12 +40,6 @@ class Point:
 
     @property
     def z(self):
-        """
-        Coordinate **z**
-
-        Returns:
-            float: value of **z** coordinate
-        """
         return round(self._z)
 
     @z.setter
@@ -63,8 +48,6 @@ class Point:
 
     def coords(self):
         """
-        Coordinate **z**
-
         Returns:
             list: coordinates of **Point**
         """
