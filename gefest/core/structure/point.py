@@ -7,7 +7,7 @@ class Point:
     """
     The smallest geometrical object which consists spatial information of point
 
-    Attributes
+    Parameters
     ----------
     x : float
         The X coordinate.
@@ -16,11 +16,14 @@ class Point:
     z : float
         The Z coordinate.
     """
+    _x: float
+    _y: float
+    _z: float = 0.0
 
-    def __init__(self, x: float, y: float, z: float = 0.0):
-        self._x = x
-        self._y = y
-        self._z = z
+    # def __init__(self, x: float, y: float, z: float = 0.0):
+    #     self._x = x
+    #     self._y = y
+    #     self._z = z
 
     @property
     def x(self):
