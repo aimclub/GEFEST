@@ -10,14 +10,15 @@ class Point:
     Parameters
     ----------
     x : float
-        
+        kj
     y : float
         The Y coordinate.
     z : float
         The Z coordinate.
     """
-    _x: float  # The X coordinate
-
+    _x: float
+    """The X coordinate
+    """
     _y: float
     _z: float = 0.0
 
