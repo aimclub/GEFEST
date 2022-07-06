@@ -33,7 +33,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
-    'sphinx.ext.mathjax', 
+    'sphinx.ext.mathjax',
     'autodocsumm',
 ]
 
@@ -76,13 +76,16 @@ autodoc_typehints = 'description'
 
 # --- Work around to make autoclass signatures not (*args, **kwargs) ----------
 
+
 class FakeSignature():
     def __getattribute__(self, *args):
         raise ValueError
 
+
 def f(app, obj, bound_method):
     if "__new__" in obj.__name__:
         obj.__signature__ = FakeSignature()
+
 
 def setup(app):
     app.connect('autodoc-before-process-signature', f)
