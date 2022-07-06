@@ -13,7 +13,7 @@
 import os
 import datetime
 import sys
-sys.path.append('/docs/source')
+# sys.path.append('/docs/source')
 
 # -- Project information -----------------------------------------------------
 
