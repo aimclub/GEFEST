@@ -8,15 +8,15 @@ class Point:
     The smallest geometrical object which consists spatial information of point
 
     Args:
-        _x: the X coordinate of Point
-        _y: the Y coordinate of Point
-        _z: the Z coordinate of Point
+        _x (float): the X coordinate of Point
+        _y (float): the Y coordinate of Point
+        _z (float)=0.0: the Z coordinate of Point
 
     Methods:
         coords: return the list with spatial coordinates of Point
 
     Returns:
-        ``Point``: **Point**
+        ``Point``: **Point(X,Y,Z)**
 
     """
 
