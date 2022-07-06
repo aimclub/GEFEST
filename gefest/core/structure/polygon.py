@@ -8,9 +8,9 @@ class Polygon:
 
     Args:
         polygon_id (str): name of Polygon, used as separator between polygons
-        in the postprocessing layer; must be ``"fixed"`` where created a polygon
-        that can not be deleted from working area due postprocessing
-        points (list): list of ``Point`` objects which form borders of Polygon
+            in the postprocessing layer; must be ``"fixed"`` where created a polygon
+            that can not be deleted from working area due postprocessing
+        points (list): list of ``Point`` objects which form borders of ``Polygon``
 
     Returns:
         ``Polygon(List[Point])``

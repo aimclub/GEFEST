@@ -1,4 +1,4 @@
-Structure units
+Structure units:
 ========
 
 Point
@@ -8,3 +8,7 @@ Point
 Polygon
 ~~~~~~~~~
 .. autoclass:: gefest.core.structure.polygon.Polygon
+
+Structure
+~~~~~~~~~
+.. autoclass:: gefest.core.structure.structure.Structure

@@ -15,6 +15,23 @@ from gefest.core.structure.polygon import Polygon
 
 @dataclass
 class Structure:
+    """The geometrical object made up of ``Polygon`` objects
+
+    Args:
+        polygons: list of ``Polygon`` objects which form a combined set of polygons,
+            needed for joint processing capability of polygons
+
+    Methods:
+        text_id: returns information about ``Polygons`` and ``Points``
+            included in ``Structure``
+        total_points: returns list with lengths (number of ``Point``)
+            of every ``Polygon`` included
+        plot: returns visualization with drawn ``Strucrure``
+
+    Returns:
+        ``Structure(List[Polygon])``
+
+    """
     polygons: List[Polygon]
 
     def __str__(self):
@@ -29,7 +46,7 @@ class Structure:
         return json.dumps(self, default=vars)
 
     @property
-    def text_id(self):
+    def text_id(self) -> str:
         out_str = ''
         for i, pol in enumerate(self.polygons):
             out_str += f'P{i}={len(pol.points)}:'
@@ -38,7 +55,7 @@ class Structure:
         return out_str
 
     @property
-    def total_points(self):
+    def total_points(self) -> list:
         return [len(p.points) for p in self.polygons]
 
     def plot(self, structure, domain=None, title=None):
