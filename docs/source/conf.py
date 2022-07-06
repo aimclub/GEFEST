@@ -126,7 +126,7 @@ autodoc_mock_imports = ['objgraph', 'memory_profiler', 'gprof2dot', 'snakeviz']
 #     'sphinx.ext.autosummary',
 #     'sphinx.ext.autodoc.typehints',
 # ]
-autodoc_typehints = 'description'
+# autodoc_typehints = 'description'
 
 # autodoc_mock_imports = ['objgraph', 'memory_profiler', 'gprof2dot', 'snakeviz']
 
