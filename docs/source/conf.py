@@ -13,7 +13,7 @@
 import os
 import datetime
 import sys
-sys.path.append('docs/source')
+sys.path.append('/docs/source')
 
 # -- Project information -----------------------------------------------------
 
@@ -52,7 +52,7 @@ exclude_patterns = []
 #
 
 html_theme = "sphinx_rtd_theme"
-html_logo = "docs/img/gefest_logo.png"
+html_logo = "/docs/img/gefest_logo.png"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
