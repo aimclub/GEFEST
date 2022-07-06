@@ -1,4 +1,4 @@
-GEFEST's modules
+Components
 =====
 
 **That is about modules into GEFEST**
@@ -7,6 +7,6 @@ GEFEST's modules
    :glob:
    :maxdepth: 2
 
-   validation
+   structure
    point
    
