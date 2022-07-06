@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List
 
 
-@dataclass
+# @dataclass
 class Point:
     """
     The smallest geometrical object which consists spatial information of point
