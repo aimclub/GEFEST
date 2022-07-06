@@ -4,15 +4,17 @@ from typing import List
 
 @dataclass
 class Point:
-    """The smallest geometrical object which consists spatial information of point
+    """
+    The smallest geometrical object which consists spatial information of point
 
-    Args:
-        _x (float): the X coordinate of ``Point``.
-        _y (float): the Y coordinate of ``Point``.
-        _z (float): the Z coordinate of ``Point``.
+    Attributes:
+        _x: the X coordinate of Point
+        _y: the Y coordinate of Point
+        _z: the Z coordinate of Point
 
     Returns:
         ``Point``: **Point**
+
     """
 
     _x: float
