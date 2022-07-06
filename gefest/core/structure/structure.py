@@ -22,9 +22,9 @@ class Structure:
             needed for joint processing capability of polygons
 
     Methods:
-        text_id: returns information about ``Polygons`` and ``Points``
+        text_id (str): returns information about ``Polygons`` and ``Points``
             included in ``Structure``
-        total_points: returns list with lengths (number of ``Point``)
+        total_points (list): returns list with lengths (number of ``Point``)
             of every ``Polygon`` included
         plot: returns visualization with drawn ``Strucrure``
 
