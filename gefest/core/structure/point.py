@@ -7,7 +7,7 @@ class Point:
     """
     The smallest geometrical object which consists spatial information of point
 
-    Attributes:
+    Args:
         _x: the X coordinate of Point
         _y: the Y coordinate of Point
         _z: the Z coordinate of Point
