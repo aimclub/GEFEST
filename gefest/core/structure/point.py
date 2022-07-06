@@ -12,6 +12,9 @@ class Point:
         _y: the Y coordinate of Point
         _z: the Z coordinate of Point
 
+    Methods:
+        coords(): return the list with spatial coordinates of Point
+
     Returns:
         ``Point``: **Point**
 
