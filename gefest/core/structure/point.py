@@ -16,7 +16,7 @@ class Point:
         coords: return the list with spatial coordinates of Point
 
     Returns:
-        :class: Point: ``Point(x,y,z)``
+        ``Point(x,y,z)``
 
     """
 
