@@ -67,7 +67,7 @@ autodoc_inherit_docstrings = False
 # napoleon_include_init_with_doc = True
 # napoleon_numpy_docstring = True
 autoclass_content = 'class'
-autodoc_typehints = 'none'
+autodoc_typehints = 'signature'
 autodoc_member_order = 'bysource'
 
 # --- Work around to make autoclass signatures not (*args, **kwargs) ----------
