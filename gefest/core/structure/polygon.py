@@ -4,7 +4,7 @@ from gefest.core.structure.point import Point
 
 
 class Polygon:
-    """The geometrical object made up of ``Point``s
+    """The geometrical object made up of ``Point`` objects
 
     Args:
         polygon_id (str): name of Polygon, used as separator between polygons
