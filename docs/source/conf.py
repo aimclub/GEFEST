@@ -51,9 +51,7 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 
-import sphinx_rtd_theme
 html_theme = "sphinx_rtd_theme"
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 html_logo = "docs/img/gefest_logo.png"
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -70,11 +68,7 @@ napoleon_include_init_with_doc = True
 napoleon_numpy_docstring = False
 
 autodoc_mock_imports = [
-    'tqdm',
-    'numpy',
-    'timm',
-    'cv2',
-    'PIL'
+    'numpy'
 ]
 
 autoclass_content = 'both'
