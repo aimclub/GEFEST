@@ -13,7 +13,7 @@
 import os
 import datetime
 import sys
-# sys.path.append('/docs/source')
+sys.path.append('/docs/source')
 
 # -- Project information -----------------------------------------------------
 
@@ -30,11 +30,11 @@ version = '0.0.1'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    # 'sphinx.ext.coverage',
+    'sphinx.ext.coverage',
     'sphinx.ext.napoleon',
-    # 'sphinx.ext.viewcode',
-    # 'sphinx.ext.mathjax',
-    # 'autodocsumm',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.mathjax',
+    'autodocsumm',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -69,6 +69,7 @@ html_theme = "sphinx_rtd_theme"
 autoclass_content = 'class'
 autodoc_typehints = 'signature'
 autodoc_member_order = 'bysource'
+master_doc = 'index'
 
 # --- Work around to make autoclass signatures not (*args, **kwargs) ----------
 
