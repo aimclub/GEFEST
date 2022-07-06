@@ -34,6 +34,13 @@ extensions = [
     'sphinx.ext.doctest'
 ]
 
+# Napoleon settings
+napoleon_google_docstring = True
+napoleon_numpy_docstring = True
+napoleon_include_init_with_doc = False
+napoleon_include_private_with_doc = False
+
+
 # autodoc_mock_imports = ['objgraph', 'memory_profiler', 'gprof2dot', 'snakeviz']
 # autodoc_member_order = 'bysource'
 
