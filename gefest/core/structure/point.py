@@ -13,7 +13,7 @@ class Point:
         _z: the Z coordinate of Point
 
     Methods:
-        coords(): return the list with spatial coordinates of Point
+        coords: return the list with spatial coordinates of Point
 
     Returns:
         ``Point``: **Point**
@@ -54,9 +54,6 @@ class Point:
         self._z = value
 
     def coords(self) -> list:
-        """
-            Return the list with spatial coordinates of **Point**
-        """
         return [self.x, self.y, self.z]
 
 
