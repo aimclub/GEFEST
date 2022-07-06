@@ -54,16 +54,6 @@ exclude_patterns = []
 import sphinx_rtd_theme
 html_theme = "sphinx_rtd_theme"
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-
-# import karma_sphinx_theme
-# html_theme = "karma_sphinx_theme"
-import faculty_sphinx_theme
-html_theme = "faculty_sphinx_theme"
-
-# import catalyst_sphinx_theme
-# html_theme = "catalyst_sphinx_theme"
-# html_theme_path = [catalyst_sphinx_theme.get_html_theme_path()]
-
 html_logo = "docs/img/gefest_logo.png"
 
 # Add any paths that contain custom static files (such as style sheets) here,
