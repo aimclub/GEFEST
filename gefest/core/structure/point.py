@@ -12,9 +12,6 @@ class Point:
         _y (float): the **y** coordinate of Point
         _z (float): the **z** coordinate of Point, by default ``_z=0.0``
 
-    Methods:
-        coords: return the list with spatial coordinates of Point
-
     Returns:
         ``Point(x,y,z)``
 
@@ -24,13 +21,10 @@ class Point:
     _y: float
     _z: float = 0.0
 
-    # def __init__(self, x: float, y: float, z: float = 0.0):
-    #     self._x = x
-    #     self._y = y
-    #     self._z = z
-
     @property
-    def x(self):
+    def x(self) -> int:
+        '''returns the rounded until integer **x** coordinate
+        '''
         return round(self._x)
 
     @x.setter
@@ -38,7 +32,9 @@ class Point:
         self._x = value
 
     @property
-    def y(self):
+    def y(self) -> int:
+        '''returns the rounded until integer **y** coordinate
+        '''
         return round(self._y)
 
     @y.setter
@@ -46,7 +42,9 @@ class Point:
         self._y = value
 
     @property
-    def z(self):
+    def z(self) -> int:
+        '''returns the rounded until integer **z** coordinate
+        '''
         return round(self._z)
 
     @z.setter
@@ -54,7 +52,11 @@ class Point:
         self._z = value
 
     def coords(self) -> list:
-        ''' summary
+        '''returns the list inclided spatial coordinates of the ``Point``
+
+        Returns:
+          ``[x,y,z]``
+
         '''
         return [self.x, self.y, self.z]
 
