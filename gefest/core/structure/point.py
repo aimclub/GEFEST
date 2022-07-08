@@ -12,6 +12,11 @@ class Point:
         _y (float): the **y** coordinate of Point
         _z (float): the **z** coordinate of Point, by default ``_z=0.0``
 
+    Attributes:
+        x: returns the rounded until integer **x** coordinate
+        y: returns the rounded until integer **y** coordinate
+    for calling a coordinate from :class: Point: hk
+
     Returns:
         ``Point(x,y,z)``
 
