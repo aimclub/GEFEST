@@ -68,6 +68,7 @@ html_theme = "sphinx_rtd_theme"
 # napoleon_google_docstring = True
 # napoleon_include_init_with_doc = True
 # napoleon_numpy_docstring = True
+napoleon_attr_annotations = False
 autodoc_default_options = {
     'members': True,
     'undoc-members': False,
