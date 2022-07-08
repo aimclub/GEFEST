@@ -8,5 +8,5 @@ Components
    :maxdepth: 2
 
    structure
-   point
+   geometry
    

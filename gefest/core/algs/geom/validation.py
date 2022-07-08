@@ -16,7 +16,9 @@ out of bound for points in polygon, closeness between polygons and unclosed (for
 """
 
 
-def intersection(structure: 'Structure', geometry: 'Geometry'):
+def intersection(structure: 'Structure', geometry: 'Geometry') -> bool:
+    '''method for checking intersection between Polygons that put to Structure
+    '''
     polygons = structure.polygons
     if len(polygons) < 2:
         return False
@@ -27,7 +29,9 @@ def intersection(structure: 'Structure', geometry: 'Geometry'):
     return False
 
 
-def out_of_bound(structure: 'Structure', domain: 'Domain'):
+def out_of_bound(structure: 'Structure', domain: 'Domain') -> bool:
+    '''bla bla
+    '''
     domain_poly = domain.bound_poly
     for poly in structure.polygons:
         if not domain.geometry.is_contain_poly(poly, domain_poly):
