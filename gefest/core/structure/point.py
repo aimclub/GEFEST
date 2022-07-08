@@ -5,7 +5,7 @@ from typing import List
 @dataclass
 class Point:
     """
-    The smallest geometrical object which consists spatial information of point
+    The smallest geometrical object which consists the spatial information of the point
 
     Args:
         _x (float): the **x** coordinate of Point
@@ -14,10 +14,8 @@ class Point:
 
     Attributes:
         x (int): returns the rounded until integer **x** coordinate
-        y: returns the rounded until integer **y** coordinate
-        rtype: y: int
-        z: returns the rounded until integer **z** coordinate
-        rtype: z: int
+        y (int): returns the rounded until integer **y** coordinate
+        z (int): returns the rounded until integer **z** coordinate
 
     Returns:
         ``Point(x,y,z)``
