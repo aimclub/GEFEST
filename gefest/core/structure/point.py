@@ -14,8 +14,11 @@ class Point:
 
     Attributes:
         x: returns the rounded until integer **x** coordinate
+        rtype: x: int
         y: returns the rounded until integer **y** coordinate
-    for calling a coordinate from :class: Point: hk
+        rtype: y: int
+        z: returns the rounded until integer **z** coordinate
+        rtype: z: int
 
     Returns:
         ``Point(x,y,z)``
