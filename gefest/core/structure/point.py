@@ -54,6 +54,8 @@ class Point:
         self._z = value
 
     def coords(self) -> list:
+        ''' summary
+        '''
         return [self.x, self.y, self.z]
 
 
