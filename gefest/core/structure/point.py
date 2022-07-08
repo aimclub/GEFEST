@@ -13,8 +13,7 @@ class Point:
         _z (float): the **z** coordinate of Point, by default ``_z=0.0``
 
     Attributes:
-        x: returns the rounded until integer **x** coordinate
-        rtype: x: int
+        x (int): returns the rounded until integer **x** coordinate
         y: returns the rounded until integer **y** coordinate
         rtype: y: int
         z: returns the rounded until integer **z** coordinate
