@@ -68,8 +68,13 @@ html_theme = "sphinx_rtd_theme"
 # napoleon_google_docstring = True
 # napoleon_include_init_with_doc = True
 # napoleon_numpy_docstring = True
+autodoc_default_options = {
+    'members': True,
+    'undoc-members': False,
+    'show-inheritance': True,
+    'member-order': 'bysource',
+    'ignore-module-all': True,
+}
 autoclass_content = 'class'
 autodoc_typehints = 'signature'
-autodoc_member_order = 'bysource'
-master_doc = 'index'
 autodoc_mock_imports = ['objgraph', 'memory_profiler', 'gprof2dot', 'snakeviz']

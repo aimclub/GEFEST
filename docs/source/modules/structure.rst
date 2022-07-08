@@ -4,7 +4,8 @@ Structure units:
 Point
 ~~~~~~~~~
 .. autoclass:: gefest.core.structure.point.Point
-   :members: x,y,z,coords
+   :members:
+   :no-undoc-members:
 
 Polygon
 ~~~~~~~~~

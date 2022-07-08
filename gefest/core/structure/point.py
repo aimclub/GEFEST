@@ -28,8 +28,6 @@ class Point:
 
     @property
     def x(self) -> int:
-        '''returns the rounded until integer **x** coordinate
-        '''
         return round(self._x)
 
     @x.setter
@@ -38,8 +36,6 @@ class Point:
 
     @property
     def y(self) -> int:
-        '''returns the rounded until integer **y** coordinate
-        '''
         return round(self._y)
 
     @y.setter
@@ -48,8 +44,6 @@ class Point:
 
     @property
     def z(self) -> int:
-        '''returns the rounded until integer **z** coordinate
-        '''
         return round(self._z)
 
     @z.setter
