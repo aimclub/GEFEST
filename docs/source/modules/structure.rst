@@ -1,4 +1,4 @@
-Structure units:
+Structure units
 ========
 
 Point
@@ -14,3 +14,5 @@ Polygon
 Structure
 ~~~~~~~~~
 .. autoclass:: gefest.core.structure.structure.Structure
+   :members:
+   :no-undoc-members:

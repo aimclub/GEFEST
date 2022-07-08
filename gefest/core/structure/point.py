@@ -51,7 +51,7 @@ class Point:
         self._z = value
 
     def coords(self) -> list:
-        '''returns the list inclided spatial coordinates of the ``Point``
+        '''returns the list included spatial coordinates of the ``Point``
 
         Returns:
           ``[x,y,z]``

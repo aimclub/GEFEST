@@ -18,15 +18,12 @@ class Structure:
     """The geometrical object made up of ``Polygon`` objects
 
     Args:
-        polygons: list of ``Polygon`` objects which form a combined set of polygons,
+        polygons (list): list of ``Polygon`` objects which form a combined set of polygons,
             needed for joint processing capability of polygons
 
-    Methods:
-        text_id (str): returns information about ``Polygons`` and ``Points``
-            included in ``Structure``
-        total_points (list): returns list with lengths (number of ``Point``)
-            of every ``Polygon`` included
-        plot: returns visualization with drawn ``Strucrure``
+    Attributes:
+        polygons (list): returns the list of ``Polygon`` objects
+
 
     Returns:
         ``Structure(List[Polygon])``
@@ -47,6 +44,10 @@ class Structure:
 
     @property
     def text_id(self) -> str:
+        '''returns information about ``Polygons`` and ``Points``
+        included in ``Structure``
+        '''
+
         out_str = ''
         for i, pol in enumerate(self.polygons):
             out_str += f'P{i}={len(pol.points)}:'
@@ -56,9 +57,16 @@ class Structure:
 
     @property
     def total_points(self) -> list:
+        '''returns list with lengths (number of ``Point``)
+        of every ``Polygon`` included
+        '''
+
         return [len(p.points) for p in self.polygons]
 
     def plot(self, structure, domain=None, title=None):
+        '''returns visualization with drawn ``Strucrure``
+        '''
+
         x = [point._x for point in structure.polygons[0].points]
         y = [point._y for point in structure.polygons[0].points]
         plt.plot(x, y)
