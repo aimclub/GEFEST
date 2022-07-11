@@ -27,7 +27,16 @@ class Point:
     _z: float = 0.0
 
     @property
-    def x(self) -> int:
+    def x(self):
+        """int: returns the rounded until integer **x** coordinate
+        
+        For determinate **x** value or reset it, please use information below:
+
+        Examples:
+            >>> point =  Point(1,2,3)
+            >>> print([i for i in example_generator(4)])
+            [0, 1, 2, 3]
+        """
         return round(self._x)
 
     @x.setter
