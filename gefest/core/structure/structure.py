@@ -86,6 +86,8 @@ class Structure:
 
         Examples:
             >>> struct.plot()
+
+        Output:
             ..image:: /docs/img/structure_plot.png
 
         '''
