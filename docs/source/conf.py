@@ -80,10 +80,10 @@ napoleon_use_keyword = True
 napoleon_use_param = True
 napoleon_use_rtype = True
 napoleon_preprocess_types = False
-napoleon_type_aliases = {
-    "Point": ":term:`gefest.core.structure.point`",
-    "Polygon": ":term:`gefest.core.structure.polygon`"
-}
+# napoleon_type_aliases = {
+#     "Point": ":term:`gefest.core.structure.point`",
+#     "Polygon": ":term:`gefest.core.structure.polygon`"
+# }
 napoleon_attr_annotations = False
 
 autodoc_default_options = {
@@ -95,4 +95,5 @@ autodoc_default_options = {
 }
 autoclass_content = 'class'
 autodoc_typehints = 'signature'
+autodoc_typehints_format = 'short'
 autodoc_mock_imports = ['objgraph', 'memory_profiler', 'gprof2dot', 'snakeviz']
