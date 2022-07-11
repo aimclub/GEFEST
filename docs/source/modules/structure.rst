@@ -21,3 +21,6 @@ class Structure
 .. autoclass:: gefest.core.structure.structure.Structure
    :members:
    :no-undoc-members:
+   .. image:: /docs/img/structure_plot.png
+
+   
