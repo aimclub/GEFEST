@@ -15,18 +15,18 @@ from gefest.core.structure.polygon import Polygon
 
 @dataclass
 class Structure:
-    """The geometrical object made up of ``Polygon`` objects
+    """The geometrical object made up of :obj:`Polygon` objects
 
     Args:
-        polygons (list): list of ``Polygon`` objects which form a combined set of polygons,
+        polygons (list): list of :obj:`Polygon` objects which form a combined set of polygons,
             needed for joint processing capability of polygons
 
     Attributes:
-        polygons (list): returns the list of ``Polygon`` objects
+        polygons (list): returns the :obj:`list` of :obj:`Polygon` objects
 
 
     Returns:
-        ``Structure(List[Polygon])``
+        Structure: ``Structure(List[Polygon])``
 
     """
     polygons: List[Polygon]

@@ -8,9 +8,9 @@ class Point:
     The smallest geometrical object which consists the spatial information of the point
 
     Args:
-        _x (float): the **x** coordinate of Point
-        _y (float): the **y** coordinate of Point
-        _z (float): the **z** coordinate of Point, by default ``_z=0.0``
+        _x (float): the **x** coordinate of :obj:`Point`
+        _y (float): the **y** coordinate of :obj:`Point`
+        _z (float): the **z** coordinate of :obj:`Point`, by default ``_z=0.0``
 
     Attributes:
         x (int): returns the rounded until integer **x** coordinate
@@ -58,11 +58,11 @@ class Point:
     def z(self, value):
         self._z = value
 
-    def coords(self) -> list:
-        '''Returns the list included spatial coordinates of the ``Point``
+    def coords(self):
+        '''Returns the :obj:`list` included spatial coordinates of the :obj:`Point`
 
         Returns:
-          list: ``[x,y,z]``
+          List: ``[x,y,z]``
 
         '''
         return [self.x, self.y, self.z]

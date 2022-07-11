@@ -4,7 +4,7 @@ Structure
 
 There is a description of structural elements that allow to create
 geometrical objects. Any geometrical figure might be created via set of
-3D ``Point`` objects, ``Polygon`` and ``Structure`` objects.  
+3D :obj:`Point`, :obj:`Polygon` and :obj:`Structure` objects.  
 
 class Point
 ~~~~~~~~~
