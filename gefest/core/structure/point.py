@@ -62,7 +62,7 @@ class Point:
         '''Returns the :obj:`list` included spatial coordinates of the :obj:`Point`
 
         Returns:
-          List: ``[x,y,z]``
+          :obj:`List`: ``[x,y,z]``
 
         '''
         return [self.x, self.y, self.z]

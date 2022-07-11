@@ -28,11 +28,30 @@ class Structure:
         total_points (list): returns the :obj:`list` with lengths (number of :obj:`Point`)
             of every :obj:`Polygon` included
 
+    Examples:
+        >>> from gefest.core.structure.point import Point
+        >>> from gefest.core.structure.polygon import Polygon
+        >>> from gefest.core.structure.structure import Structure
+        >>> # creating the rectangle Polygon
+        >>> points_rect = [Point(4,0), Point(8,0), Point(8,4), Point(4,4), Point(4,0)]
+        >>> rectangle = Polygon('rectangle', points=points_rect)
+        >>> # creating the triangle Polygon
+        >>> points_triagle = [Point(0,0), Point(3,3), Point(3,0), Point(0,0)]
+        >>> triangle = Polygon('triangle', points=points_triagle)
+        >>> # creating the Structure and plot it 
+        >>> struct = Structure([triangle, rectangle])
+        >>> struct.text_id
+        'P0=4:(x=0, y=0); (x=3, y=3); (x=3, y=0); (x=0, y=0);
+        P1=5:(x=4, y=0); (x=8, y=0); (x=8, y=4); (x=4, y=4); (x=4, y=0); '
+
+        >>> struct.total_points
+        [4, 5]
 
     Returns:
         Structure: ``Structure(List[Polygon])``
 
     """
+    
     polygons: List[Polygon]
 
     def __str__(self):
@@ -59,20 +78,27 @@ class Structure:
     def total_points(self) -> list:
         return [len(p.points) for p in self.polygons]
 
-    def plot(self, structure: 'Structure', title=None):
+    def plot(self, title=None):
         '''Visualization with drawn :obj:`Strucrure`
 
         Args:
-            structure (:obj:`Structure`): the :obj:`Strucrure` that should be showed
-            title (:obj:`str`): the name of drawing
+            title (str, optional): the name of drawing, by default ``None``
+
+        Examples:
+            >>> struct.plot()
+            `structure_plot`_
+
+        .. _structure_plot:
+            docs/img/structure_plot.png
 
         '''
-
-        x = [point._x for point in structure.polygons[0].points]
-        y = [point._y for point in structure.polygons[0].points]
-        plt.plot(x, y)
+        for poly in self.polygons:
+            x = [point._x for point in poly.points]
+            y = [point._y for point in poly.points]
+            plt.plot(x, y, label=poly.id)
+        plt.legend()
         plt.title(title)
-        plt.show()
+        plt.show
 
 
 def get_random_structure(domain: 'Domain') -> Structure:
