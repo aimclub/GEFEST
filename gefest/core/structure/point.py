@@ -19,8 +19,7 @@ class Point:
 
     Examples:
             >>> from gefest.core.structure.point import Point
-
-            >>> point =  Point(1,2)
+            >>> point = Point(1,2)
             Point(_x=1, _y=2, _z=3)
 
             >>> print('x = {}, y = {}'.format(point.x, point.y))
@@ -60,10 +59,10 @@ class Point:
         self._z = value
 
     def coords(self) -> list:
-        '''list: Returns the list included spatial coordinates of the ``Point``
+        '''Returns the list included spatial coordinates of the ``Point``
 
         Returns:
-          ``[x,y,z]``
+          list: ``[x,y,z]``
 
         '''
         return [self.x, self.y, self.z]
