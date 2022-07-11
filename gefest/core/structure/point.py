@@ -17,8 +17,17 @@ class Point:
         y (int): returns the rounded until integer **y** coordinate
         z (int): returns the rounded until integer **z** coordinate
 
+    Examples:
+            >>> from gefest.core.structure.point import Point
+
+            >>> point =  Point(1,2)
+            Point(_x=1, _y=2, _z=3)
+
+            >>> print('x = {}, y = {}'.format(point.x, point.y))
+            x = 1, y = 2
+
     Returns:
-        ``Point(x,y,z)``
+        Point: ``Point(x,y,z)``
 
     """
 
@@ -27,16 +36,7 @@ class Point:
     _z: float = 0.0
 
     @property
-    def x(self):
-        """int: returns the rounded until integer **x** coordinate
-        
-        For determinate **x** value or reset it, please use information below:
-
-        Examples:
-            >>> point =  Point(1,2,3)
-            >>> print([i for i in example_generator(4)])
-            [0, 1, 2, 3]
-        """
+    def x(self) -> int:
         return round(self._x)
 
     @x.setter
@@ -60,7 +60,7 @@ class Point:
         self._z = value
 
     def coords(self) -> list:
-        '''returns the list included spatial coordinates of the ``Point``
+        '''list: Returns the list included spatial coordinates of the ``Point``
 
         Returns:
           ``[x,y,z]``
