@@ -2,7 +2,6 @@ Welcome to GEFEST's documentation!
 =================================
 
 .. image:: docs/img/gefest_logo.png
-  :width: 400
 
 This site contains main documentation for the `GEFEST framework <https://github.com/ITMO-NSS-team/GEFEST>`__.
 
