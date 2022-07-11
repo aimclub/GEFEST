@@ -21,4 +21,4 @@ The additional description of the algorthmic core, real-world cases and other de
 
 
 
-.. |logo| image:: docs/img/gefest_logo.png
+.. |logo| image:: /docs/img/gefest_logo.png
