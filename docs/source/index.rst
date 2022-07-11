@@ -21,4 +21,4 @@ The additional description of the algorthmic core, real-world cases and other de
 
 
 
-.. |logo| image:: https://i.ibb.co/dc1XdhT/Segmentation-Models-V2-Side-1-1.png
+.. |logo| image:: docs/img/gefest_logo.png
