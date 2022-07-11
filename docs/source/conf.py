@@ -80,7 +80,10 @@ napoleon_use_keyword = True
 napoleon_use_param = True
 napoleon_use_rtype = True
 napoleon_preprocess_types = False
-napoleon_type_aliases = None
+napoleon_type_aliases = {
+    'Point': 'gefest.core.structure.point',
+    'Polygon': 'gefest.core.structure.polygon'
+}
 napoleon_attr_annotations = False
 
 autodoc_default_options = {

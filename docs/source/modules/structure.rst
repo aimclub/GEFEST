@@ -1,5 +1,5 @@
 ========
-STRUCTURE
+Structure
 ========
 
 There is a description of structural elements that allow to create
