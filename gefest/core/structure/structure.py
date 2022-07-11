@@ -86,10 +86,7 @@ class Structure:
 
         Examples:
             >>> struct.plot()
-            `PEP 484`_
-
-        .. _PEP 484:
-            https://www.python.org/dev/peps/pep-0484/
+            ..image:: /docs/img/structure_plot.png
 
         '''
         for poly in self.polygons:
