@@ -81,8 +81,8 @@ napoleon_use_param = True
 napoleon_use_rtype = True
 napoleon_preprocess_types = False
 napoleon_type_aliases = {
-    'Point': 'gefest.core.structure.point',
-    'Polygon': 'gefest.core.structure.polygon'
+    "Point": ":term:`gefest.core.structure.point`",
+    "Polygon": ":term:`gefest.core.structure.polygon`"
 }
 napoleon_attr_annotations = False
 
