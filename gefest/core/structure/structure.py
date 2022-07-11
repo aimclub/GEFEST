@@ -38,7 +38,7 @@ class Structure:
         >>> # creating the triangle Polygon
         >>> points_triagle = [Point(0,0), Point(3,3), Point(3,0), Point(0,0)]
         >>> triangle = Polygon('triangle', points=points_triagle)
-        >>> # creating the Structure and plot it 
+        >>> # creating the Structure and plot it
         >>> struct = Structure([triangle, rectangle])
         >>> struct.text_id
         'P0=4:(x=0, y=0); (x=3, y=3); (x=3, y=0); (x=0, y=0);
@@ -51,7 +51,7 @@ class Structure:
         Structure: ``Structure(List[Polygon])``
 
     """
-    
+
     polygons: List[Polygon]
 
     def __str__(self):
@@ -86,10 +86,10 @@ class Structure:
 
         Examples:
             >>> struct.plot()
-            `structure_plot`_
+            `PEP 484`_
 
-        .. _structure_plot:
-            docs/img/structure_plot.png
+        .. _PEP 484:
+            https://www.python.org/dev/peps/pep-0484/
 
         '''
         for poly in self.polygons:
