@@ -1,7 +1,8 @@
 Welcome to GEFEST's documentation!
 =================================
 
-.. image:: https://github.com/ITMO-NSS-team/GEFEST/blob/docstrings/docs/img/gefest_logo.png
+.. image:: /docs/img/gefest_logo.png
+   :target: /docs/img/gefest_logo.png
    :height: 100px
    :width: 200 px
    :scale: 50 %
