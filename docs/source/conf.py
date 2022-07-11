@@ -79,7 +79,6 @@ napoleon_use_ivar = True
 napoleon_use_keyword = True
 napoleon_use_param = True
 napoleon_use_rtype = True
-napoleon_preprocess_types = False
 # napoleon_type_aliases = {
 #     "Point": ":term:`gefest.core.structure.point`",
 #     "Polygon": ":term:`gefest.core.structure.polygon`"
@@ -89,7 +88,7 @@ napoleon_attr_annotations = False
 autodoc_default_options = {
     'members': True,
     'undoc-members': False,
-    'show-inheritance': True,
+    # 'show-inheritance': True,
     'member-order': 'bysource',
     'ignore-module-all': True,
 }
