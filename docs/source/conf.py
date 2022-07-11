@@ -88,7 +88,7 @@ napoleon_attr_annotations = False
 autodoc_default_options = {
     'members': True,
     'undoc-members': False,
-    # 'show-inheritance': True,
+    'show-inheritance': True,
     'member-order': 'bysource',
     'ignore-module-all': True,
 }
