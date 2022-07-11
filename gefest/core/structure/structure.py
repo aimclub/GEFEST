@@ -22,7 +22,11 @@ class Structure:
             needed for joint processing capability of polygons
 
     Attributes:
+        text_id (str): returns information about :obj:`Polygons` and :obj:`Points`
+            included in :obj:`Structure`
         polygons (list): returns the :obj:`list` of :obj:`Polygon` objects
+        total_points (list): returns the :obj:`list` with lengths (number of :obj:`Point`)
+            of every :obj:`Polygon` included
 
 
     Returns:
@@ -44,10 +48,6 @@ class Structure:
 
     @property
     def text_id(self) -> str:
-        '''returns information about ``Polygons`` and ``Points``
-        included in ``Structure``
-        '''
-
         out_str = ''
         for i, pol in enumerate(self.polygons):
             out_str += f'P{i}={len(pol.points)}:'
@@ -57,14 +57,15 @@ class Structure:
 
     @property
     def total_points(self) -> list:
-        '''returns list with lengths (number of ``Point``)
-        of every ``Polygon`` included
-        '''
-
         return [len(p.points) for p in self.polygons]
 
-    def plot(self, structure, domain=None, title=None):
-        '''returns visualization with drawn ``Strucrure``
+    def plot(self, structure: 'Structure', title=None):
+        '''Visualization with drawn :obj:`Strucrure`
+
+        Args:
+            structure (:obj:`Structure`): the :obj:`Strucrure` that should be showed
+            title (:obj:`str`): the name of drawing
+
         '''
 
         x = [point._x for point in structure.polygons[0].points]
