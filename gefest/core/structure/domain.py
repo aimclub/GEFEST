@@ -18,7 +18,7 @@ class Domain:
             with the ``length of edge = 100`` and bottom left corner located in the origin.
         max_poly_num (int): the maximum number of :obj:`Polygon` objects :obj:`Structure`
             might contains, by default ``max_poly_num=4``
-        min_poly_num (int): the minimum number of :obj:`Polygon` objects :obj:`Structure`
+        min_poly_num (int): the minimum number of :obj:`Polygon` objects :obj:`Structure`_
             might contains, by default ``min_poly_num=2``
         max_points_num (int): the maximum number of :obj:`Point` objects :obj:`Polygon`
             might contains, by default ``max_points_num=50``
@@ -43,6 +43,9 @@ class Domain:
 
     Returns:
         Domain: ``obj Domain()``
+
+    _Structure:
+        gefest.core.structure.structure.Structure
 
     """
     def __init__(self, name='main', allowed_area: Optional[List[Tuple]] = None,
