@@ -20,7 +20,8 @@ class Point:
     Examples:
             >>> from gefest.core.structure.point import Point
             >>> point = Point(1,2)
-            Point(_x=1, _y=2, _z=3)
+            >>> point.coords()
+            [1, 2, 0]
 
             >>> print('x = {}, y = {}'.format(point.x, point.y))
             x = 1, y = 2
