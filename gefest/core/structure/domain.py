@@ -11,7 +11,7 @@ class Domain:
 
     Args:
         name (str): the name 'id' of the :obj:`Domain`, by deafult ``name='main'``
-        allowed_area (Optional[List[Tuple]]): determinate allowed area for exploring solution
+        allowed_area (List[Tuple]): determinate allowed area for exploring solution
             into its frame; the :obj:`list` of :obj:`tuple` objects that
             contain couples of border coordinates, by default is ``None``
             If ``allowed_area=None``, allowed area will be determinated by square
@@ -33,12 +33,12 @@ class Domain:
             If ``geometry=None``, created objects will process as 2D objects via :obj:`Geometry2D()`
 
     Attributes:
-        min_x (int): returns the minimum value among **x** coordinates within **allowed_area**
-        max_x (int): returns the maximum value among **x** coordinates within **allowed_area**
-        min_y (int): returns the minimum value among **y** coordinates within **allowed_area**
-        max_y (int): returns the maximum value among **y** coordinates within **allowed_area**
-        len_x (int): returns the absolute difference betwen **max_x** and **min_x**
-        len_y (int): returns the absolute difference betwen **max_y** and **min_y**
+        min_x (int): the minimum value among **x** coordinates within **allowed_area**
+        max_x (int): the maximum value among **x** coordinates within **allowed_area**
+        min_y (int): the minimum value among **y** coordinates within **allowed_area**
+        max_y (int): the maximum value among **y** coordinates within **allowed_area**
+        len_x (int): the absolute difference betwen **max_x** and **min_x**
+        len_y (int): the absolute difference betwen **max_y** and **min_y**
         bound_poly (Polygon): creates the :obj:`Polygon` by :obj:`Domain`'s border coordinates
 
     Returns:
