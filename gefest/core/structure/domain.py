@@ -6,6 +6,45 @@ from gefest.core.structure.polygon import Polygon
 
 
 class Domain:
+    """:obj:`Domain` is responsible for the whole information about geometry of the
+    problem
+
+    Args:
+        name (str): the name 'id' of the :obj:`Domain`, by deafult ``name='main'``
+        allowed_area (Optional[List[Tuple]]): determinate allowed area for exploring solution
+            into its frame; the :obj:`list` of :obj:`tuple` objects that
+            contain couples of border coordinates, by default is ``None``
+            If ``allowed_area=None``, allowed area will be determinated by square
+            with the ``length of edge = 100`` and bottom left corner located in the origin.
+        max_poly_num (int): the maximum number of :obj:`Polygon` objects :obj:`Structure`
+            might contains, by default ``max_poly_num=4``
+        min_poly_num (int): the minimum number of :obj:`Polygon` objects :obj:`Structure`
+            might contains, by default ``min_poly_num=2``
+        max_points_num (int): the maximum number of :obj:`Point` objects :obj:`Polygon`
+            might contains, by default ``max_points_num=50``
+        min_points_num (int): the minimum number of :obj:`Point` objects :obj:`Polygon`
+            might contains, by default ``min_points_num=20``
+        fixed_points (list): determine the areas that must not be ignored during find solution;
+            the :obj:`list` of sets of border coordinates, every set has contain couples of coordinates
+            as set of :obj:`tuple`, by default is ``None``
+        is_closed (bool): will create geometrical objects with closed borders (when start point is same
+            with the last one) if ``True``, against if ``False``; by default is ``True``
+        geometry (obj): determinate a way for processing created objects, by default is ``None``
+            If ``geometry=None``, created objects will process as 2D objects via :obj:`Geometry2D()`
+
+    Attributes:
+        min_x (int): returns the minimum value among **x** coordinates within **allowed_area**
+        max_x (int): returns the maximum value among **x** coordinates within **allowed_area**
+        min_y (int): returns the minimum value among **y** coordinates within **allowed_area**
+        max_y (int): returns the maximum value among **y** coordinates within **allowed_area**
+        len_x (int): returns the absolute difference betwen **max_x** and **min_x**
+        len_y (int): returns the absolute difference betwen **max_y** and **min_y**
+        bound_poly (Polygon): creates the :obj:`Polygon` by :obj:`Domain`'s border coordinates
+
+    Returns:
+        Domain: ``obj Domain()``
+
+    """
     def __init__(self, name='main', allowed_area: Optional[List[Tuple]] = None,
                  max_poly_num=4, min_poly_num=2,
                  max_points_num=50, min_points_num=20,
@@ -66,6 +105,9 @@ class Domain:
         return abs(self.max_y - self.min_y)
 
     def contains(self, point: Point):
+        '''bool: returns ``True`` if given :obj:`Point` locates in the allowed area borders,
+        otherwise returns ``False``
+        '''
         geom_poly_allowed = Polygon(polygon_id=f'bnd_{self.name}',
                                     points=[Point(pt[0], pt[1]) for pt in self.allowed_area])
         return self.geometry.is_contain_point(geom_poly_allowed, point)

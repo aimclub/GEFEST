@@ -1,8 +1,16 @@
 ========
-Geometry Processing
+Domain
 ========
 
-There is a description of processing geometrical objects.
+There is a description of ...
+
+class Domain
+~~~~~~~~~
+
+.. autoclass:: gefest.core.structure.domain.Domain
+   :members:
+   :no-undoc-members:
+
 
 Geometry 2D
 ~~~~~~~~~
