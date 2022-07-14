@@ -12,7 +12,7 @@ def configurate_estimator(domain):
     # User-defined estimator
     # it should be created as object with .estimate() method
     # ------------
-    root_path = Path(__file__).parent.parent.parent
+    root_path = Path(__file__).parent.parent.parent.parent
     path = f'{root_path}/gefest/tools/estimators/simulators/swan/swan_model/'
     swan = Swan(path=path,
                 targets=area.targets,
