@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from gefest.tools.estimators.simulators.comsol.comsol_interface import Comsol
 from gefest.tools.estimators.estimator import Estimator
 
@@ -8,8 +10,9 @@ def configurate_estimator(domain):
     # it should be created as object with .estimate() method
     # ------------
 
+    root_path = Path(__file__).parent.parent.parent.parent
     comsol = Comsol(
-        path_to_mph='C:/Users/nano_user/PycharmProjects/rbc-traps-generative-design/setup/rbc-trap-setup.mph')
+        path_to_mph=f'{root_path}/gefest/tools/estimators/simulators/comsol/microfluid_file/rbc-trap-setup.mph')
 
     # ------------
     # GEFEST estimator
