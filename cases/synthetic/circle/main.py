@@ -23,6 +23,7 @@ opt = parser.parse_args()
 # ------------
 # GEFEST tools configuration
 # ------------
+
 domain, task_setup = circle_domain.configurate_domain(poly_num=opt.n_polys,
                                                       points_num=opt.n_points,
                                                       is_closed=opt.is_closed)
@@ -37,6 +38,7 @@ optimizer = circle_optimizer.configurate_optimizer(pop_size=opt.pop_size,
 # ------------
 # Generative design stage
 # ------------
+
 start = timeit.default_timer()
 optimized_pop = design(n_steps=opt.n_steps,
                        pop_size=opt.pop_size,

@@ -28,7 +28,7 @@ def configurate_estimator(domain):
                 lengths += length
 
         _, hs = estimator.estimate(struct)
-        l_f = [2 * lengths / max_length, hs]
+        l_f = [hs, 2 * lengths / max_length]
 
         return l_f
 
