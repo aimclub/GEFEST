@@ -7,13 +7,15 @@ from gefest.tools.estimators.estimator import Estimator
 import cases.breakwaters.configuration_de.bw_domain as area
 
 
-def configurate_estimator(domain):
+def configurate_estimator(domain, path=False):
     # ------------
     # User-defined estimator
     # it should be created as object with .estimate() method
     # ------------
-    root_path = Path(__file__).parent.parent.parent.parent
-    path = f'{root_path}/gefest/tools/estimators/simulators/swan/swan_model/'
+    if not path:
+        root_path = Path(__file__).parent.parent.parent.parent
+        path = f'{root_path}/gefest/tools/estimators/simulators/swan/swan_model/'
+
     swan = Swan(path=path,
                 targets=area.targets,
                 grid=area.grid,
