@@ -1,19 +1,13 @@
-from pathlib import Path
-
 from gefest.tools.samplers.DL.microfluid.microfluid_sampler import DeepSampler
 from gefest.tools.samplers.sampler import Sampler
 
 
-def configurate_sampler(domain, path_to_sampler=False):
+def configurate_sampler(domain):
     # ------------
     # User-defined sampler
     # it should be created as object with .sample() method
     # ------------
-    if not path_to_sampler:
-        root_path = Path(__file__).parent.parent.parent.parent
-        path_to_sampler = f'{root_path}/gefest/tools/samplers/DL/microfluid/DL_sampler'
-
-    sampler = DeepSampler(path_to_sampler)
+    sampler = DeepSampler()
 
     # ------------
     # GEFEST sampler,

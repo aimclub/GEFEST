@@ -13,12 +13,12 @@ class CNN:
     Surrogate model for the heat components task
     """
 
-    def __init__(self, path):
+    def __init__(self):
         super(CNN, self).__init__()
 
         self.model = EffModel()
         self.model.load_state_dict(
-            torch.load(path, map_location=torch.device('cpu')))
+            torch.load('../../gefest/tools/estimators/DL/heat/effnet_mean', map_location=torch.device('cpu')))
 
         self.img_size = 128
 
