@@ -135,26 +135,8 @@ class SPEA2(BaseGA):
 
         # Second case, deleting using truncation procedure
         elif len(self.archive) > self.arch_size:
-            k = 0
-            distance_and_idx = []
-            for i in range(len(self.archive)):
-                distance = []
-                first_point = np.array(self.archive[i].objectives)
-                for j in range(len(self.archive)):
-                    if j == i:
-                        continue
-                    second_point = np.array(self.archive[j].objectives)
-                    distance.append(np.linalg.norm(first_point - second_point))
-                sort_dist = sorted(distance)
-                distance_and_idx.append((sort_dist[k], i))
-
-            sorted_distance_and_idx = sorted(distance_and_idx)
-
-            length = len(self.archive)
-            idx_for_delete = [idx[1] for idx in sorted_distance_and_idx][:(length - self.arch_size)]
-
-            arch_selected = [self.archive[idx] for idx in range(length) if idx not in idx_for_delete]
-            self.archive = arch_selected
+            arch_obj = sorted([(ind.objectives[0], ind) for ind in self._pop])[:self.arch_size]
+            self.archive = [ind[1] for ind in arch_obj]
 
     def _save_archive(self, n):
         with open(f'HistoryFiles/archive_{n}.pickle', 'wb') as handle:
@@ -183,7 +165,7 @@ class SPEA2(BaseGA):
         self.environmental_selection()
 
         best = sorted(self.archive, key=lambda x: x.objectives[1])[0]
-        print(f'\n Best objective is {best.objectives[1]}')
+        print(f'\n Best wave height is {best.objectives[0]}')
 
         self._save_archive(n_step)
 
