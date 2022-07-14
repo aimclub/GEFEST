@@ -8,7 +8,7 @@ from cases.breakwaters.configuration_surrogate import bw_estimator
 from cases.breakwaters.configuration_spea2 import bw_optimizer
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--pop_size", type=int, default=30, help='number of individs in population')
+parser.add_argument("--pop_size", type=int, default=3, help='number of individs in population')
 parser.add_argument("--n_steps", type=int, default=80, help='number of generative design steps')
 parser.add_argument('--n_polys', type=int, default=5, help='maximum number of polygons in structure')
 parser.add_argument('--n_points', type=int, default=15, help='maximum number of points in polygon')
@@ -40,6 +40,8 @@ optimized_pop = design(n_steps=opt.n_steps,
                        pop_size=opt.pop_size,
                        estimator=estimator,
                        sampler=sampler,
-                       optimizer=optimizer)
+                       optimizer=optimizer,
+                       extra=True)
 spend_time = timeit.default_timer() - start
 print(f'spent time {spend_time} sec')
+
