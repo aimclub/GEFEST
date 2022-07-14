@@ -1,6 +1,6 @@
 1
 
-                    Execution started at 20220714.235438         
+                    Execution started at 20220715.015232         
 
 
 
@@ -64,9 +64,7 @@
     
  
     
- OBSTACLE TRANSM 0. REFL 0. LINE 1855, 443, 1723, 422, 1434, 340, 1880, 172, 1984, 281
-    
- OBSTACLE TRANSM 0. REFL 0. LINE 1521, 1088, 1447, 690, 1806, 614, 1957, 801, 1754, 1038
+ OBSTACLE TRANSM 0. REFL 0. LINE 1834, 1447, 1694, 1398, 1480, 1068, 1952, 1102, 2022, 1389
     
  $optline
     
@@ -165,128 +163,3 @@
 
  
  Time of computation ->  17761025.001100      in sec:        660.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.001440      in sec:        880.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.001820      in sec:       1100.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.002200      in sec:       1320.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.002540      in sec:       1540.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.002920      in sec:       1760.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.003300      in sec:       1980.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.003640      in sec:       2200.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.004020      in sec:       2420.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.004400      in sec:       2640.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.004740      in sec:       2860.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.005120      in sec:       3080.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.005500      in sec:       3300.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.005840      in sec:       3520.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.010220      in sec:       3740.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.010600      in sec:       3960.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.010940      in sec:       4180.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.011320      in sec:       4400.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.011700      in sec:       4620.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.012040      in sec:       4840.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.012420      in sec:       5060.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.012800      in sec:       5280.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.013140      in sec:       5500.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.013520      in sec:       5720.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.013900      in sec:       5940.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.014240      in sec:       6160.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.014620      in sec:       6380.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.015000      in sec:       6600.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.015340      in sec:       6820.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.015720      in sec:       7040.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.020100      in sec:       7260.
- not possible to compute, first iteration
-
- 
-    
- STOP
