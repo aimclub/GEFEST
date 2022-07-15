@@ -1,5 +1,4 @@
 import timeit
-import pickle
 import argparse
 
 from gefest.core.opt.gen_design import design
@@ -16,6 +15,7 @@ parser.add_argument('--c_rate', type=float, default=0.6, help='crossover rate')
 parser.add_argument('--m_rate', type=float, default=0.6, help='mutation rate')
 parser.add_argument('--is_closed', type=bool, default=False, help='type of polygon')
 parser.add_argument('--path_to_sim', type=str, default=False, help='path to physical simulator')
+parser.add_argument('--path_to_sur', type=str, default=False, help='path to surrogate model')
 opt = parser.parse_args()
 
 # ------------
@@ -26,9 +26,11 @@ domain, task_setup = bw_domain.configurate_domain(poly_num=opt.n_polys,
                                                   is_closed=opt.is_closed)
 
 estimator = bw_estimator.configurate_estimator(domain=domain,
-                                               path=opt.path_to_sim)
+                                               path_sim=opt.path_to_sim,
+                                               path_sur=opt.path_to_sur)
 
 sampler = bw_sampler.configurate_sampler(domain=domain)
+
 optimizer = bw_optimizer.configurate_optimizer(pop_size=opt.pop_size,
                                                crossover_rate=opt.c_rate,
                                                mutation_rate=opt.m_rate,

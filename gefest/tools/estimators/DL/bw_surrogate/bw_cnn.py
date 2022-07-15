@@ -15,11 +15,11 @@ class CNN:
     Surrogate model for breakwaters task
     """
 
-    def __init__(self, domain: Domain, main_model: Optional = None):
+    def __init__(self, path, domain: Domain, main_model: Optional = None):
         super(CNN, self).__init__()
 
         self.domain = domain
-        self.model = keras.models.load_model("../../gefest/tools/estimators/DL/bw_surrogate/bw_surrogate_700_train.h5")
+        self.model = keras.models.load_model(path)
         self.main_model = main_model
 
         self.img_name = 'tmp_images/0.png'
