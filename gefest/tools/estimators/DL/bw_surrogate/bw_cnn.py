@@ -1,6 +1,9 @@
 import matplotlib
 import matplotlib.pyplot as plt
 import tensorflow as tf
+import os
+import shutil
+
 from tensorflow import keras
 from typing import Optional
 
@@ -22,9 +25,23 @@ class CNN:
         self.model = keras.models.load_model(path)
         self.main_model = main_model
 
+        self._create_temp_path()
         self.img_name = 'tmp_images/0.png'
         self.img_size = 128
         self.rate = 6
+
+    def _create_temp_path(self):
+        """
+        Creation of temporary folder for images
+        :return: None
+        """
+        path = 'tmp_images'
+
+        if os.path.exists(path):
+            shutil.rmtree(path)
+        os.makedirs(path)
+
+        return
 
     def _save_as_fig(self, struct: Structure, ax=plt):
         """
