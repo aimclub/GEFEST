@@ -2,9 +2,8 @@ import timeit
 import argparse
 
 from gefest.core.opt.gen_design import design
-from cases.breakwaters.configuration_de import bw_domain, bw_sampler
-from cases.breakwaters.configuration_surrogate import bw_estimator
-from cases.breakwaters.configuration_spea2 import bw_optimizer
+from cases.breakwaters.configuration_de import bw_domain
+from cases.breakwaters.configuration_spea2 import bw_optimizer, bw_sampler, bw_estimator
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--pop_size", type=int, default=30, help='number of individs in population')
@@ -26,8 +25,7 @@ domain, task_setup = bw_domain.configurate_domain(poly_num=opt.n_polys,
                                                   is_closed=opt.is_closed)
 
 estimator = bw_estimator.configurate_estimator(domain=domain,
-                                               path_sim=opt.path_to_sim,
-                                               path_sur=opt.path_to_sur)
+                                               path_sim=opt.path_to_sim)
 
 sampler = bw_sampler.configurate_sampler(domain=domain)
 
