@@ -164,9 +164,6 @@ class SPEA2(BaseGA):
         # Step 2, environmental selection
         self.environmental_selection()
 
-        best = sorted(self.archive, key=lambda x: x.objectives[1])[0]
-        print(f'\n Best wave height is {best.objectives[0]}')
-
         self._save_archive(n_step)
 
         # Step 3, check for last step (termination)
