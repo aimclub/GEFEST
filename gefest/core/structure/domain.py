@@ -30,7 +30,8 @@ class Domain:
         is_closed (bool): will create geometrical objects with closed borders (when start point is same
             with the last one) if ``True``, against if ``False``; by default is ``True``
         geometry (obj): determinate a way for processing created objects, by default is ``None``
-            If ``geometry=None``, created objects will process as 2D objects via :obj:`Geometry2D()`
+            .. note::
+               If ``geometry=None``, created objects will process as 2D objects via :obj:`Geometry2D()`
 
     Attributes:
         min_x (int): the minimum value among **x** coordinates within **allowed_area**
