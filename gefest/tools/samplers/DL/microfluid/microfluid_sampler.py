@@ -18,10 +18,13 @@ class DeepSampler:
     It is creates images of polygons with size 128x128
     """
 
-    def __init__(self):
+    def __init__(self, path):
+        """
+        :param path: path to deep learning generative model
+        """
         super(DeepSampler, self).__init__()
 
-        self.path = "DL_sampler"
+        self.path = path
 
         self.sampler = None
         self.device = None
