@@ -16,10 +16,10 @@ class DeepSampler:
     It is creates images of polygons with size 128x128
     """
 
-    def __init__(self):
+    def __init__(self, path):
         super(DeepSampler, self).__init__()
 
-        self.path = '../../gefest/tools/samplers/DL/heat/DL_sampler'
+        self.path = path
 
         self.sampler = None
         self.device = None
