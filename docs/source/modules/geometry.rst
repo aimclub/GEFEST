@@ -1,16 +1,18 @@
-========
-Domain
-========
+=========
+Geometry
+=========
 
-There is a description of ...
-
-class Domain
+class Geometry
 ~~~~~~~~~
 
-.. autoclass:: gefest.core.structure.domain.Domain
+There is an object included set of methods for processing 2D
+geometrical figures. The most of implemented methods based on
+the **shapely** library.
+
+
+.. autoclass:: gefest.core.geometry.geometry_2d.Geometry2D
    :members:
    :no-undoc-members:
-
 
 Geometry 2D
 ~~~~~~~~~

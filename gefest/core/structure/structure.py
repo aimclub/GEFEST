@@ -87,6 +87,9 @@ class Structure:
         Examples:
             >>> struct.plot()
 
+        Returns:
+            plot: ..image:: https://i.ibb.co/1q0CVNJ/structure-plot.png
+
         '''
         for poly in self.polygons:
             x = [point._x for point in poly.points]
