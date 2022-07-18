@@ -56,7 +56,7 @@ class Geometry2D(Geometry):
 
     def resize_poly(self, poly: 'Polygon', x_scale: float, y_scale: float):
         """The function for rescaling polygons along each axis.
-           Scaling occurs relative to the center of mass of the polygon
+        Scaling occurs relative to the center of mass of the polygon
 
         Args:
             poly (Polygon): :obj:`Polygon` for processing
@@ -190,8 +190,8 @@ class Geometry2D(Geometry):
 
     def bezier_transform(self, poly: 'Polygon') -> 'Polygon':
         """Function for bezier transformation over the polygon.
-           The polygon is transformed into a convex spherical figure without self-intersections.
-           Such transformation might be useful if you are working with round-shaped figures
+        The polygon is transformed into a convex spherical figure without self-intersections.
+        Such transformation might be useful if you are working with round-shaped figures
 
         Args:
             poly (Polygon): :obj:`Polygon` for processing
@@ -259,7 +259,7 @@ class Geometry2D(Geometry):
 
     def intersects(self, structure: 'Structure') -> bool:
         """Function to check for any intersection in structure of polygons
-           Whole structure appears like shapely MultiLineString for which uses method is simple
+        Whole structure appears like shapely MultiLineString for which uses method is simple
 
         Args:
             structure (Structure): the :obj:`Structure` that explore
