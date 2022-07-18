@@ -21,7 +21,7 @@ class Geometry2D(Geometry):
     The input receives information about the closeness of the polygon
 
     Args:
-        is_closed (bool): ``True`` if the obj:`Polygon` must have close borders
+        is_closed (bool): ``True`` if the :obj:`Polygon` must have close borders
             (first Point is equal to the last one), otherwise ``False``. Default value is ``True``
     """
 
@@ -33,10 +33,10 @@ class Geometry2D(Geometry):
         """The function for getting points
 
         Args:
-            poly (Polygon): obj:`Polygon` for processing
+            poly (Polygon): :obj:`Polygon` for processing
 
         Returns:
-            list: all obj:`Point` that obj:`poly`contains
+            list: all :obj:`Point` that :obj:`poly`contains
         """
 
         if isinstance(poly, GeomPolygon):
@@ -59,12 +59,12 @@ class Geometry2D(Geometry):
            Scaling occurs relative to the center of mass of the polygon
 
         Args:
-            poly (Polygon): obj:`Polygon` for processing
+            poly (Polygon): :obj:`Polygon` for processing
             x_scale (float): scale value for **x** axis
             y_scale (float): scale value for **y** axis
 
         Returns:
-            Polygon: scaled obj:`poly` by ``(x,y)`` axes
+            Polygon: scaled :obj:`poly` by ``(x,y)`` axes
         """
 
         geom_polygon = self._poly_to_geom(poly)  # Transformation to shapely structure
@@ -83,11 +83,11 @@ class Geometry2D(Geometry):
         """Rotating polygon relative to the center of mass by a given angle
 
         Args:
-            poly (Polygon): obj:`Polygon` for processing
+            poly (Polygon): :obj:`Polygon` for processing
             angle (float): value of degree rotation
 
         Returns:
-            Polygon: rotated obj:`poly`
+            Polygon: rotated :obj:`poly`
         """
 
         geom_polygon = self._poly_to_geom(poly)  # Transformation to shapely structure
@@ -104,10 +104,10 @@ class Geometry2D(Geometry):
         """Recieving value of the area
 
         Args:
-            polygon (Polygon): obj:`Polygon` for processing
+            polygon (Polygon): :obj:`Polygon` for processing
 
         Returns:
-            float: value of the obj:`polygon` area
+            float: value of the :obj:`polygon` area
         """
 
         if len(polygon.points) <= 1:
@@ -122,11 +122,11 @@ class Geometry2D(Geometry):
         """Checking if a point is inside a polygon
 
         Args:
-            poly (Polygon): obj:`Polygon` that explore
-            point (Point): obj:`Point` for checking presence inside the obj:`Polygon`
+            poly (Polygon): :obj:`Polygon` that explore
+            point (Point): :obj:`Point` for checking presence inside the :obj:`Polygon`
 
         Returns:
-            bool: ``True`` if obj:`point` is into obj:`poly`, otherwise ``False``
+            bool: ``True`` if :obj:`point` is into :obj:`poly`, otherwise ``False``
         """
 
         geom_poly_allowed = GeomPolygon([self._pt_to_geom(pt) for pt in poly.points])
@@ -138,11 +138,11 @@ class Geometry2D(Geometry):
         """Checking if a poly_1 is inside into poly_2
 
         Args:
-            poly_1 (Polygon): the first obj:`Polygon` that explore
-            poly_2 (Polygon): the second obj:`Polygon` that explore
+            poly_1 (Polygon): the first :obj:`Polygon` that explore
+            poly_2 (Polygon): the second :obj:`Polygon` that explore
 
         Returns:
-            bool: ``True`` if obj:`poly_1` is into obj:`poly_2` (poly_2 covers whole area of poly_1),
+            bool: ``True`` if :obj:`poly_1` is into :obj:`poly_2` (poly_2 covers whole area of poly_1),
                  otherwise ``False``
         """
 
@@ -155,11 +155,11 @@ class Geometry2D(Geometry):
         """Calculating closest point between input point and polygon.
 
         Args:
-            point (Point): the obj:`Point` that explore
-            poly (Polygon): the obj:`Polygon` that explore
+            point (Point): the :obj:`Point` that explore
+            poly (Polygon): the :obj:`Polygon` that explore
 
         Returns:
-            Point: returns the nearest obj:`Point` from ``point`` among all points
+            Point: returns the nearest :obj:`Point` from ``point`` among all points
                 in the ``poly``
         """
 
@@ -173,12 +173,12 @@ class Geometry2D(Geometry):
         """Calculating closest point between two polygons
 
         Args:
-            poly_1 (Polygon): the first obj:`Polygon` that explore
-            poly_2 (Polygon): the second obj:`Polygon` that explore
+            poly_1 (Polygon): the first :obj:`Polygon` that explore
+            poly_2 (Polygon): the second :obj:`Polygon` that explore
 
         Returns:
-            List[Point]: the couple of obj:`Point` where the first one from
-            obj:`poly_1` and the second one from obj:`poly_2`
+            List[Point]: the couple of :obj:`Point` where the first one from
+            :obj:`poly_1` and the second one from :obj:`poly_2`
         """
 
         geom_poly_1 = self._poly_to_geom(poly_1)
@@ -194,10 +194,10 @@ class Geometry2D(Geometry):
            Such transformation might be useful if you are working with round-shaped figures
 
         Args:
-            poly (Polygon): obj:`Polygon` for processing
+            poly (Polygon): :obj:`Polygon` for processing
 
         Returns:
-            Polygon: transformed obj:`poly`
+            Polygon: transformed :obj:`poly`
         """
 
         poly = GeomPolygon([self._pt_to_geom(pt) for pt in poly.points])  # Transform to shapely Polygon
@@ -224,10 +224,10 @@ class Geometry2D(Geometry):
         """Obtaining a convex polygon to avoid intersections
 
         Args:
-            poly (Polygon): obj:`Polygon` for processing
+            poly (Polygon): :obj:`Polygon` for processing
 
         Returns:
-            Polygon: convex obj:`Polygon`
+            Polygon: convex :obj:`Polygon`
         """
 
         if len(poly.points) < 3:
@@ -242,10 +242,10 @@ class Geometry2D(Geometry):
         """Getting a point that is the center of mass of the polygon
 
         Args:
-            poly (Polygon): the obj:`Polygon` that explore
+            poly (Polygon): the :obj:`Polygon` that explore
 
         Returns:
-            Point: central obj:`Point` of obj:`poly`
+            Point: central :obj:`Point` of :obj:`poly`
         """
 
         points = [pt for pt in poly.points]
@@ -262,10 +262,10 @@ class Geometry2D(Geometry):
            Whole structure appears like shapely MultiLineString for which uses method is simple
 
         Args:
-            structure (Structure): the obj:`Structure` that explore
+            structure (Structure): the :obj:`Structure` that explore
 
         Returns:
-            bool: ``True`` if any obj:`Polygon` in obj:`structure` intersects with another one,
+            bool: ``True`` if any :obj:`Polygon` in :obj:`structure` intersects with another one,
                otherwise - ``False``
         """
 
@@ -278,11 +278,11 @@ class Geometry2D(Geometry):
         """Intersection between two polygons
 
         Args:
-            poly_1 (Polygon): the first obj:`Polygon` that explore
-            poly_2 (Polygon): the second obj:`Polygon` that explore
+            poly_1 (Polygon): the first :obj:`Polygon` that explore
+            poly_2 (Polygon): the second :obj:`Polygon` that explore
 
         Returns:
-            bool: ``True`` if the obj:`poly_1` intersects with obj:`poly_2`,
+            bool: ``True`` if the :obj:`poly_1` intersects with :obj:`poly_2`,
                otherwise - ``False``
         """
 
@@ -303,8 +303,8 @@ class Geometry2D(Geometry):
         """Smallest distance between two objects
 
         Args:
-            obj_1 (Union[Polygon, Point]): the first obj:`obj_1` that explore
-            obj_2 (Union[Polygon, Point]): the second obj:`obj_2` that explore
+            obj_1 (Union[Polygon, Point]): the first :obj:`obj_1` that explore
+            obj_2 (Union[Polygon, Point]): the second :obj:`obj_2` that explore
 
         Returns:
             float: value of distance between the nearest points of the explored objects
