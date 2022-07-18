@@ -49,7 +49,6 @@ class Structure:
 
     Returns:
         Structure: ``Structure(List[Polygon])``
-
     """
 
     polygons: List[Polygon]
@@ -88,9 +87,9 @@ class Structure:
             >>> struct.plot()
 
         Returns:
-            plot: ..image:: https://i.ibb.co/1q0CVNJ/structure-plot.png
-
+            plot: Visualization of :obj:`Strucrure`
         '''
+
         for poly in self.polygons:
             x = [point._x for point in poly.points]
             y = [point._y for point in poly.points]
