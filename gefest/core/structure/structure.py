@@ -255,7 +255,7 @@ def distance(point: 'Point',
     polygons = structure.polygons
     distances = []
     for poly in polygons:
-        d = geometry.centroid_distance(point, poly)
+        d = geometry.min_distance(point, poly)
         distances.append(d)
 
     return min(distances)

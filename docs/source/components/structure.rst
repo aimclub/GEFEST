@@ -27,7 +27,6 @@ class Structure
 
 class Domain
 ~~~~~~~~~~~~
-There is a description of ...
 
 .. autoclass:: gefest.core.structure.domain.Domain
    :members:
