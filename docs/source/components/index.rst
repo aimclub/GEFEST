@@ -9,4 +9,5 @@ Components
 
    structure
    geometry
+   algorithm
    
