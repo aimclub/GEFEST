@@ -322,6 +322,7 @@ class Geometry2D(Geometry):
 
         return distance
 
+
 # Function to create a circle, needed for one of the synthetic examples
 def create_circle(struct: 'Structure') -> 'Structure':
     geom = Geometry2D(is_closed=False)
