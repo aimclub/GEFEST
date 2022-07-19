@@ -120,7 +120,7 @@ def unclosed_poly(structure: 'Structure', domain: 'Domain') -> bool:
     Returns:
         bool: ``True`` if patameter ``is_closed`` from :obj:`Domain` is ``True`` and at least
         one of the polygons has unequality between the first one and the last point,
-        otherwise - ``False`
+        otherwise - ``False``
     """
 
     if domain.is_closed:
