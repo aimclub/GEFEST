@@ -24,16 +24,22 @@ def postprocess(structure: Structure, domain: Domain) -> Structure:
         domain (Domain): the :obj:`Domain` that determinates the main
             parameters, it needs there for checking equality between given
             :obj:`Structure` and set parameters in the :obj:`Domain`
-    
+
     Stages of processing:
 
     Methods:
-        fixed poly: If you set fixed polygons in the domain, they will be added to the structure
-        
+        fixed poly: If ``fixed_points`` in the :obj:`Domain` set, they will be added to the structure
+        too close: Fixing proximity between polygons, for polygons that are closer than the
+            specified threshold, one of them will be removed (exclude fixed polygons)
+        self-intersection: Change self-intersected poly to convex
+        out of allowed area: Cut :obj:`Polygon` that is out of borders by borders, than rescale it
+            down to 80%
+        unclosed polygon: Fix for open polygons by adding first :obj:`Point` to end
 
     Returns:
-        Structure: lddldlf
+        Structure: checked by rules on stages before and corrected :obj:`Structure`
     """
+
     corrected_structure = deepcopy(structure)
 
     # If you set fixed polygons in the domain, they will be added to the structure
@@ -102,10 +108,7 @@ def _correct_self_intersection(poly: Polygon, domain: Domain):
 
 
 def _correct_closeness(structure: Structure, domain: Domain):
-    """
-    For polygons that are closer than the specified threshold,
-    one of them will be removed
-    """
+    # For polygons that are closer than the specified threshold, one of them will be removed
     polygons = structure.polygons
     matching = {}
     for poly_1, poly_2 in permutations(polygons, 2):
