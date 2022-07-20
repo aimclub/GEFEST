@@ -1,3 +1,4 @@
+from cProfile import label
 import matplotlib.pyplot as plt
 
 from gefest.core.structure.domain import Domain
@@ -9,51 +10,58 @@ class StructVizualizer:
     """The object for mapping a :obj:`Structure` or :obj:`Polygon`
 
     Examples:
-        >>> from gefest.core.structure.point import Point
-        >>> from gefest.core.structure.polygon import Polygon
-        >>> from gefest.core.structure.structure import Structure
+        >>> from gefest.core.structure.domain import Domain
         >>> from gefest.core.viz.struct_vizualizer import StructVizualizer
-        >>> # creating the rectangle Polygon
-        >>> points_rect = [Point(4,0), Point(8,0), Point(8,4), Point(4,4), Point(4,0)]
-        >>> rectangle = Polygon('rectangle', points=points_rect)
-        >>> # creating the triangle Polygon
-        >>> points_triagle = [Point(0,0), Point(3,3), Point(3,0), Point(0,0)]
-        >>> triangle = Polygon('triangle', points=points_triagle)
-        >>> # creating the Structure and the Vizualizer object
-        >>> struct = Structure([triangle, rectangle])
-        >>> viz = StructVizualizer()
+        >>> domain = Domain()
+        >>> viz = StructVizualizer(domain)
     """
+
     def __init__(self, domain: Domain):
         self.domain = domain
 
-    def plot_structure(self, struct: Structure, info: dict) -> plt.plot:
-        """_summary_
+    def plot_structure(self, struct: Structure) -> plt.plot:
+        """The method displays the given :obj:`Structure`
 
         Args:
-            struct (Structure): _description_
-            info (_type_): _description_
+            struct (Structure): the :obj:`Structure` for displaying
+
         Examples:
-            >>> viz.plot_structure
+            >>> from gefest.core.structure.structure import get_random_structure
+            >>> struct = get_random_structure(domain)
+            >>> viz.plot_structure(struct)
 
         Returns:
-            plt.plot: _description_
+            plt.plot: visualization of the :obj:`Structure`
         """
+
         for poly in struct.polygons:
-            self.plot_poly(poly, info)
+            self.plot_poly(poly, poly.id)
 
         boundary = self.domain.bound_poly
         x = [pt.x for pt in boundary.points]
         y = [pt.y for pt in boundary.points]
 
-        plt.plot(x, y)
+        plt.plot(x, y, label='allowed area')
         plt.legend()
 
-    def plot_poly(self, poly: Polygon, info: dict) -> plt.plot:
-        type = info['type']
-        fitness = info['fitness']
+    def plot_poly(self, poly: Polygon, info: str) -> plt.plot:
+        """The method displays the given :obj:`Polygon`
 
+        Args:
+            poly (Polygon): the :obj:`Polygon` for displaying
+            info (str): name of Polygon, allow to use id of Polygon
+
+        Examples:
+            >>> from gefest.core.structure.structure import get_random_poly
+            >>> struct = get_random_structure(domain)
+            >>> poly = struct.polygons[0]
+            >>> viz.plot_poly(poly, 'random genreated polygon')
+
+        Returns:
+            plt.plot: visualization of the :obj:`Polygon`
+        """
         x = [pt.x for pt in poly.points]
         y = [pt.y for pt in poly.points]
 
-        plt.plot(x, y, label=f'{type}, fitness = {fitness:.3f}')
+        plt.plot(x, y, label=info)
         plt.legend()
