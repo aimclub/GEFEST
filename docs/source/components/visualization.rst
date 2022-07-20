@@ -2,12 +2,16 @@
 Visualization
 =========
 
+Showing :obj:`Structure`
+~~~~~~~~~~~~
+
 .. autoclass:: gefest.core.viz.struct_vizualizer.StructVizualizer
    :members: plot_structure
-   :no-undoc-members:
-   :img: 
+.. image:: https://i.ibb.co/r0YsVtR/vizualizer.png
 
 
+Showing :obj:`Polygon`
+~~~~~~~~~~~~
 .. autoclass:: gefest.core.viz.struct_vizualizer.StructVizualizer
    :members: plot_poly
-   :no-undoc-members:
+.. image:: https://i.ibb.co/5Lnvx40/viz-poly.png
