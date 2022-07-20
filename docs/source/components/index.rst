@@ -10,4 +10,5 @@ Components
    structure
    geometry
    algorithm
+   visualization
    
