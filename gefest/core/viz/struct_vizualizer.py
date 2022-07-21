@@ -34,7 +34,7 @@ class StructVizualizer:
         .. image:: https://i.ibb.co/r0YsVtR/vizualizer.png
 
         Returns:
-            plt.plot: visualization of the :obj:`Structure`
+            plt.plot: visualization |viz| of the :obj:`Structure`
 
         .. |viz| image:: https://i.ibb.co/r0YsVtR/vizualizer.png
         """
