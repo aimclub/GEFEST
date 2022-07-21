@@ -29,12 +29,9 @@ class StructVizualizer:
             >>> from gefest.core.structure.structure import get_random_structure
             >>> struct = get_random_structure(domain)
             >>> viz.plot_structure(struct)
-            >>> text |viz| 
-
-        .. image:: https://i.ibb.co/r0YsVtR/vizualizer.png
 
         Returns:
-            plt.plot: visualization |viz| of the :obj:`Structure`
+            plt.plot: |viz|
 
         .. |viz| image:: https://i.ibb.co/r0YsVtR/vizualizer.png
         """
@@ -63,7 +60,9 @@ class StructVizualizer:
             >>> viz.plot_poly(poly, 'random genreated polygon')
 
         Returns:
-            plt.plot: visualization of the :obj:`Polygon`
+            plt.plot: |viz|
+
+        .. |viz| image:: https://i.ibb.co/x7B0QPY/random-poly.png
         """
         x = [pt.x for pt in poly.points]
         y = [pt.y for pt in poly.points]

@@ -87,7 +87,9 @@ class Structure:
             >>> struct.plot()
 
         Returns:
-            plot: Visualization of :obj:`Strucrure`
+            plot: |viz|
+        
+        .. |viz| image:: https://i.ibb.co/1q0CVNJ/structure-plot.png
         '''
 
         for poly in self.polygons:

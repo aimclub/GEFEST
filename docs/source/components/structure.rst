@@ -22,8 +22,6 @@ class Structure
 .. autoclass:: gefest.core.structure.structure.Structure
    :members:
    :no-undoc-members:
-.. image:: https://i.ibb.co/1q0CVNJ/structure-plot.png
-   :alt: Output of Examples
 
 class Domain
 ~~~~~~~~~~~~
