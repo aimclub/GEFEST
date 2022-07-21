@@ -7,7 +7,7 @@ Showing :obj:`Structure`
 
 .. autoclass:: gefest.core.viz.struct_vizualizer.StructVizualizer
    :members: plot_structure
-   .. image:: https://i.ibb.co/r0YsVtR/vizualizer.png
+.. image:: https://i.ibb.co/r0YsVtR/vizualizer.png
 
 
 Showing :obj:`Polygon`
