@@ -31,9 +31,9 @@ class StructVizualizer:
             >>> viz.plot_structure(struct)
 
         Returns:
-            plt.plot: |viz|
+            plt.plot: |viz_struct|
 
-        .. |viz| image:: https://i.ibb.co/r0YsVtR/vizualizer.png
+        .. |viz_struct| image:: https://i.ibb.co/r0YsVtR/vizualizer.png
         """
 
         for poly in struct.polygons:
@@ -60,9 +60,9 @@ class StructVizualizer:
             >>> viz.plot_poly(poly, 'random genreated polygon')
 
         Returns:
-            plt.plot: |viz|
+            plt.plot: |viz_poly|
 
-        .. |viz| image:: https://i.ibb.co/x7B0QPY/random-poly.png
+        .. |viz_poly| image:: https://i.ibb.co/x7B0QPY/random-poly.png
         """
         x = [pt.x for pt in poly.points]
         y = [pt.y for pt in poly.points]
