@@ -29,7 +29,7 @@ class StructVizualizer:
             >>> from gefest.core.structure.structure import get_random_structure
             >>> struct = get_random_structure(domain)
             >>> viz.plot_structure(struct)
-            |viz|
+            >>> text |viz| 
 
         .. image:: https://i.ibb.co/r0YsVtR/vizualizer.png
 
