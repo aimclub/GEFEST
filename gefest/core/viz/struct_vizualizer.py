@@ -29,11 +29,14 @@ class StructVizualizer:
             >>> from gefest.core.structure.structure import get_random_structure
             >>> struct = get_random_structure(domain)
             >>> viz.plot_structure(struct)
+            |viz|
 
         .. image:: https://i.ibb.co/r0YsVtR/vizualizer.png
 
         Returns:
             plt.plot: visualization of the :obj:`Structure`
+
+        .. |viz| image:: https://i.ibb.co/r0YsVtR/vizualizer.png
         """
 
         for poly in struct.polygons:
