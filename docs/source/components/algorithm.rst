@@ -16,4 +16,3 @@ Postprocessing
 .. automodule:: gefest.core.algs.postproc.resolve_errors
    :members:
    :no-private-members:
-   
