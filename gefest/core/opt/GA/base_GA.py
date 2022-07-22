@@ -10,12 +10,15 @@ from gefest.core.viz.struct_vizualizer import StructVizualizer
 
 
 class BaseGA:
+    """Genetic algorithm (GA)
+
+    Args:
+        calculate_objectives (Callable): 
+    """
+
     def __init__(self, params, calculate_objectives,
                  evolutionary_operators, task_setup: Setup,
                  visualiser=None):
-        """
-         Genetic algorithm (GA)
-        """
 
         self.params = params
 
