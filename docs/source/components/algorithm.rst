@@ -3,7 +3,7 @@ Algorithms
 =========
 
 Validation
-~~~~~~~~~
+~~~~~~~~~~
 
 .. automodule:: gefest.core.algs.geom.validation
    :members:
@@ -11,7 +11,7 @@ Validation
 
 
 Postprocessing
-~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. automodule:: gefest.core.algs.postproc.resolve_errors
    :members:

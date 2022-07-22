@@ -1,5 +1,5 @@
 Components
-=====
+==========
 
 **That is about modules into GEFEST**
 
@@ -10,5 +10,6 @@ Components
    structure
    geometry
    algorithm
+   optimization
    visualization
    

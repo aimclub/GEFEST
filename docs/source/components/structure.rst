@@ -14,11 +14,11 @@ class Point
    :no-undoc-members:
 
 class Polygon
-~~~~~~~~~~~~
+~~~~~~~~~~~~~
 .. autoclass:: gefest.core.structure.polygon.Polygon
 
 class Structure
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 .. autoclass:: gefest.core.structure.structure.Structure
    :members:
    :no-undoc-members:

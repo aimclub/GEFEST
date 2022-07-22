@@ -1,6 +1,6 @@
-=============
-Visualization
-=============
+============
+Optimization
+============
 
 .. autoclass:: gefest.core.viz.struct_vizualizer.StructVizualizer
    :members:
