@@ -9,7 +9,6 @@ CLASS_PATH_KEY = '_class_path'
 
 
 class Serializer(JSONEncoder, JSONDecoder):
-
     _to_json = 'to_json'
     _from_json = 'from_json'
 
@@ -42,7 +41,6 @@ class Serializer(JSONEncoder, JSONDecoder):
                 Point: basic_serialization
 
             }
-
 
     @staticmethod
     def _get_field_checker(obj: Union[INSTANCE_OR_CALLABLE, Type[INSTANCE_OR_CALLABLE]]) -> Callable[..., bool]:

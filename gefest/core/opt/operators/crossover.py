@@ -29,7 +29,8 @@ def crossover_worker(args):
             # All polygons are shuffling between Structures in random way
             s1, s2 = shuffle_structures(s1, s2)
 
-            crossover_point = random.randint(1, min(len(s1.polygons), len(s2.polygons)))  # Choosing crossover point randomly
+            # Choosing crossover point randomly
+            crossover_point = random.randint(1, min(len(s1.polygons), len(s2.polygons)))
 
             # Crossover conversion
             part_1 = s1.polygons[:crossover_point]
