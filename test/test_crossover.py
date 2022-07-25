@@ -1,10 +1,8 @@
-import pytest
 from gefest.core.opt.operators.crossover import crossover
+from gefest.core.structure.domain import Domain
 from gefest.core.structure.point import Point
 from gefest.core.structure.polygon import Polygon
 from gefest.core.structure.structure import Structure
-from gefest.core.structure.domain import Domain
-
 
 domain = Domain()
 geometry = domain.geometry
@@ -26,6 +24,7 @@ def test_crossover_passed():
     expected_square = geometry.get_square(structure_large.polygons[0])\
         + geometry.get_square(structure_small.polygons[0])
 
+    condition = False
     for i in range(100):
         new_structure = crossover(structure_large, structure_small, domain)
         if len(new_structure.polygons) == 2:

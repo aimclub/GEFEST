@@ -8,7 +8,7 @@ from gefest.core.opt.result import Result
 from gefest.core.opt.setup import Setup
 
 
-def optimize(task_setup: Setup, objective_function: Callable, max_gens: int, pop_size: int) -> list:
+def optimize(task_setup: Setup, objective_function: Callable, max_gens: int, pop_size: int) -> Result:
     """The wrapper object for searching optimal solution by given arguments
 
     Args:

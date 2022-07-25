@@ -29,36 +29,36 @@ def crossover_worker(args):
             # All polygons are shuffling between Structures in random way
             s1, s2 = shuffle_structures(s1, s2)
 
-            # Choosing crossover point randomly
-            crossover_point = random.randint(1, min(len(s1.polygons), len(s2.polygons)))
+        # Choosing crossover point randomly
+        crossover_point = random.randint(1, min(len(s1.polygons), len(s2.polygons)))
 
-            # Crossover conversion
-            part_1 = s1.polygons[:crossover_point]
-            if not isinstance(part_1, list):
-                part_1 = [part_1]
-            part_2 = s2.polygons[crossover_point:]
-            if not isinstance(part_2, list):
-                part_2 = [part_2]
+        # Crossover conversion
+        part_1 = s1.polygons[:crossover_point]
+        if not isinstance(part_1, list):
+            part_1 = [part_1]
+        part_2 = s2.polygons[crossover_point:]
+        if not isinstance(part_2, list):
+            part_2 = [part_2]
 
-            result = copy.deepcopy(part_1)
-            result.extend(copy.deepcopy(part_2))
+        result = copy.deepcopy(part_1)
+        result.extend(copy.deepcopy(part_2))
 
-            new_structure.polygons = result
+        new_structure.polygons = result
 
-            # Postprocessing for new structure
+        # Postprocessing for new structure
+        new_structure = postprocess(new_structure, domain)
+        constraints = check_constraints(structure=new_structure, domain=domain)
+        max_attempts = 3  # Number of postprocessing attempts
+        while not constraints:
             new_structure = postprocess(new_structure, domain)
             constraints = check_constraints(structure=new_structure, domain=domain)
-            max_attempts = 3  # Number of postprocessing attempts
-            while not constraints:
-                new_structure = postprocess(new_structure, domain)
-                constraints = check_constraints(structure=new_structure, domain=domain)
-                max_attempts -= 1
-                if max_attempts == 0:
-                    # If the number of attempts is over,
-                    # the transformation is considered unsuccessful
-                    # and one of the structures is returned
-                    return s1
-            return new_structure
+            max_attempts -= 1
+            if max_attempts == 0:
+                # If the number of attempts is over,
+                # the transformation is considered unsuccessful
+                # and one of the structures is returned
+                return s1
+        return new_structure
     except Exception as ex:
         print(ex)
         return s1

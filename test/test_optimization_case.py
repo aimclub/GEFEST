@@ -1,4 +1,3 @@
-import pytest
 import numpy as np
 
 from gefest.core.geometry.geometry_2d import Geometry2D
@@ -54,10 +53,12 @@ task_setup = Setup(domain=domain)
 
 
 def test_optimization():
-
-    optimized_structure = optimize(task_setup=task_setup,
+    optimization_result = optimize(task_setup=task_setup,
                                    objective_function=multi_loss,
                                    pop_size=30,
                                    max_gens=3)
+    optimized_structure = optimization_result.best_structure
+
+    assert optimization_result.fitness > 0
     assert all([isinstance(optimized_structure, Structure),
                 len(optimized_structure.polygons) > 0])
