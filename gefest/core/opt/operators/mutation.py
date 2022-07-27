@@ -25,8 +25,9 @@ def mutation(structure: Structure, domain: Domain, rate=0.6) -> Structure:
         rate (float, optional): likelihood for success mutation. Defaults to 0.6.
 
     Returns:
-        Structure: if mutation was finished succsess - new structure, born from :obj:`structure`
-                     and with mutated individuals inside; otherwise will return the given :obj:`structure`
+        Structure:
+        if mutation was finished succsess - new structure, born from :obj:`structure`
+        and with mutated individuals inside; otherwise will return the given :obj:`structure`
     """
 
     random_val = random.random()

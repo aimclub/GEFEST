@@ -60,7 +60,7 @@ def crossover_worker(args):
 
 
 def crossover(s1: Structure, s2: Structure, domain: Domain, rate=0.4) -> Structure:
-    """_summary_
+    """the crossover proccess method
 
     Args:
         s1 (Structure): the firts generative :obj:`Structure`
@@ -69,8 +69,9 @@ def crossover(s1: Structure, s2: Structure, domain: Domain, rate=0.4) -> Structu
         rate (float, optional): likelihood for success crossover. Defaults to 0.4.
 
     Returns:
-        Structure: if crossover was finished succsess - new structure, born from parents
-                    obj:`s1` and obj:`s2`; otherwise will randomly return one of the given :obj:`Structure`
+        Structure:
+        if crossover was finished succsess - new structure, born from parents
+        obj:`s1` and obj:`s2`; otherwise will randomly return one of the given :obj:`Structure`
     """
 
     random_val = random.random()

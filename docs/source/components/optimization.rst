@@ -20,7 +20,7 @@ Operators
 
 .. automethod:: gefest.core.opt.operators.crossover.crossover
 
-.. automodule:: gefest.core.opt.operators.mutation.mutation
+.. automethod:: gefest.core.opt.operators.mutation.mutation
 
 
 Optimization
