@@ -59,7 +59,19 @@ def crossover_worker(args):
     return new_structure
 
 
-def crossover(s1: Structure, s2: Structure, domain: Domain, rate=0.4):
+def crossover(s1: Structure, s2: Structure, domain: Domain, rate=0.4) -> Structure:
+    """_summary_
+
+    Args:
+        s1 (Structure): The firts generative :obj:`Structure`
+        s2 (Structure): The second generative :obj:`Structure`
+        domain (Domain): the :obj:`Domain` that use for optimization process
+        rate (float, optional): likelihood for success crossover. Defaults to 0.4.
+
+    Returns:
+        Structure: if crossover was finished succsess - new structure, born from parents
+            obj:`s1` and obj:`s2`; otherwise will randomly return one of the given :obj:`Structure`
+    """
     random_val = random.random()
     if random_val >= rate or all([len(s1.polygons) <= 1, len(s2.polygons) <= 1]):
         # In the case when all of structures consist one polygon or less,

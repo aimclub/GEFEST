@@ -18,8 +18,7 @@ Genetic
 Operators
 ~~~~~~~~~
 
-.. automodule:: gefest.core.opt.operators.crossover
-   :members:
+.. automethod:: gefest.core.opt.operators.crossover.crossover
 
 .. automodule:: gefest.core.opt.operators.mutation
    :members:
@@ -30,9 +29,6 @@ Operators
 
 Optimization
 ~~~~~~~~~~~~
-
-.. autoclass:: gefest.core.opt.analytics.EvoAnalytics
-   :members:
 
 .. automodule:: gefest.core.opt.constraints
    :members:
