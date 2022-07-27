@@ -19,10 +19,10 @@ Operators
 ~~~~~~~~~
 
 .. automodule:: gefest.core.opt.operators.crossover
-   .. automethod:: crossover
+   :members: crossover
 
 .. automodule:: gefest.core.opt.operators.mutation
-   .. automethod:: mutation
+   :members: mutation
 
 
 Optimization
