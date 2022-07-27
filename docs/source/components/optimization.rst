@@ -28,4 +28,4 @@ Optimization
 
 .. automethod:: gefest.core.opt.optimize.optimize
 
-.. automethod:: gefest.core.opt.setup.Setup
+.. autoclass:: gefest.core.opt.setup.Setup
