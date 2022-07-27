@@ -18,14 +18,17 @@ Genetic
 Operators
 ~~~~~~~~~
 
-.. automethod:: gefest.core.opt.operators.crossover.crossover
+.. automodule:: gefest.core.opt.operators.crossover
+   .. automethod:: crossover
 
-.. automethod:: gefest.core.opt.operators.mutation.mutation
+.. automodule:: gefest.core.opt.operators.mutation
+   .. automethod:: mutation
 
 
 Optimization
 ~~~~~~~~~~~~
 
-.. automethod:: gefest.core.opt.optimize.optimize
+.. automodule:: gefest.core.opt.optimize
+   .. automethod:: optimize
 
 .. autoclass:: gefest.core.opt.setup.Setup
