@@ -8,9 +8,11 @@ Genetic
 
 .. autoclass:: gefest.core.opt.GA.base_GA.BaseGA
    :members:
+   :no-undoc-members:
 
 .. autoclass:: gefest.core.opt.GA.GA.GA
    :members:
+   :no-undoc-members:
 
 
 Operators
