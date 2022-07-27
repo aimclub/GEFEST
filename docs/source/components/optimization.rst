@@ -20,9 +20,11 @@ Operators
 
 .. automodule:: gefest.core.opt.operators.crossover
    :members: crossover
+   :exclude-members: crossover_worker
 
 .. automodule:: gefest.core.opt.operators.mutation
    :members: mutation
+   :no-undoc-members:
 
 
 Optimization
