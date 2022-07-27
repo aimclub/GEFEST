@@ -71,7 +71,7 @@ def crossover(s1: Structure, s2: Structure, domain: Domain, rate=0.4) -> Structu
     Returns:
         Structure:
         if crossover was finished succsess - new structure, born from parents
-        obj:`s1`: and obj:`s2`:; otherwise will randomly return one of the given :obj:`Structure`
+        :obj:`s1` and :obj:`s2`; otherwise will randomly return one of the given :obj:`Structure`
     """
 
     random_val = random.random()

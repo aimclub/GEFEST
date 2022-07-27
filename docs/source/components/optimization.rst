@@ -26,7 +26,6 @@ Operators
 Optimization
 ~~~~~~~~~~~~
 
-.. automodule:: gefest.core.opt.optimize
-   .. automethod:: optimize
+.. automethod:: gefest.core.opt.optimize.optimize
 
 .. autoclass:: gefest.core.opt.setup.Setup

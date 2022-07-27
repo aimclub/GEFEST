@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Callable
+from typing import Callable, List
 
 from gefest.core.opt.GA.GA import GA
 from gefest.core.opt.objectives import calculate_objectives
@@ -7,7 +7,7 @@ from gefest.core.opt.operators.operators import default_operators
 from gefest.core.opt.setup import Setup
 
 
-def optimize(task_setup: Setup, objective_function: Callable, max_gens, pop_size):
+def optimize(task_setup: Setup, objective_function: Callable, max_gens, pop_size) -> List:
     """The wrapper object for searching optimal solution by given arguments
 
     Args:
