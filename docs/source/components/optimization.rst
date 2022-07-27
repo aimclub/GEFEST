@@ -29,6 +29,6 @@ Optimization
 ~~~~~~~~~~~~
 
 .. automodule:: gefest.core.opt.optimize
-   .. automethod:: optimize
+   :members: optimize
 
 .. autoclass:: gefest.core.opt.setup.Setup
