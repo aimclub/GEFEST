@@ -26,14 +26,6 @@ Operators
 Optimization
 ~~~~~~~~~~~~
 
-.. automodule:: gefest.core.opt.constraints
-   :members:
+.. automethod:: gefest.core.opt.optimize
 
-.. automodule:: gefest.core.opt.objectives
-   :members:
-
-.. automodule:: gefest.core.opt.optimize
-   :members:
-
-.. automodule:: gefest.core.opt.setup
-   :members:
+.. automethod:: gefest.core.opt.setup

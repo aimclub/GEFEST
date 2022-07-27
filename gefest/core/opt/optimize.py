@@ -8,16 +8,16 @@ from gefest.core.opt.setup import Setup
 
 
 def optimize(task_setup: Setup, objective_function: Callable, max_gens, pop_size):
-    """The object for searching optimal solution by given arguments
+    """The wrapper object for searching optimal solution by given arguments
 
     Args:
-        task_setup (Setup): the union of :obj:`Domain` and a simulator of physical process
-        objective_function (Callable): _description_
-        max_gens (int): _description_
-        pop_size (int): _description_
+        task_setup (Setup): the wrapper object that union :obj:`Domain` and a simulator of physical process
+        objective_function (Callable): cost function
+        max_gens (int): the limit number of generation in optimization process
+        pop_size (int): the number of population size for one gemneration
 
     Returns:
-        _type_: _description_
+        List: the best individuals from last generation after optimization
     """
     operators = default_operators()
 
