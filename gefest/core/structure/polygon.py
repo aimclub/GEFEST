@@ -7,15 +7,15 @@ class Polygon:
     """The geometrical object made up of :obj:`Point` objects
 
     Args:
-        polygon_id (str): name of :obj:`Polygon`, used as separator between polygons
+        polygon_id: name of :obj:`Polygon`, used as separator between polygons
             in the postprocessing layer; must be ``"fixed"`` where created a :obj:`Polygon`
             that can not be deleted from working area due postprocessing
-        points (list): :obj:`list` of :obj:`Point` objects which form borders of :obj:`Polygon`
+        points: :obj:`list` of :obj:`Point` objects which form borders of :obj:`Polygon`
 
     Attributes:
-        polygon_id (str): returns the name of :obj:`Polygon`
+        polygon_id: returns the name of :obj:`Polygon`
             that can not be deleted from working area due postprocessing
-        points (list): returns :obj:`list` of :obj:`Point` which form borders of :obj:`Polygon`
+        points: returns :obj:`list` of :obj:`Point` which form borders of :obj:`Polygon`
 
     Examples:
         >>> from gefest.core.structure.point import Point
