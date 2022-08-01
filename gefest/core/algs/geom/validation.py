@@ -19,12 +19,12 @@ def intersection(structure: 'Structure', geometry: 'Geometry') -> bool:
     """The method for checking intersection between Polygons in the Structure
 
     Args:
-        structure (Structure): the :obj:`Structure` that explore
-        geometry (Geometry): way of processing geometrical objects,
+        structure: the :obj:`Structure` that explore
+           geometry: way of processing geometrical objects,
            :obj:`class Geometry2D` for processing 2D objects
 
     Returns:
-        bool: ``True`` if at least one of the polygons in given :obj:`structure` intersects another,
+        ``True`` if at least one of the polygons in given :obj:`structure` intersects another,
         otherwise - ``False``
     """
 
