@@ -8,14 +8,14 @@ class Point:
     The smallest geometrical object which consists the spatial information of the point
 
     Args:
-        _x (float): the **x** coordinate of :obj:`Point`
-        _y (float): the **y** coordinate of :obj:`Point`
-        _z (float): the **z** coordinate of :obj:`Point`, by default ``_z=0.0``
+        _x: the **x** coordinate of :obj:`Point`
+        _y: the **y** coordinate of :obj:`Point`
+        _z: the **z** coordinate of :obj:`Point`, by default ``_z=0.0``
 
     Attributes:
-        x (int): returns the rounded until integer **x** coordinate
-        y (int): returns the rounded until integer **y** coordinate
-        z (int): returns the rounded until integer **z** coordinate
+        x: returns the rounded until integer **x** coordinate
+        y: returns the rounded until integer **y** coordinate
+        z: returns the rounded until integer **z** coordinate
 
     Examples:
             >>> from gefest.core.structure.point import Point
