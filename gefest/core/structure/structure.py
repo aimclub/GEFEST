@@ -18,14 +18,14 @@ class Structure:
     """The geometrical object made up of :obj:`Polygon` objects
 
     Args:
-        polygons (list): list of :obj:`Polygon` objects which form a combined set of polygons,
+        polygons: list of :obj:`Polygon` objects which form a combined set of polygons,
             needed for joint processing capability of polygons
 
     Attributes:
-        text_id (str): returns information about :obj:`Polygons` and :obj:`Points`
+        text_id: returns information about :obj:`Polygons` and :obj:`Points`
             included in :obj:`Structure`
-        polygons (list): returns the :obj:`list` of :obj:`Polygon` objects
-        total_points (list): returns the :obj:`list` with lengths (number of :obj:`Point`)
+        polygons: returns the :obj:`list` of :obj:`Polygon` objects
+        total_points: returns the :obj:`list` with lengths (number of :obj:`Point`)
             of every :obj:`Polygon` included
 
     Examples:
@@ -81,14 +81,14 @@ class Structure:
         '''Visualization with drawn :obj:`Strucrure`
 
         Args:
-            title (str, optional): the name of drawing, by default ``None``
+            title: the name of drawing, by default ``None``
 
         Examples:
             >>> struct.plot()
 
         Returns:
             plot: |viz|
-        
+
         .. |viz| image:: https://i.ibb.co/1q0CVNJ/structure-plot.png
         '''
 
