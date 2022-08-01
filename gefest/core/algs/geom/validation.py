@@ -20,7 +20,7 @@ def intersection(structure: 'Structure', geometry: 'Geometry') -> bool:
 
     Args:
         structure: the :obj:`Structure` that explore
-           geometry: way of processing geometrical objects,
+        geometry: way of processing geometrical objects,
            :obj:`class Geometry2D` for processing 2D objects
 
     Returns:
@@ -44,12 +44,12 @@ def out_of_bound(structure: 'Structure', domain: 'Domain') -> bool:
     on crossing borders of :obj:`Domain`
 
     Args:
-        structure (Structure): the :obj:`Structure` that explore
-        domain (Domain): the :obj:`Domain` that determinates the main
+        structure: the :obj:`Structure` that explore
+        domain: the :obj:`Domain` that determinates the main
             parameters, this method requires ``allowed_area`` from :obj:`Domain`
 
     Returns:
-        bool: ``True`` if at least one of the polygons in given :obj:`structure` crossing borders
+        ``True`` if at least one of the polygons in given :obj:`structure` crossing borders
         of allowed area, otherwise - ``False``
     """
     domain_poly = domain.bound_poly
@@ -60,17 +60,17 @@ def out_of_bound(structure: 'Structure', domain: 'Domain') -> bool:
     return False
 
 
-def too_close(structure: 'Structure', domain: Domain) -> bool:
+def too_close(structure: 'Structure', domain: 'Domain') -> bool:
     """Checking for too close location between every :obj:`Polygon` in the
     given :obj:`Structure`
 
     Args:
-        structure (Structure): the :obj:`Structure` that explore
-        domain (Domain): the :obj:`Domain` that determinates the main
+        structure: the :obj:`Structure` that explore
+        domain: the :obj:`Domain` that determinates the main
             parameters, this method requires ``min_dist`` from :obj:`Domain`
 
     Returns:
-        bool: ``True`` if at least one distance between any polygons is less than value of minimal
+        ``True`` if at least one distance between any polygons is less than value of minimal
         distance set by :obj:`Domain`, otherwise - ``False``
     """
 
@@ -95,10 +95,10 @@ def self_intersection(structure: 'Structure') -> bool:
     is self-intersected
 
     Args:
-        structure (Structure): the :obj:`Structure` that explore
+        structure: the :obj:`Structure` that explore
 
     Returns:
-        bool: ``True`` if at least one of the polygons in the :obj:`Structure` is
+        ``True`` if at least one of the polygons in the :obj:`Structure` is
         self-intersected, otherwise - ``False``
     """
 
@@ -112,12 +112,12 @@ def unclosed_poly(structure: 'Structure', domain: 'Domain') -> bool:
     """Checking for equality of the first and last points
 
     Args:
-        structure (Structure): the :obj:`Structure` that explore
-        domain (Domain): the :obj:`Domain` that determinates the main
+        structure: the :obj:`Structure` that explore
+        domain: the :obj:`Domain` that determinates the main
             parameters, this method requires ``is_closed`` from :obj:`Domain`
 
     Returns:
-        bool: ``True`` if patameter ``is_closed`` from :obj:`Domain` is ``True`` and at least
+        ``True`` if patameter ``is_closed`` from :obj:`Domain` is ``True`` and at least
         one of the polygons has unequality between the first one and the last point,
         otherwise - ``False``
     """
