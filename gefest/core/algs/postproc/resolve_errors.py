@@ -20,8 +20,8 @@ def postprocess(structure: Structure, domain: Domain) -> Structure:
     it is not correct.
 
     Args:
-        structure (Structure): the :obj:`Structure` that need correcting
-        domain (Domain): the :obj:`Domain` that determinates the main
+        structure: the :obj:`Structure` that need correcting
+        domain: the :obj:`Domain` that determinates the main
             parameters, it needs there for checking equality between given
             :obj:`Structure` and set parameters in the :obj:`Domain`
 
@@ -37,7 +37,7 @@ def postprocess(structure: Structure, domain: Domain) -> Structure:
         unclosed polygon: Fix for open polygons by adding first :obj:`Point` to end
 
     Returns:
-        Structure: checked by rules on stages before and corrected :obj:`Structure`
+        checked by rules on stages before and corrected :obj:`Structure`
     """
 
     corrected_structure = deepcopy(structure)
