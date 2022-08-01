@@ -1,7 +1,6 @@
 """
-Here are defined general constraints on polygons.
-We define intersection between polygons in structure, self-intersection in polygons,
-out of bound for points in polygon, closeness between polygons and unclosed (for closed polygons).
+Here are defined general constraints on polygons by validation rules.
+Validation is a checking on valid and unvalid objects for further processing.
 """
 
 from itertools import permutations
@@ -17,7 +16,7 @@ min_dist_from_boundary = 0.01
 
 
 def intersection(structure: 'Structure', geometry: 'Geometry') -> bool:
-    """The method for checking intersection between Polygons that put to Structure
+    """The method for checking intersection between Polygons in the Structure
 
     Args:
         structure (Structure): the :obj:`Structure` that explore
