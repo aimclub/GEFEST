@@ -16,8 +16,7 @@ poly_pt = TypeVar('poly_pt', Polygon, Point)
 
 
 class Geometry2D(Geometry):
-    """
-    Overriding the geometry base class for 2D structures.
+    """Overriding the geometry base class for 2D structures.
     The input receives information about the closeness of the polygon
 
     Args:
@@ -26,17 +25,17 @@ class Geometry2D(Geometry):
     """
 
     def __init__(self,
-                 is_closed=True):
+                 is_closed: bool = True):
         self.is_closed = is_closed
 
-    def get_coords(self, poly: 'Polygon'):
+    def get_coords(self, poly: 'Polygon') -> list:
         """The function for getting points
 
         Args:
-            poly (Polygon): :obj:`Polygon` for processing
+            poly: :obj:`Polygon` for processing
 
         Returns:
-            list: all :obj:`Point` that :obj:`poly`contains
+            all :obj:`Point` that :obj:`poly`contains
         """
 
         if isinstance(poly, GeomPolygon):
@@ -54,17 +53,17 @@ class Geometry2D(Geometry):
 
         return points
 
-    def resize_poly(self, poly: 'Polygon', x_scale: float, y_scale: float):
+    def resize_poly(self, poly: 'Polygon', x_scale: float, y_scale: float) -> 'Polygon':
         """The function for rescaling polygons along each axis.
         Scaling occurs relative to the center of mass of the polygon
 
         Args:
-            poly (Polygon): :obj:`Polygon` for processing
-            x_scale (float): scale value for **x** axis
-            y_scale (float): scale value for **y** axis
+            poly: :obj:`Polygon` for processing
+            x_scale: scale value for **x** axis
+            y_scale: scale value for **y** axis
 
         Returns:
-            Polygon: scaled :obj:`poly` by ``(x,y)`` axes
+            scaled :obj:`poly` by ``(x,y)`` axes
         """
 
         geom_polygon = self._poly_to_geom(poly)  # Transformation to shapely structure
@@ -79,15 +78,15 @@ class Geometry2D(Geometry):
 
         return rescaled_poly
 
-    def rotate_poly(self, poly: 'Polygon', angle: float):
+    def rotate_poly(self, poly: 'Polygon', angle: float) -> 'Polygon':
         """Rotating polygon relative to the center of mass by a given angle
 
         Args:
-            poly (Polygon): :obj:`Polygon` for processing
-            angle (float): value of degree rotation
+            poly: :obj:`Polygon` for processing
+            angle: value of degree rotation
 
         Returns:
-            Polygon: rotated :obj:`poly`
+            rotated :obj:`poly`
         """
 
         geom_polygon = self._poly_to_geom(poly)  # Transformation to shapely structure
@@ -100,14 +99,14 @@ class Geometry2D(Geometry):
 
         return rotated_poly
 
-    def get_square(self, polygon: 'Polygon'):
+    def get_square(self, polygon: 'Polygon') -> float:
         """Recieving value of the area
 
         Args:
-            polygon (Polygon): :obj:`Polygon` for processing
+            polygon: :obj:`Polygon` for processing
 
         Returns:
-            float: value of the :obj:`polygon` area
+            value of the :obj:`polygon` area
         """
 
         if len(polygon.points) <= 1:
@@ -118,15 +117,15 @@ class Geometry2D(Geometry):
 
         return geom_polygon.area
 
-    def is_contain_point(self, poly: 'Polygon', point: 'Point'):
+    def is_contain_point(self, poly: 'Polygon', point: 'Point') -> bool:
         """Checking if a point is inside a polygon
 
         Args:
-            poly (Polygon): :obj:`Polygon` that explore
-            point (Point): :obj:`Point` for checking presence inside the :obj:`Polygon`
+            poly: :obj:`Polygon` that explore
+            point: :obj:`Point` for checking presence inside the :obj:`Polygon`
 
         Returns:
-            bool: ``True`` if :obj:`point` is into :obj:`poly`, otherwise ``False``
+            ``True`` if :obj:`point` is into :obj:`poly`, otherwise ``False``
         """
 
         geom_poly_allowed = GeomPolygon([self._pt_to_geom(pt) for pt in poly.points])
@@ -138,12 +137,11 @@ class Geometry2D(Geometry):
         """Checking if a poly_1 is inside into poly_2
 
         Args:
-            poly_1 (Polygon): the first :obj:`Polygon` that explore
-            poly_2 (Polygon): the second :obj:`Polygon` that explore
+            poly_1: the first :obj:`Polygon` that explore
+            poly_2: the second :obj:`Polygon` that explore
 
         Returns:
-            bool: ``True`` if :obj:`poly_1` is into :obj:`poly_2` (poly_2 covers whole area of poly_1),
-                 otherwise ``False``
+            ``True`` if :obj:`poly_1` is into :obj:`poly_2` (poly_2 covers whole area of poly_1), otherwise ``False``
         """
 
         geom_poly_allowed = GeomPolygon([self._pt_to_geom(pt) for pt in poly_2.points])
@@ -155,12 +153,11 @@ class Geometry2D(Geometry):
         """Calculating closest point between input point and polygon.
 
         Args:
-            point (Point): the :obj:`Point` that explore
-            poly (Polygon): the :obj:`Polygon` that explore
+            point: the :obj:`Point` that explore
+            poly: the :obj:`Polygon` that explore
 
         Returns:
-            Point: returns the nearest :obj:`Point` from ``point`` among all points
-                in the ``poly``
+            returns the nearest :obj:`Point` from ``point`` among all points in the ``poly``
         """
 
         geom_poly = self._poly_to_geom(poly)
@@ -173,12 +170,11 @@ class Geometry2D(Geometry):
         """Calculating closest point between two polygons
 
         Args:
-            poly_1 (Polygon): the first :obj:`Polygon` that explore
-            poly_2 (Polygon): the second :obj:`Polygon` that explore
+            poly_1: the first :obj:`Polygon` that explore
+            poly_2: the second :obj:`Polygon` that explore
 
         Returns:
-            List[Point]: the couple of :obj:`Point` where the first one from
-            :obj:`poly_1` and the second one from :obj:`poly_2`
+            the couple of :obj:`Point` where the first one from :obj:`poly_1` and the second one from :obj:`poly_2`
         """
 
         geom_poly_1 = self._poly_to_geom(poly_1)
@@ -194,10 +190,10 @@ class Geometry2D(Geometry):
         Such transformation might be useful if you are working with round-shaped figures
 
         Args:
-            poly (Polygon): :obj:`Polygon` for processing
+            poly: :obj:`Polygon` for processing
 
         Returns:
-            Polygon: transformed :obj:`poly`
+            ransformed :obj:`poly`
         """
 
         poly = GeomPolygon([self._pt_to_geom(pt) for pt in poly.points])  # Transform to shapely Polygon
@@ -224,10 +220,10 @@ class Geometry2D(Geometry):
         """Obtaining a convex polygon to avoid intersections
 
         Args:
-            poly (Polygon): :obj:`Polygon` for processing
+            poly: :obj:`Polygon` for processing
 
         Returns:
-            Polygon: convex :obj:`Polygon`
+            convex :obj:`Polygon`
         """
 
         if len(poly.points) < 3:
@@ -242,10 +238,10 @@ class Geometry2D(Geometry):
         """Getting a point that is the center of mass of the polygon
 
         Args:
-            poly (Polygon): the :obj:`Polygon` that explore
+            poly: the :obj:`Polygon` that explore
 
         Returns:
-            Point: central :obj:`Point` of :obj:`poly`
+            central :obj:`Point` of :obj:`poly`
         """
 
         points = [pt for pt in poly.points]
@@ -262,10 +258,10 @@ class Geometry2D(Geometry):
         Whole structure appears like shapely MultiLineString for which uses method is simple
 
         Args:
-            structure (Structure): the :obj:`Structure` that explore
+            structure: the :obj:`Structure` that explore
 
         Returns:
-            bool: ``True`` if any :obj:`Polygon` in :obj:`structure` intersects with another one,
+            ``True`` if any :obj:`Polygon` in :obj:`structure` intersects with another one,
                otherwise - ``False``
         """
 
@@ -278,12 +274,11 @@ class Geometry2D(Geometry):
         """Intersection between two polygons
 
         Args:
-            poly_1 (Polygon): the first :obj:`Polygon` that explore
-            poly_2 (Polygon): the second :obj:`Polygon` that explore
+            poly_1: the first :obj:`Polygon` that explore
+            poly_2: the second :obj:`Polygon` that explore
 
         Returns:
-            bool: ``True`` if the :obj:`poly_1` intersects with :obj:`poly_2`,
-               otherwise - ``False``
+            ``True`` if the :obj:`poly_1` intersects with :obj:`poly_2`, otherwise - ``False``
         """
 
         geom_poly_1 = self._poly_to_geom(poly_1)
@@ -303,11 +298,11 @@ class Geometry2D(Geometry):
         """Smallest distance between two objects
 
         Args:
-            obj_1 (Union[Polygon, Point]): the first :obj:`obj_1` that explore
-            obj_2 (Union[Polygon, Point]): the second :obj:`obj_2` that explore
+            obj_1: the first :obj:`obj_1` that explore
+            obj_2: the second :obj:`obj_2` that explore
 
         Returns:
-            float: value of distance between the nearest points of the explored objects
+            value of distance between the nearest points of the explored objects
         """
 
         if isinstance(obj_1, Polygon):
