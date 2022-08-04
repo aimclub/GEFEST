@@ -23,7 +23,7 @@ class StructVizualizer:
         """The method displays the given :obj:`Structure`
 
         Args:
-            struct (Structure): the :obj:`Structure` for displaying
+            struct: the :obj:`Structure` for displaying
 
         Examples:
             >>> from gefest.core.structure.structure import get_random_structure
@@ -31,7 +31,7 @@ class StructVizualizer:
             >>> viz.plot_structure(struct)
 
         Returns:
-            plt.plot: |viz_struct|
+            |viz_struct|
 
         .. |viz_struct| image:: https://i.ibb.co/r0YsVtR/vizualizer.png
         """
@@ -50,8 +50,8 @@ class StructVizualizer:
         """The method displays the given :obj:`Polygon`
 
         Args:
-            poly (Polygon): the :obj:`Polygon` for displaying
-            info (str): name of Polygon, allow to use id of Polygon
+            poly: the :obj:`Polygon` for displaying
+            info: name of Polygon, allow to use id of Polygon
 
         Examples:
             >>> from gefest.core.structure.structure import get_random_poly
@@ -60,7 +60,7 @@ class StructVizualizer:
             >>> viz.plot_poly(poly, 'random genreated polygon')
 
         Returns:
-            plt.plot: |viz_poly|
+            |viz_poly|
 
         .. |viz_poly| image:: https://i.ibb.co/x7B0QPY/random-poly.png
         """
