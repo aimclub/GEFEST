@@ -10,12 +10,14 @@ from gefest.core.viz.struct_vizualizer import StructVizualizer
 
 
 class BaseGA:
+    """The base optimization class.
+    The class contains basic optimization functions which allow to use different
+    way of optimization algorithm via legacy from the :obj:`class BaseGA`.
+    """
+
     def __init__(self, params, calculate_objectives,
                  evolutionary_operators, task_setup: Setup,
                  visualiser=None):
-        """
-         Genetic algorithm (GA)
-        """
 
         self.params = params
 
@@ -49,10 +51,19 @@ class BaseGA:
             self.mutation_rate = mutation_rate
             self.mutation_value_rate = mutation_value_rate
 
-    def solution(self, verbose=True, **kwargs):
+    def solution(self, verbose: bool = True, **kwargs):
+        """Method for finding a solution via choosen algorithm
+
+        Args:
+            verbose: Full description of finding the best solution if ``True``, otherwise - ``False``. Defaults to True.
+        """
+
         pass
 
     def fitness(self):
+        """Calculating value of the fitness function
+        """
+
         self.calculate_objectives(population=self._pop)
         for ind in self._pop:
             ind.fitness = ind.objectives[0]
@@ -61,7 +72,16 @@ class BaseGA:
     def random_selection(self, group_size):
         return [self._pop[randint(0, len(self._pop) - 1)] for _ in range(group_size)]
 
-    def tournament_selection(self, fraction=0.1):
+    def tournament_selection(self, fraction: float = 0.1):
+        """The method allows to select the best ones from whole population
+
+        Args:
+            fraction: value for separating the best part of population from another. Defaults to 0.1.
+
+        Returns:
+            The best individuals from given population. Their number is equal to ``'initial_number' * fraction``
+        """
+
         group_size = math.ceil(len(self._pop) * fraction)
         min_group_size = 2 if len(self._pop) > 1 else 1
         group_size = max(group_size, min_group_size)
@@ -80,8 +100,16 @@ class BaseGA:
                 chosen.append(rnd)
         return chosen
 
-    def reproduce(self, selected):
+    def reproduce(self, selected) -> list:
+        """The method imitatess evolutionory reproduce process via apply
+        `crossover` and `mutation` to given undividuals from population.
 
+        Args:
+            selected : the set of inviduals for reproducing
+
+        Returns:
+            reprodused individuals
+        """
         children = []
         np.random.shuffle(selected)
         for pair_index in range(0, len(selected) - 1):

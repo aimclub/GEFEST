@@ -14,11 +14,19 @@ from gefest.core.structure.structure import Structure, get_random_poly, get_rand
 from gefest.core.structure.point import Point
 
 
-def mutation(structure: Structure, domain: Domain, rate=0.6):
-    """
-    We divide mutations into two types: points mutations and polygons mutations
+def mutation(structure: Structure, domain: Domain, rate: float = 0.6) -> Structure:
+    """We divide mutations into two types: points mutations and polygons mutations
     Points mutation: add/delete points, change position
     Polygon mutation: add/delete polygon, rotate, resize
+
+    Args:
+        structure: the given generative :obj:`Structure`
+        domain: the :obj:`Domain` that use for optimization process
+        rate: likelihood for success mutation. Defaults to 0.6.
+
+    Returns:
+        if mutation was finished succsess - new structure, born from :obj:`structure`
+        and with mutated individuals inside; otherwise will return the given :obj:`structure`
     """
 
     random_val = random.random()

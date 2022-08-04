@@ -15,6 +15,42 @@ from gefest.core.structure.polygon import Polygon
 
 @dataclass
 class Structure:
+    """The geometrical object made up of :obj:`Polygon` objects
+
+    Args:
+        polygons: list of :obj:`Polygon` objects which form a combined set of polygons,
+            needed for joint processing capability of polygons
+
+    Attributes:
+        text_id: returns information about :obj:`Polygons` and :obj:`Points`
+            included in :obj:`Structure`
+        polygons: returns the :obj:`list` of :obj:`Polygon` objects
+        total_points: returns the :obj:`list` with lengths (number of :obj:`Point`)
+            of every :obj:`Polygon` included
+
+    Examples:
+        >>> from gefest.core.structure.point import Point
+        >>> from gefest.core.structure.polygon import Polygon
+        >>> from gefest.core.structure.structure import Structure
+        >>> # creating the rectangle Polygon
+        >>> points_rect = [Point(4,0), Point(8,0), Point(8,4), Point(4,4), Point(4,0)]
+        >>> rectangle = Polygon('rectangle', points=points_rect)
+        >>> # creating the triangle Polygon
+        >>> points_triagle = [Point(0,0), Point(3,3), Point(3,0), Point(0,0)]
+        >>> triangle = Polygon('triangle', points=points_triagle)
+        >>> # creating the Structure and plot it
+        >>> struct = Structure([triangle, rectangle])
+        >>> struct.text_id
+        'P0=4:(x=0, y=0); (x=3, y=3); (x=3, y=0); (x=0, y=0);
+        P1=5:(x=4, y=0); (x=8, y=0); (x=8, y=4); (x=4, y=4); (x=4, y=0); '
+
+        >>> struct.total_points
+        [4, 5]
+
+    Returns:
+        Structure: ``Structure(List[Polygon])``
+    """
+
     polygons: List[Polygon]
 
     def __str__(self):
@@ -29,7 +65,7 @@ class Structure:
         return json.dumps(self, default=vars)
 
     @property
-    def text_id(self):
+    def text_id(self) -> str:
         out_str = ''
         for i, pol in enumerate(self.polygons):
             out_str += f'P{i}={len(pol.points)}:'
@@ -38,15 +74,31 @@ class Structure:
         return out_str
 
     @property
-    def total_points(self):
+    def total_points(self) -> list:
         return [len(p.points) for p in self.polygons]
 
-    def plot(self, structure, domain=None, title=None):
-        x = [point._x for point in structure.polygons[0].points]
-        y = [point._y for point in structure.polygons[0].points]
-        plt.plot(x, y)
+    def plot(self, title=None):
+        '''Visualization with drawn :obj:`Strucrure`
+
+        Args:
+            title: the name of drawing, by default ``None``
+
+        Examples:
+            >>> struct.plot()
+
+        Returns:
+            plot: |viz|
+
+        .. |viz| image:: https://i.ibb.co/1q0CVNJ/structure-plot.png
+        '''
+
+        for poly in self.polygons:
+            x = [point._x for point in poly.points]
+            y = [point._y for point in poly.points]
+            plt.plot(x, y, label=poly.id)
+        plt.legend()
         plt.title(title)
-        plt.show()
+        plt.show
 
 
 def get_random_structure(domain: 'Domain') -> Structure:
@@ -204,7 +256,7 @@ def distance(point: 'Point',
     polygons = structure.polygons
     distances = []
     for poly in polygons:
-        d = geometry.centroid_distance(point, poly)
+        d = geometry.min_distance(point, poly)
         distances.append(d)
 
     return min(distances)

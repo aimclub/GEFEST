@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from shapely.geometry import Point as GeomPoint, LineString
 
-from typing import List, Union
+from typing import Union
 
 from gefest.core.structure.point import Point
 from gefest.core.structure.polygon import Polygon

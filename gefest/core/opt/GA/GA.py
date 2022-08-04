@@ -3,8 +3,21 @@ from gefest.core.opt.analytics import EvoAnalytics
 
 
 class GA(BaseGA):
+    """The class uses genetic algorithm during optimization process.
 
-    def solution(self, verbose=True, **kwargs):
+    Args:
+        BaseGA (Collable): parent abstract class with main optimization methods
+    """
+
+    def solution(self, verbose: bool = True, **kwargs) -> tuple:
+        """Implementation of genetic algorithm
+
+        Args:
+            verbose: Full description of finding the best solution if ``True``, otherwise - ``False``. Defaults to True
+
+        Returns:
+            a couple like (population, the best individual)
+        """
         self.generation_number = 0
 
         self.fitness()
