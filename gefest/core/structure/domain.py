@@ -49,9 +49,9 @@ class Domain:
     def __init__(self, name: str = 'main', allowed_area: Optional[List[Tuple]] = None,
                  max_poly_num: int = 4, min_poly_num: int = 2,
                  max_points_num: int = 50, min_points_num: int = 20,
-                 fixed_points: List[Polygon] = None,
+                 fixed_points: Optional[List[Polygon]] = None,
                  is_closed: bool = True,
-                 geometry: Geometry = None):
+                 geometry: Optional[Geometry] = None):
         self.name = name
         self.is_closed = is_closed
         if geometry is None:
