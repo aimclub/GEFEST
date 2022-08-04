@@ -51,12 +51,11 @@ class BaseGA:
             self.mutation_rate = mutation_rate
             self.mutation_value_rate = mutation_value_rate
 
-    def solution(self, verbose=True, **kwargs):
+    def solution(self, verbose: bool = True, **kwargs):
         """Method for finding a solution via choosen algorithm
 
         Args:
-            verbose (bool, optional): Full description of finding the best solution if ``True``,
-                otherwise - ``False``. Defaults to True.
+            verbose: Full description of finding the best solution if ``True``, otherwise - ``False``. Defaults to True.
         """
 
         pass
@@ -73,12 +72,11 @@ class BaseGA:
     def random_selection(self, group_size):
         return [self._pop[randint(0, len(self._pop) - 1)] for _ in range(group_size)]
 
-    def tournament_selection(self, fraction=0.1):
+    def tournament_selection(self, fraction: float = 0.1):
         """The method allows to select the best ones from whole population
 
         Args:
-            fraction (float, optional): value for separating the best part of population from another.
-                Defaults to 0.1.
+            fraction: value for separating the best part of population from another. Defaults to 0.1.
 
         Returns:
             The best individuals from given population. Their number is equal to ``'initial_number' * fraction``
@@ -102,7 +100,7 @@ class BaseGA:
                 chosen.append(rnd)
         return chosen
 
-    def reproduce(self, selected):
+    def reproduce(self, selected) -> list:
         """The method imitatess evolutionory reproduce process via apply
         `crossover` and `mutation` to given undividuals from population.
 
@@ -110,7 +108,7 @@ class BaseGA:
             selected : the set of inviduals for reproducing
 
         Returns:
-            List: reprodused individuals
+            reprodused individuals
         """
         children = []
         np.random.shuffle(selected)
