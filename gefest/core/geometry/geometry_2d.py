@@ -20,7 +20,7 @@ class Geometry2D(Geometry):
     The input receives information about the closeness of the polygon
 
     Args:
-        is_closed (bool): ``True`` if the :obj:`Polygon` must have close borders
+        is_closed: ``True`` if the :obj:`Polygon` must have close borders
             (first Point is equal to the last one), otherwise ``False``. Default value is ``True``
     """
 
