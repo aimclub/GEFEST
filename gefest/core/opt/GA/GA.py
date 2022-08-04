@@ -9,15 +9,14 @@ class GA(BaseGA):
         BaseGA (Collable): parent abstract class with main optimization methods
     """
 
-    def solution(self, verbose=True, **kwargs):
+    def solution(self, verbose: bool = True, **kwargs) -> tuple:
         """Implementation of genetic algorithm
 
         Args:
-            verbose (bool, optional): Full description of finding the best solution if ``True``,
-                otherwise - ``False``. Defaults to True.
+            verbose: Full description of finding the best solution if ``True``, otherwise - ``False``. Defaults to True
 
         Returns:
-            tuple: a couple like (population, the best individual)
+            a couple like (population, the best individual)
         """
         self.generation_number = 0
 
