@@ -84,15 +84,15 @@ Citation
 ========
 
 .. topic:: @inproceedings
-   {nikitin2021generative, title={Generative design of microfluidic channel geometry using evolutionary
-   approach}, author={Nikitin, Nikolay O and Hvatov, Alexander and Polonskaia, Iana S and Kalyuzhnaya, Anna V and Grigorev,
-   Georgii V and Wang, Xiaohao and Qian, Xiang}, booktitle={Proceedings of the Genetic and Evolutionary Computation
-   Conference Companion}, pages={59--60}, year={2021} }
+      {nikitin2021generative, title={Generative design of microfluidic channel geometry using evolutionary
+      approach}, author={Nikitin, Nikolay O and Hvatov, Alexander and Polonskaia, Iana S and Kalyuzhnaya, Anna V and Grigorev,
+      Georgii V and Wang, Xiaohao and Qian, Xiang}, booktitle={Proceedings of the Genetic and Evolutionary Computation
+      Conference Companion}, pages={59--60}, year={2021} }
 
 .. topic:: @article
-   {nikitin2020multi, title={The multi-objective optimisation of breakwaters using evolutionary approach},
-   author={Nikitin, Nikolay O and Polonskaia, Iana S and Kalyuzhnaya, Anna V and Boukhanovsky, Alexander V}, journal={arXiv
-   preprint arXiv:2004.03010}, year={2020} }
+      {nikitin2020multi, title={The multi-objective optimisation of breakwaters using evolutionary approach},
+      author={Nikitin, Nikolay O and Polonskaia, Iana S and Kalyuzhnaya, Anna V and Boukhanovsky, Alexander V}, journal={arXiv
+      preprint arXiv:2004.03010}, year={2020} }
 
 
 
