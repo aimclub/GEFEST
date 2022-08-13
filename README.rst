@@ -17,8 +17,9 @@
 **GEFEST** (**G**\enerative **E**\volution **F**\or **E**\ncoded **ST**\ructures) is a toolbox for the generative design of
 physical objects.
 
-It uses: (1) numerical modelling to simulate the interaction between object and environment;
-(2) evolutionary optimization to produce new variants of geometrically-encoded structures.
+In core it uses:
+1. Numerical modelling to simulate the interaction between object and environment
+2. Evolutionary optimization to produce new variants of geometrically-encoded structures
 
 The basic abstractions in GEFEST are Point, Polygon, Structure and Domain.
 
@@ -27,6 +28,12 @@ The workflow of the generative design is the following:
 .. figure:: /docs/img/workflow.png
    :figwidth: image
    :align: center
+
+How to use
+==========
+
+All details about first steps with GEFEST might be found in the `quick start guide <https://gefest.readthedocs.io/en/latest/gefest/quickstart.html>`__
+and in the `tutorial for novices  <https://github.com/ITMO-NSS-team/GEFEST/tree/main/tutorials/for_novices.ipynb>`__
 
 Project Structure
 =================
