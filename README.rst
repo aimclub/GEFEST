@@ -25,14 +25,8 @@ The basic abstractions in GEFEST are Point, Polygon, Structure and Domain.
 The workflow of the generative design is the following:
 
 .. image:: /docs/img/workflow.png
-   :align: center
+   :align: middle
    :alt: workflow
-
-
-How to use
-==========
-
-
 
 Project Structure
 =================
@@ -49,7 +43,14 @@ The repository includes the following directories:
 Current R&D and future plans
 ============================
 
+Currently, we are working on integration of new types of physical objects with consideration of their internal structure.\n
 
+The major ongoing tasks:
+
+* to make the use of GEFEST more accessible and simple for users
+* to integrate three dimensional physical objects
+* to implement gradient based approaches for optimization of physical objects
+* to improve efficiency of GEFEST's standard sampler
 
 Documentation
 =============
@@ -84,14 +85,12 @@ Citation
 ========
 
 @inproceedings
---------------
    {nikitin2021generative, title={Generative design of microfluidic channel geometry using evolutionary
    approach}, author={Nikitin, Nikolay O and Hvatov, Alexander and Polonskaia, Iana S and Kalyuzhnaya, Anna V and Grigorev,
    Georgii V and Wang, Xiaohao and Qian, Xiang}, booktitle={Proceedings of the Genetic and Evolutionary Computation
    Conference Companion}, pages={59--60}, year={2021} }
 
 @article
---------
    {nikitin2020multi, title={The multi-objective optimisation of breakwaters using evolutionary approach},
    author={Nikitin, Nikolay O and Polonskaia, Iana S and Kalyuzhnaya, Anna V and Boukhanovsky, Alexander V}, journal={arXiv
    preprint arXiv:2004.03010}, year={2020} }
