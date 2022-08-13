@@ -24,9 +24,9 @@ The basic abstractions in GEFEST are Point, Polygon, Structure and Domain.
 
 The workflow of the generative design is the following:
 
-.. image:: /docs/img/workflow.png
-   :align: middle
-   :alt: workflow
+.. figure:: /docs/img/workflow.png
+   :figwidth: image
+   :align: center
 
 Project Structure
 =================
@@ -71,10 +71,10 @@ and workshops for their valuable advice and suggestions.
 Contacts
 ========
 
-- `Telegram channel for solving problems and answering questions on GEFEST <https://t.me/gefest_helpdesk>`_
-- `Natural System Simulation Team <https://itmo-nss-team.github.io/>`_
-- `Newsfeed <https://t.me/NSS_group>`_
-- `Youtube channel <https://www.youtube.com/channel/UC4K9QWaEUpT_p3R4FeDp5jA>`_
+* `Telegram channel for solving problems and answering questions on GEFEST <https://t.me/gefest_helpdesk>`_
+* `Natural System Simulation Team <https://itmo-nss-team.github.io/>`_
+* `Newsfeed <https://t.me/NSS_group>`_
+* `Youtube channel <https://www.youtube.com/channel/UC4K9QWaEUpT_p3R4FeDp5jA>`_
 
 Supported by
 ============
