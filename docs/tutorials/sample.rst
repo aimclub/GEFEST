@@ -2,17 +2,17 @@ Tutorial for beginners
 ======================
 
 *Here is an example of breakwaters optimization. SWAN model need to be installed.
-You can find our configuration in simulators folder in INPUT file.
-It consist water area with two fixed breakwaters, bathymetry (specified in bathymetry folder) and land.
-Output file (wave height at each point of the water are) located is in the 'r' folder.*
+|You can find our configuration in simulators folder in INPUT file.
+|It consist water area with two fixed breakwaters, bathymetry (specified in bathymetry folder) and land.
+|Output file (wave height at each point of the water are) located is in the 'r' folder.*
 
-1. **Install last stable version of the GEFEST**
+**1. Install last stable version of the GEFEST**
 
 .. code-block:: python
 
     pip install https://github.com/ITMO-NSS-team/GEFEST/archive/master.zip
 
-2. **Import needed libraries**
+**2. Import needed libraries**
 
 .. code-block:: python
 
@@ -30,7 +30,7 @@ Output file (wave height at each point of the water are) located is in the 'r' f
     from gefest.core.opt.analytics import EvoAnalytics
     from gefest.core.viz.struct_vizualizer import StructVizualizer
 
-3. **Settings for domain to be researched**
+**3. Settings for domain to be researched**
 
 *You have to set grid resolution on each axis (x and y), spatial grid
 and coordinates of your target (or targets) for which you want to optimize height of wave*
@@ -45,7 +45,7 @@ and coordinates of your target (or targets) for which you want to optimize heigh
     grid_target_X = 25  # X-grid coordinate of your target
     grid_target_Y = 25  # Y-grid coordinate of your target
 
-4. **Create domain grid and coordinates of your targets**
+**4. Create domain grid and coordinates of your targets**
 
 *As you can see, in this exampe we consider only one target*
 
@@ -54,7 +54,7 @@ and coordinates of your target (or targets) for which you want to optimize heigh
     grid = [grid_resolution_x, grid_resolution_y]
     targets = [[grid_target_X, grid_target_Y]]
 
-5. **Set up domain configuration that GEFEST requires for every task**
+**5. Set up domain configuration that GEFEST requires for every task**
 
 *Here we are working with open polygons*
 
@@ -77,10 +77,10 @@ and coordinates of your target (or targets) for which you want to optimize heigh
                     is_closed=is_closed)
     task_setup = Setup(domain=domain)
 
-6. **Preparation of the SWAN model**
+**6. Preparation of the SWAN model**
 
-*You need to set path to folder with swan.exe file\n
-Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of targets*
+*You need to set path to folder with swan.exe file
+|Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of targets*
 
 .. code-block:: python
 
@@ -92,7 +92,7 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
 
     max_length = np.linalg.norm(np.array([max(coord_X) - min(coord_X), max(coord_Y) - min(coord_Y)]))
 
-7. **Definition of the cost function **
+**7. Definition of the cost function**
 
 *There is a cost function as sum of cost of structure and wave height at the target points*
 
@@ -110,7 +110,7 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
 
         return loss
 
-8. **Optimization stage**
+**8. Optimization stage**
 
 .. code-block:: python
 
@@ -121,7 +121,7 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
                                 max_gens=10)
     spend_time = timeit.default_timer() - start
 
-9. **Vizualization of the result**
+**9. Vizualization of the result**
 
 .. code-block:: python
 
