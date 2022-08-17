@@ -1,10 +1,10 @@
 Tutorial for beginners
 ======================
 
-*Here is an example of breakwaters optimization. SWAN model need to be installed.*
-| *You can find our configuration in simulators folder in INPUT file.*
-| It consist water area with two fixed breakwaters, bathymetry (specified in bathymetry folder) and land.
-| Output file (wave height at each point of the water are) located is in the 'r' folder.
+*Here is an example of breakwaters optimization. SWAN model need to be installed.
+You can find our configuration in simulators folder in INPUT file.
+It consist water area with two fixed breakwaters, bathymetry (specified in bathymetry folder) and land.
+Output file (wave height at each point of the water are) located is in the 'r' folder.*
 
 **1. Install last stable version of the GEFEST**
 
@@ -79,8 +79,8 @@ and coordinates of your target (or targets) for which you want to optimize heigh
 
 **6. Preparation of the SWAN model**
 
-*You need to set path to folder with swan.exe file
-|Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of targets*
+*You need to set path to folder with swan.exe file. 
+Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of targets*
 
 .. code-block:: python
 
