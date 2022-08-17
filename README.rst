@@ -33,7 +33,7 @@ How to use
 ==========
 
 All details about first steps with GEFEST might be found in the `quick start guide <https://gefest.readthedocs.io/en/latest/gefest/quickstart.html>`__
-and in the `tutorial for novices  <https://github.com/ITMO-NSS-team/GEFEST/tree/main/tutorials/for_novices.ipynb>`__
+and in the `tutorial for novices  </docs/tutorials/sample.rst>`__
 
 Project Structure
 =================
