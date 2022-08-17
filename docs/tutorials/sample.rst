@@ -1,10 +1,10 @@
 Tutorial for beginners
 ======================
 
-*Here is an example of breakwaters optimization. SWAN model need to be installed.
-| You can find our configuration in simulators folder in INPUT file.
+*Here is an example of breakwaters optimization. SWAN model need to be installed.*
+| *You can find our configuration in simulators folder in INPUT file.*
 | It consist water area with two fixed breakwaters, bathymetry (specified in bathymetry folder) and land.
-| Output file (wave height at each point of the water are) located is in the 'r' folder.*
+| Output file (wave height at each point of the water are) located is in the 'r' folder.
 
 **1. Install last stable version of the GEFEST**
 
