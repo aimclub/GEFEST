@@ -122,7 +122,7 @@ class Serializer(JSONEncoder, JSONDecoder):
         """Decodes every JSON-object to python class/func object or just returns dict
 
         Args:
-            json_obj: dict[str, Any] to be decoded into Python class, function or
+            json_obj: dict to be decoded into Python class, function or
             method object only if it has some special fields
 
         Returns:
