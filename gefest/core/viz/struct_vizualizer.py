@@ -1,4 +1,3 @@
-from cProfile import label
 import matplotlib.pyplot as plt
 
 from gefest.core.structure.domain import Domain
@@ -57,7 +56,7 @@ class StructVizualizer:
             >>> from gefest.core.structure.structure import get_random_poly
             >>> struct = get_random_structure(domain)
             >>> poly = struct.polygons[0]
-            >>> viz.plot_poly(poly, 'random genreated polygon')
+            >>> viz.plot_poly(poly, 'random generated polygon')
 
         Returns:
             |viz_poly|
