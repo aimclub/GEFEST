@@ -1,4 +1,5 @@
 from shapely.geometry import Point as GeomPoint, LineString
+from itertools import permutations
 
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.polygon import Polygon
@@ -13,17 +14,26 @@ out of bound for points in polygon, closeness between polygons and unclosed (for
 """
 
 
-def intersection(structure: 'Structure',
-                 domain: 'Domain'):
-    try:
-        for poly1 in domain.prohibited_area.polygons:
-            for poly2 in structure.polygons:
-                if domain.geometry.intersects_poly(poly1, poly2):
-                    return True
+def intersection(structure: 'Structure', geometry: 'Geometry') -> bool:
+    """The method for checking intersection between Polygons in the Structure
+    Args:
+        structure: the :obj:`Structure` that explore
+        geometry: way of processing geometrical objects,
+           :obj:`class Geometry2D` for processing 2D objects
+    Returns:
+        ``True`` if at least one of the polygons in given :obj:`structure` intersects another,
+        otherwise - ``False``
+    """
+
+    polygons = structure.polygons
+    if len(polygons) < 2:
         return False
 
-    except AttributeError:
-        return False
+    for poly_1, poly_2 in permutations(polygons, 2):
+        if geometry.intersects_poly(poly_1, poly_2):
+            return True
+
+    return False
 
 
 def is_contain(structure: 'Structure',
@@ -51,15 +61,23 @@ def out_of_bound(structure: 'Structure', domain):
     return False
 
 
-def too_close(structure: 'Structure', domain: Domain):
-    polygons = structure.polygons
-    num_poly = len(polygons)
+def too_close(structure: 'Structure', domain: 'Domain') -> bool:
+    """Checking for too close location between every :obj:`Polygon` in the
+    given :obj:`Structure`
+    Args:
+        structure: the :obj:`Structure` that explore
+        domain: the :obj:`Domain` that determinates the main
+            parameters, this method requires ``min_dist`` from :obj:`Domain`
+    Returns:
+        ``True`` if at least one distance between any polygons is less than value of minimal
+        distance set by :obj:`Domain`, otherwise - ``False``
+    """
 
-    for i, poly in enumerate(polygons):
-        for j in range(i + 1, num_poly):
-            distance = _pairwise_dist(poly, polygons[j], domain)
-            if distance < domain.min_dist:
-                return True
+    polygons = structure.polygons
+    for poly_1, poly_2 in permutations(polygons, 2):
+        distance = _pairwise_dist(poly_1, poly_2, domain)
+        if distance < domain.min_dist:
+            return True
 
     return False
 
@@ -71,16 +89,35 @@ def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain):
     return domain.geometry.min_distance(poly_1, poly_2)
 
 
-# The is_simple method indicates that the figure is self-intersecting
-def self_intersection(structure: 'Structure'):
+def self_intersection(structure: 'Structure') -> bool:
+    """The method indicates that any :obj:`Polygon` in the :obj:`Structure`
+    is self-intersected
+    Args:
+        structure: the :obj:`Structure` that explore
+    Returns:
+        ``True`` if at least one of the polygons in the :obj:`Structure` is
+        self-intersected, otherwise - ``False``
+    """
+
     intersected = not any([LineString([GeomPoint(pt.x, pt.y) for pt in poly.points]).is_simple
                            for poly in structure.polygons])
+
     return intersected
 
 
-# Checks for equality of the first and last points
-def unclosed_poly(structure: 'Structure', domain: 'Domain'):
+def unclosed_poly(structure: 'Structure', domain: 'Domain') -> bool:
+    """Checking for equality of the first and the last points
+    Args:
+        structure: the :obj:`Structure` that explore
+        domain: the :obj:`Domain` that determinates the main
+            parameters, this method requires ``is_closed`` from :obj:`Domain`
+    Returns:
+        ``True`` if patameter ``is_closed`` from :obj:`Domain` is ``True`` and at least
+        one of the polygons has unequality between the first one and the last point,
+        otherwise - ``False``
+    """
+
     if domain.is_closed:
-        return int(any([poly.points[0] != poly.points[-1] for poly in structure.polygons]))
+        return any([poly.points[0] != poly.points[-1] for poly in structure.polygons])
     else:
         return False
