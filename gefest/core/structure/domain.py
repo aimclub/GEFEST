@@ -45,6 +45,7 @@ class Domain:
     def __init__(self, name='main', allowed_area: Optional[List[Tuple]] = None,
                  max_poly_num=4, min_poly_num=2,
                  max_points_num=50, min_points_num=20,
+                 prohibited_area: Optional = None,
                  fixed_points=None,
                  is_closed=True,
                  geometry=None):
@@ -64,6 +65,7 @@ class Domain:
             allowed_area = [(int(round(p[0], 0)), int(round(p[1], 0))) for p in allowed_area]
 
         self.allowed_area = allowed_area
+        self.prohibited_area = prohibited_area
 
         self.max_poly_num = max_poly_num
         self.min_poly_num = min_poly_num
