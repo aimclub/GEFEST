@@ -21,11 +21,16 @@ In core it uses:
 1. Numerical modelling to simulate the interaction between object and environment
 2. Evolutionary optimization to produce new variants of geometrically-encoded structures
 
-The basic abstractions in GEFEST are Point, Polygon, Structure and Domain.
-
-The workflow of the generative design is the following:
+The basic abstractions in GEFEST are Point, Polygon, Structure and Domain. Architecture of the GEFEST can be described as:
 
 .. figure:: /docs/img/workflow.png
+   :figwidth: image
+   :align: center
+
+
+The evolutionary workflow of the generative design is the following:
+
+.. figure:: /docs/img/evo.png
    :figwidth: image
    :align: center
 
@@ -91,19 +96,30 @@ Supported by
 Citation
 ========
 
-@inproceedings
-   {nikitin2021generative, title={Generative design of microfluidic channel geometry using evolutionary
-   approach}, author={Nikitin, Nikolay O and Hvatov, Alexander and Polonskaia, Iana S and Kalyuzhnaya, Anna V and Grigorev,
-   Georgii V and Wang, Xiaohao and Qian, Xiang}, booktitle={Proceedings of the Genetic and Evolutionary Computation
-   Conference Companion}, pages={59--60}, year={2021} }
+@article{starodubcev2022generative,
+  title={Generative Design of Physical Objects using Modular Framework},
+  author={Starodubcev, Nikita O and Nikitin, Nikolay O and Gavaza, Konstantin G and Andronova, Elizaveta A and Sidorenko, Denis O and Kalyuzhnaya, Anna V},
+  journal={arXiv preprint arXiv:2207.14621},
+  year={2022}
+}
 
-@article
-   {nikitin2020multi, title={The multi-objective optimisation of breakwaters using evolutionary approach},
-   author={Nikitin, Nikolay O and Polonskaia, Iana S and Kalyuzhnaya, Anna V and Boukhanovsky, Alexander V}, journal={arXiv
-   preprint arXiv:2004.03010}, year={2020} }
+@article{starodubcev2022surrogate,
+  title={Surrogate-Assisted Evolutionary Generative Design Of Breakwaters Using Deep Convolutional Networks},
+  author={Starodubcev, Nikita O and Nikitin, Nikolay O and Kalyuzhnaya, Anna V},
+  journal={arXiv preprint arXiv:2204.03400},
+  year={2022}
+}
 
-
-
+@article{grigorev2022single,
+  title={Single Red Blood Cell Hydrodynamic Traps via the Generative Design},
+  author={Grigorev, Georgii V and Nikitin, Nikolay O and Hvatov, Alexander and Kalyuzhnaya, Anna V and Lebedev, Alexander V and Wang, Xiaohao and Qian, Xiang and Maksimov, Georgii V and Lin, Liwei},
+  journal={Micromachines},
+  volume={13},
+  number={3},
+  pages={367},
+  year={2022},
+  publisher={MDPI}
+}
 
 .. |docs| image:: https://readthedocs.org/projects/gefest/badge/?version=latest
    :target: https://gefest.readthedocs.io/en/latest/?badge=latest
