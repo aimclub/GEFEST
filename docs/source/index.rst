@@ -4,7 +4,7 @@ Welcome to GEFEST's documentation!
 .. container::
 
    | |logo|
-   | There is contained main documentation for the `GEFEST framework <https://github.com/ITMO-NSS-team/GEFEST>`__. 
+   | There is contained main documentation for the `GEFEST framework <https://github.com/ITMO-NSS-team/GEFEST>`__.
 
 Content:
 ========
@@ -17,7 +17,7 @@ Content:
    faq
    about
 
-The additional description of the algorthmic core, real-world cases and other details is available in `GEFEST.Docs <doc site>`__.
-
+**GEFEST** (**G**\enerative **E**\volution **F**\or **E**\ncoded **ST**\ructures) is a toolbox for the generative design of
+physical objects.
 
 .. |logo| image:: https://i.ibb.co/WF2bp5t/gefest-logo.png
