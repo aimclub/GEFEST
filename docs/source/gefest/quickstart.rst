@@ -13,6 +13,7 @@ How to design your own polygon in manual way
 ----------------------------------------------------
 
 -  **Step 1**. Create loss function or simulator of the physical process.
+
 Loss function for finding a polygon that seems like circle showed below. 
 
 .. code:: python
@@ -37,6 +38,7 @@ Loss function for finding a polygon that seems like circle showed below.
     return loss
 
 -  **Step 2**. Specify border coordinates of area where GEFEST will solve the task.
+
 Put the *Domain* to *Setup()* class for creating a task variable.
 
 .. code:: python
@@ -67,6 +69,7 @@ Put the *Domain* to *Setup()* class for creating a task variable.
  task_setup = Setup(domain=domain)
 
 -  **Step 3**. Create an optimized structure via *optimize* method. 
+
 The structure will contain number of polygons that previously specified in *Domain*
 
 .. code:: python
