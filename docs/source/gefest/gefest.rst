@@ -35,6 +35,6 @@ Generative design
 
 .. image:: ../../img/third.*
 
-| The second is another example
+| The second is cell trap example task
 
 .. image:: ../../img/Webp.*

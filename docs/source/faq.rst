@@ -24,5 +24,5 @@ Frequently asked questions and answers
 
 .. List of links:
 
-.. _instructions: ../gefest/quickstart.rst
+.. _instructions: https://github.com/ITMO-NSS-team/GEFEST/blob/e314752e80c738dd865137ff1e2f3ac32a5278b4/docs/source/gefest/quickstart.rst
 .. `instructions` replace:: *instructions*
