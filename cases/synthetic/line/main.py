@@ -1,22 +1,12 @@
 import timeit
 import pickle
-import argparse
 import matplotlib.pyplot as plt
 
 from gefest.core.viz.struct_vizualizer import StructVizualizer
 
 from gefest.core.opt.gen_design import design
 from cases.synthetic.line.configuration import line_estimator, line_sampler, line_optimizer, line_domain
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--pop_size", type=int, default=100, help='number of individs in population')
-parser.add_argument("--n_steps", type=int, default=100, help='number of generative design steps')
-parser.add_argument('--n_polys', type=int, default=5, help='maximum number of polygons in structure')
-parser.add_argument('--n_points', type=int, default=50, help='maximum number of points in polygon')
-parser.add_argument('--c_rate', type=float, default=0.6, help='crossover rate')
-parser.add_argument('--m_rate', type=float, default=0.6, help='mutation rate')
-parser.add_argument('--is_closed', type=bool, default=False, help='type of polygon')
-opt = parser.parse_args()
+from cases.main_conf import opt
 
 # ------------
 # GEFEST tools configuration_de

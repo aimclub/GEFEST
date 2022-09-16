@@ -3,13 +3,13 @@ import cv2 as cv
 import numpy as np
 import os
 
-os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
-
 from gefest.tools.samplers.DL.microfluid.backbones import Encoder, Decoder, Discriminator
 from gefest.core.structure.domain import Domain
 from gefest.tools.samplers.DL.microfluid.aae import AAE
 from gefest.core.structure.polygon import Polygon, Point
 from gefest.core.structure.structure import Structure
+
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
 
 class DeepSampler:

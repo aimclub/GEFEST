@@ -2,7 +2,7 @@ import numpy as np
 from pathlib import Path
 
 from gefest.core.structure.structure import Structure
-from gefest.tools.estimators.DL.bw_surrogate.bw_cnn import CNN
+from gefest.tools.estimators.DL.bw_surrogate.bw_cnn import BWCNN
 from gefest.tools.estimators.simulators.swan.swan_interface import Swan
 from gefest.tools.estimators.estimator import Estimator
 import cases.breakwaters.configuration_de.bw_domain as area
@@ -26,9 +26,9 @@ def configurate_estimator(domain, path_sim=False, path_sur=False):
                 grid=area.grid,
                 domain=domain)
 
-    cnn = CNN(domain=domain,
-              path=path_sur,
-              main_model=swan)
+    cnn = BWCNN(domain=domain,
+                path=path_sur,
+                main_model=swan)
 
     # Multi-criteria loss function, in our case - HW and cost of structure
     def loss(struct: Structure, estimator):

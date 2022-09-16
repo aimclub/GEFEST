@@ -8,13 +8,13 @@ import PIL
 from torch import nn
 
 
-class CNN:
+class HeatCNN:
     """
     Surrogate model for the heat components task
     """
 
     def __init__(self, path):
-        super(CNN, self).__init__()
+        super(HeatCNN, self).__init__()
 
         self.model = EffModel()
         self.model.load_state_dict(

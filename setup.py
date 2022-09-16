@@ -10,8 +10,8 @@ HERE = Path(__file__).parent.resolve()
 NAME = 'gefest'
 AUTHOR = 'NSS Lab'
 SHORT_DESCRIPTION = 'The toolbox for the generative design of physical objects'
-README = Path(HERE, 'README.md').read_text()
-URL = 'https://github.com/quickjkee/GEFEST'
+README = Path(HERE, 'README.rst').read_text()
+URL = 'https://github.com/ITMO-NSS-team/GEFEST'
 REQUIRES_PYTHON = '>=3.7'
 LICENSE = 'BSD 3-Clause'
 

@@ -19,8 +19,7 @@ def intersection(structure: 'Structure', domain: 'Domain') -> bool:
     """The method for checking intersection between Polygons in the Structure
     Args:
         structure: the :obj:`Structure` that explore
-        domain: way of processing geometrical objects,
-           :obj:`class Geometry2D` for processing 2D objects
+        domain: the :obj:`class Domain`
     Returns:
         ``True`` if at least one of the polygons in given :obj:`structure` intersects another,
         otherwise - ``False``
@@ -38,6 +37,17 @@ def intersection(structure: 'Structure', domain: 'Domain') -> bool:
 
 
 def out_of_bound(structure: 'Structure', domain=None) -> bool:
+    """The method for checking every polygon in the given :obj:`Structure`
+        on crossing borders of :obj:`Domain`
+
+        Args:
+            structure: the :obj:`Structure` that explore
+            domain: the :obj:`Domain` that determinates the main
+                parameters, this method requires ``allowed_area`` from :obj:`Domain`
+        Returns:
+        ``True`` if at least one of the polygons in given :obj:`structure` crossing borders
+        of allowed area, otherwise - ``False``
+    """
     geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in domain.allowed_area])
 
     for poly in structure.polygons:
@@ -51,6 +61,16 @@ def out_of_bound(structure: 'Structure', domain=None) -> bool:
 
 
 def too_close(structure: 'Structure', domain: Domain) -> bool:
+    """Checking for too close location between every :obj:`Polygon` in the
+    given :obj:`Structure`
+    Args:
+        structure: the :obj:`Structure` that explore
+        domain: the :obj:`Domain` that determinates the main
+            parameters, this method requires ``min_dist`` from :obj:`Domain`
+    Returns:
+        ``True`` if at least one distance between any polygons is less than value of minimal
+        distance set by :obj:`Domain`, otherwise - ``False``
+    """
     is_too_close = any(
         [any([_pairwise_dist(poly_1, poly_2, domain) < domain.min_dist for
               poly_2 in structure.polygons]) for poly_1
@@ -67,6 +87,14 @@ def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain):
 
 
 def self_intersection(structure: 'Structure'):
+    """The method indicates that any :obj:`Polygon` in the :obj:`Structure`
+    is self-intersected
+    Args:
+        structure: the :obj:`Structure` that explore
+    Returns:
+        ``True`` if at least one of the polygons in the :obj:`Structure` is
+        self-intersected, otherwise - ``False``
+    """
     return any([len(poly.points) > 2 and
                 _forbidden_validity(explain_validity(GeomPolygon([GeomPoint(pt.x, pt.y) for pt in poly.points])))
                 for poly in structure.polygons])

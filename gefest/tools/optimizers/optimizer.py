@@ -21,4 +21,3 @@ class Optimizer:
         population = self.optimizer.step(population, performance, n_step)
 
         return population
-

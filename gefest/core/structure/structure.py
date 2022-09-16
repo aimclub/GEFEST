@@ -13,6 +13,36 @@ from gefest.core.structure.polygon import Polygon
 
 @dataclass
 class Structure:
+    """The geometrical object made up of :obj:`Polygon` objects
+        Args:
+            polygons: list of :obj:`Polygon` objects which form a combined set of polygons,
+                needed for joint processing capability of polygons
+        Attributes:
+            text_id: returns information about :obj:`Polygons` and :obj:`Points`
+                included in :obj:`Structure`
+            polygons: returns the :obj:`list` of :obj:`Polygon` objects
+            total_points: returns the :obj:`list` with lengths (number of :obj:`Point`)
+                of every :obj:`Polygon` included
+        Examples:
+            >>> from gefest.core.structure.point import Point
+            >>> from gefest.core.structure.polygon import Polygon
+            >>> from gefest.core.structure.structure import Structure
+            >>> # creating the rectangle Polygon
+            >>> points_rect = [Point(4,0), Point(8,0), Point(8,4), Point(4,4), Point(4,0)]
+            >>> rectangle = Polygon('rectangle', points=points_rect)
+            >>> # creating the triangle Polygon
+            >>> points_triagle = [Point(0,0), Point(3,3), Point(3,0), Point(0,0)]
+            >>> triangle = Polygon('triangle', points=points_triagle)
+            >>> # creating the Structure and plot it
+            >>> struct = Structure([triangle, rectangle])
+            >>> struct.text_id
+            'P0=4:(x=0, y=0); (x=3, y=3); (x=3, y=0); (x=0, y=0);
+            P1=5:(x=4, y=0); (x=8, y=0); (x=8, y=4); (x=4, y=4); (x=4, y=0); '
+            >>> struct.total_points
+            [4, 5]
+        Returns:
+            Structure: ``Structure(List[Polygon])``
+        """
     polygons: List[Polygon]
 
     def __str__(self):
@@ -39,11 +69,22 @@ class Structure:
     def length(self):
         return sum([p.length for p in self.polygons])
 
+    def total_points(self) -> list:
+        return [len(p.points) for p in self.polygons]
+
     @property
     def size(self):
         return sum([len(p.points) for p in self.polygons])
 
     def plot(self, structure, domain=None, title=None):
+        """Visualization with drawn :obj:`Strucrure`
+        Args:
+            title: the name of drawing, by default ``None``
+        Examples:
+            >>> struct.plot()
+        Returns:
+            plot: |viz|
+        """
         x = [point._x for point in structure.polygons[0].points]
         y = [point._y for point in structure.polygons[0].points]
         plt.plot(x, y)

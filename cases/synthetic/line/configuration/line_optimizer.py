@@ -19,7 +19,6 @@ def configurate_optimizer(pop_size: int,
     ga_optimizer = GA(params=params,
                       evolutionary_operators=default_operators(),
                       task_setup=task_setup)
-
     # ------------
     # GEFEST optimizer
     # ------------

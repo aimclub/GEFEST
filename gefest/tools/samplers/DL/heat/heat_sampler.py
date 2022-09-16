@@ -1,13 +1,9 @@
 import torch
 import os
-import numpy as np
-import matplotlib.pyplot as plt
+from gefest.tools.samplers.DL.microfluid.backbones import Encoder, Decoder, Discriminator
+from gefest.tools.samplers.DL.microfluid.aae import AAE
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
-
-from gefest.tools.samplers.DL.microfluid.backbones import Encoder, Decoder, Discriminator
-from gefest.core.structure.domain import Domain
-from gefest.tools.samplers.DL.microfluid.aae import AAE
 
 
 class DeepSampler:

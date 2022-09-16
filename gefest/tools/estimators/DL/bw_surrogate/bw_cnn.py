@@ -13,13 +13,13 @@ from gefest.core.structure.domain import Domain
 matplotlib.use('agg')
 
 
-class CNN:
+class BWCNN:
     """
     Surrogate model for breakwaters task
     """
 
     def __init__(self, path, domain: Domain, main_model: Optional = None):
-        super(CNN, self).__init__()
+        super(BWCNN, self).__init__()
 
         self.domain = domain
         self.model = keras.models.load_model(path)

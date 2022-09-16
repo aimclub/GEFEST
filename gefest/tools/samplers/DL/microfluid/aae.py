@@ -5,9 +5,11 @@ from torch import nn
 
 
 class AAE(nn.Module):
-    ######
+
+    ################################
     # Adversarial Auto Encoder model
-    #####
+    ################################
+
     def __init__(self, Encoder, Decoder, Discriminator, hidden_dim, conv_dims, n_layers, device):
         """
         Creating AAE model
@@ -86,6 +88,7 @@ class AAE(nn.Module):
         where z* ~ q(z*|x), z ~ p(z)
 
         :param d_z: (Tensor) [B x 1]
+        :param d_prior: (Tensor) [B x 1]
         :return: (Float)
         """
         batch_size = d_z.size(dim=0)
@@ -148,9 +151,7 @@ class AAE(nn.Module):
               (type(en_optim).__name__,
                en_optim.param_groups[0]['lr'], epochs, self.device))
 
-        history = {}
-        history['loss'] = []
-        history['val_loss'] = []
+        history = {'loss': [], 'val_loss': []}
 
         train_len = len(trainloader.dataset)
         test_len = len(testloader.dataset)
@@ -158,7 +159,9 @@ class AAE(nn.Module):
         for epoch in range(epochs):
             start_time = time.time()
 
-            ############ TRAINING PART ############
+            #################
+            # TRAINING PART
+            # ###############
 
             for i, batch_samples in enumerate(trainloader):
                 batch_samples = batch_samples['image'].to(self.device)
@@ -215,7 +218,9 @@ class AAE(nn.Module):
                        recon_loss.item(), discrim_reg.item(), encoder_reg.item(),
                        work_time))
 
-            ############ VALIDATION PART ############
+            #######################
+            # VALIDATION PART
+            #######################
             val_recon_loss = 0.0
             val_gen_loss = 0.0
             val_dis_loss = 0.0
@@ -234,7 +239,7 @@ class AAE(nn.Module):
             val_gen_loss = val_gen_loss / test_len
             val_dis_loss = val_dis_loss / test_len
 
-            if (epoch + 1):
+            if epoch + 1:
                 print('Epoch %3d/%3d \n'
                       'val_en_loss %5.5f, val_gen_loss %5.5f, val_dis_loss %5.5f \n' % \
                       (epoch + 1, epochs,

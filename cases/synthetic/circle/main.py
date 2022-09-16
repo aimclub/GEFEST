@@ -1,6 +1,5 @@
 import timeit
 import pickle
-import argparse
 import matplotlib.pyplot as plt
 
 from gefest.core.geometry.geometry_2d import create_circle
@@ -9,16 +8,9 @@ from gefest.core.viz.struct_vizualizer import StructVizualizer
 
 from gefest.core.opt.gen_design import design
 from cases.synthetic.circle.configuration import circle_estimator, circle_sampler, circle_optimizer, circle_domain
+from cases.main_conf import opt
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--pop_size", type=int, default=100, help='number of individs in population')
-parser.add_argument("--n_steps", type=int, default=100, help='number of generative design steps')
-parser.add_argument('--n_polys', type=int, default=5, help='maximum number of polygons in structure')
-parser.add_argument('--n_points', type=int, default=50, help='maximum number of points in polygon')
-parser.add_argument('--c_rate', type=float, default=0.6, help='crossover rate')
-parser.add_argument('--m_rate', type=float, default=0.6, help='mutation rate')
-parser.add_argument('--is_closed', type=bool, default=True, help='type of polygon')
-opt = parser.parse_args()
+opt.is_closed = True
 
 # ------------
 # GEFEST tools configuration
