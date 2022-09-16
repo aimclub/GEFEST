@@ -33,8 +33,12 @@ Generative design
 | For taking clear below is shown two examples of generative design process. 
 | The first one is solving breakwaters task. 
 
-.. image:: ../../img/third.*
+.. image:: ../../img/breakwaters.*
 
 | The second is cell trap example task
 
-.. image:: ../../img/Webp.*
+.. image:: ../../img/selez.*
+
+| The third is heat source example task
+
+.. image:: ../../img/head.*
