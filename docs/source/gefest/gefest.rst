@@ -30,15 +30,16 @@ Generative design
 
 | The fundamental stage of the GEFEST workflow is the generative design, depicted as last step in picture a head.
 | This procedure is based on three principles: **sampling**, **estimation**, **optimization**, which can be combined in different ways.
-| For taking clear below is shown two examples of generative design process. 
-| The first one is solving breakwaters task. 
+
+| For taking clear below is shown two examples of generative design process.
+| The first one is solving breakwaters task:
 
 .. image:: ../../img/breakwaters.*
 
-| The second is cell trap example task
+| The second is cell trap example task:
 
 .. image:: ../../img/selez.*
 
-| The third is heat source example task
+| The third is heat source example task:
 
-.. image:: ../../img/head.*
+.. image:: ../../img/heat.*
