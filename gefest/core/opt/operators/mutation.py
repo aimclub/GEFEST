@@ -7,12 +7,25 @@ import numpy as np
 
 from gefest.core.algs.postproc.resolve_errors import postprocess
 from gefest.core.opt.constraints import check_constraints
-from gefest.core.opt.operators.initial import MAX_ITER, NUM_PROC
+from gefest.tools.samplers.standard.standard import MAX_ITER, NUM_PROC, StandardSampler
 from gefest.core.structure.domain import Domain
-from gefest.core.structure.structure import Structure, get_random_point, get_random_poly
+from gefest.core.structure.structure import Structure, get_random_poly, get_random_point
+from gefest.core.structure.point import Point
 
 
 def mutation(structure: Structure, domain: Domain, rate=0.6):
+    """We divide mutations into two types: points mutations and polygons mutations
+    Points mutation: add/delete points, change position
+    Polygon mutation: add/delete polygon, rotate, resize
+    Args:
+        structure: the given generative :obj:`Structure`
+        domain: the :obj:`Domain` that use for optimization process
+        rate: likelihood for success mutation. Defaults to 0.6.
+    Returns:
+        if mutation was finished succsess - new structure, born from :obj:`structure`
+        and with mutated individuals inside; otherwise will return the given :obj:`structure`
+    """
+
     random_val = random.random()
 
     if random_val > rate:
@@ -42,12 +55,20 @@ def mutation(structure: Structure, domain: Domain, rate=0.6):
                 new_structure = structure
                 is_correct = True
                 break
+            elif structure is None:
+                # if the mutation did not return anything,
+                # then it is considered unsuccessful,
+                # in which case a random structure is generated
+                new_structure = StandardSampler().get_pop_worker(domain=domain)
+                is_correct = True
+                break
     return new_structure
 
 
 def polygons_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: Domain):
+    # Weights for each type of mutation
     polygon_drop_mutation_prob = 0.2
-    polygon_add_mutation_prob = 0.2
+    polygon_add_mutation_prob = 0.6
     polygon_rotate_mutation_prob = 0.5
     polygon_reshape_mutation_prob = 0.5
 
@@ -60,18 +81,17 @@ def polygons_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: D
     elif random.random() < polygon_add_mutation_prob and \
             len(new_structure.polygons) < domain.max_poly_num:
         # if add polygon to structure
-        new_poly = get_random_poly(is_large=False,
-                                   parent_structure=new_structure,
+        new_poly = get_random_poly(parent_structure=new_structure,
                                    domain=domain)
         if new_poly is None:
-            return None
+            return new_structure
         new_structure.polygons.append(new_poly)
     elif random.random() < polygon_rotate_mutation_prob:
-        # if add polygon to structure
-        angle = float(random.randint(-60, 60))
+        # if rotate polygon
+        angle = float(random.randint(-120, 120))
         geometry.rotate_poly(new_structure.polygons[polygon_to_mutate_idx], angle)
     elif random.random() < polygon_reshape_mutation_prob:
-        # if add polygon to structure
+        # if resize polygon
         geometry.resize_poly(new_structure.polygons[polygon_to_mutate_idx],
                              x_scale=np.random.uniform(0.25, 3, 1)[0],
                              y_scale=np.random.uniform(0.25, 3, 1)[0])
@@ -80,9 +100,11 @@ def polygons_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: D
 
 
 def add_delete_point_mutation(new_structure: Structure, polygon_to_mutate_idx, mutate_point_idx, domain):
+    # Weight for add and delete point
     point_drop_mutation_prob = 0.5
     point_add_mutation_prob = 0.5
 
+    # Choosing polygon and point to mutate
     polygon_to_mutate = new_structure.polygons[polygon_to_mutate_idx]
     point_to_mutate = polygon_to_mutate.points[mutate_point_idx]
 
@@ -91,12 +113,10 @@ def add_delete_point_mutation(new_structure: Structure, polygon_to_mutate_idx, m
         # if drop point from polygon
         new_structure.polygons[polygon_to_mutate_idx].points.remove(point_to_mutate)
     else:
-        # if change point in polygon
-        if point_to_mutate is not None and not domain.contains(point_to_mutate):
-            raise ValueError('Wrong prev_point')
-
-        new_point = get_random_point(point_to_mutate, polygon_to_mutate,
-                                     new_structure, domain=domain)
+        # if add point to polygon
+        new_point = get_random_point(polygon_to_mutate,
+                                     new_structure,
+                                     domain)
 
         if new_point is None:
             return None
@@ -113,22 +133,39 @@ def add_delete_point_mutation(new_structure: Structure, polygon_to_mutate_idx, m
 
 
 def pos_change_point_mutation(new_structure: Structure, polygon_to_mutate_idx, mutate_point_idx, domain):
+    # Neighborhood to reposition
     eps_x = round(domain.len_x / 10)
     eps_y = round(domain.len_y / 10)
 
+    structure = copy.deepcopy(new_structure)
+
+    # Displacement in the neighborhood
     displacement_x = random.randint(-eps_x, eps_x)
     displacement_y = random.randint(-eps_y, eps_y)
 
-    x_old = new_structure.polygons[polygon_to_mutate_idx].points[mutate_point_idx].x
-    y_old = new_structure.polygons[polygon_to_mutate_idx].points[mutate_point_idx].y
+    x_new = structure.polygons[polygon_to_mutate_idx].points[mutate_point_idx].x + displacement_x
+    y_new = structure.polygons[polygon_to_mutate_idx].points[mutate_point_idx].y + displacement_y
 
-    new_structure.polygons[polygon_to_mutate_idx].points[mutate_point_idx].x = x_old + displacement_x
-    new_structure.polygons[polygon_to_mutate_idx].points[mutate_point_idx].y = y_old + displacement_y
+    i = 20  # Number of attempts to change the position of the point
+    while not domain.contains(Point(x_new, y_new)):
+        x_new = structure.polygons[polygon_to_mutate_idx].points[mutate_point_idx].x + displacement_x
+        y_new = structure.polygons[polygon_to_mutate_idx].points[mutate_point_idx].y + displacement_y
+        i -= 1
+        if i == 0:
+            # If number of attempts is over,
+            # then transformation is unsuccessful
+            # and returns input stucture
+            return new_structure
 
-    return new_structure
+    structure.polygons[polygon_to_mutate_idx].points[mutate_point_idx].x = x_new
+    structure.polygons[polygon_to_mutate_idx].points[mutate_point_idx].y = y_new
+
+    return structure
 
 
 def points_mutation(new_structure: Structure, polygon_to_mutate_idx, domain: Domain):
+    # Choosing type of points mutation, polygon to mutate and point to mutate
+
     polygon_to_mutate = new_structure.polygons[polygon_to_mutate_idx]
 
     mutate_point_idx = random.randint(0, len(polygon_to_mutate.points) - 1)
@@ -166,14 +203,24 @@ def mutate_worker(args):
 
             for fixed in domain.fixed_points:
                 if fixed not in new_structure.polygons:
-                    new_structure.polygons.append(deepcopy(fixed))
+                    # If fixed points were removed from the structure after the mutation,
+                    # they must be added back
+                    if not (fixed.points == [p.points for p in new_structure.polygons]):
+                        new_structure.polygons.append(deepcopy(fixed))
 
         new_structure = postprocess(new_structure, domain)
-        is_correct = check_constraints(new_structure, is_lightweight=True, domain=domain)
-        if not is_correct:
-            return None
-        else:
-            return new_structure
+        constraints = check_constraints(structure=new_structure, domain=domain)
+        max_attempts = 3  # Number of attempts to postprocess mutated structures
+        while not constraints:
+            new_structure = postprocess(new_structure, domain)
+            constraints = check_constraints(structure=new_structure, domain=domain)
+            max_attempts -= 1
+            if max_attempts == 0:
+                # If attempts is over,
+                # mutation is considered like unsuccessful
+                return None
+
+        return new_structure
     except Exception as ex:
         print(f'Mutation error: {ex}')
         import traceback

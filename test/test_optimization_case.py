@@ -1,9 +1,9 @@
 import numpy as np
 
 from gefest.core.geometry.geometry_2d import Geometry2D
-from gefest.core.opt.optimize import optimize
 from gefest.core.opt.setup import Setup
 from gefest.core.structure.domain import Domain
+from gefest.core.opt.gen_design import design
 from gefest.core.structure.structure import Structure
 
 
@@ -53,12 +53,7 @@ task_setup = Setup(domain=domain)
 
 
 def test_optimization():
-    optimization_result = optimize(task_setup=task_setup,
-                                   objective_function=multi_loss,
-                                   pop_size=30,
-                                   max_gens=3)
-    optimized_structure = optimization_result.best_structure
-
-    assert optimization_result.fitness > 0
-    assert all([isinstance(optimized_structure, Structure),
-                len(optimized_structure.polygons) > 0])
+    """
+    ::TODO::
+    Change optimization to design like in synthetic examples
+    """

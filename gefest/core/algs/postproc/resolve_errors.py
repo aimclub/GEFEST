@@ -1,7 +1,7 @@
 import numpy as np
 from copy import deepcopy
 
-from gefest.core.algs.geom.validation import out_of_bound, self_intersection, too_close, unclosed_poly, intersection
+from gefest.core.algs.geom.validation import out_of_bound, self_intersection, too_close, unclosed_poly
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.structure import Polygon, Structure, Point
 

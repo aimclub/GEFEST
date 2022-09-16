@@ -1,7 +1,6 @@
 import os
 import shutil
 import pickle
-import numpy as np
 from tqdm import tqdm
 
 

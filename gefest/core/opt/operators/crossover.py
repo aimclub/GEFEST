@@ -21,7 +21,7 @@ def crossover_worker(args):
 
     new_structure = copy.deepcopy(s1)
 
-    crossover_point = random.randint(1, len(new_structure.polygons))  # Choosing crossover point randomly
+    crossover_point = random.randint(1, len(new_structure.polygons) + 1)  # Choosing crossover point randomly
 
     # Crossover conversion
     part_1 = s1.polygons[0:crossover_point]
@@ -61,8 +61,12 @@ def crossover(s1: Structure, s2: Structure, domain: Domain, rate=0.4):
             return s1
         else:
             return s2
+    elif len(s1.polygons) == 0:
+        return s2
+    elif len(s2.polygons) == 0:
+        return s1
 
-    new_structure = s1
+    new_structure = s2
 
     if NUM_PROC > 1:
         # Calculations on different processor cores

@@ -1,6 +1,6 @@
 1
 
-                    Execution started at 20220715.025850         
+                    Execution started at 20220916.170753         
 
 
 
@@ -64,13 +64,13 @@
     
  
     
- OBSTACLE TRANSM 0. REFL 0. LINE 675, 760, 715, 546
+ OBSTACLE TRANSM 0. REFL 0. LINE 1104, 1178, 962, 373, 1176, 117, 1403, 492, 1417, 1138
     
- OBSTACLE TRANSM 0. REFL 0. LINE 1828, 514, 1575, 475, 1725, 46, 1784, 34, 1943, 67, 1969, 108, 2010, 356
+ OBSTACLE TRANSM 0. REFL 0. LINE 1621, 920, 1624, 731, 1774, 330, 1863, 795
     
- OBSTACLE TRANSM 0. REFL 0. LINE 260, 1337, 118, 1261, 88, 958, 311, 1037
+ OBSTACLE TRANSM 0. REFL 0. LINE 49, 1385, 128, 943, 343, 769, 456, 978, 442, 1017, 376, 1143
     
- OBSTACLE TRANSM 0. REFL 0. LINE 1738, 1405, 1617, 1389, 1551, 1355, 1515, 1037, 1596, 1052, 1714, 1075, 1904, 1270
+ OBSTACLE TRANSM 0. REFL 0. LINE 442, 399, 138, 247, 11, 143, 380, 21, 540, 132
     
  $optline
     
@@ -96,8 +96,6 @@
     
  COMPUTE NONSTat 17761025.000000 220 SEC 17761025.020000
  ** Warning          : DT is not a fraction of the computational period
- ** Warning          : Obstacle points moved
-OBSTACLE POINTS (    1828.00,     514.00), and (    1575.00,     475.00),moved to: (    1827.96,     514.25), and (    1574.96,     475.25), because OBSTACLE line piece was on computational grid point (    1575.00,     475.00).
  Time of computation ->  17761025.000340      in sec:        220.
 
 ----------------------------------------------------------------
@@ -167,35 +165,3 @@ OBSTACLE POINTS (    1828.00,     514.00), and (    1575.00,     475.00),moved t
 
  
  Time of computation ->  17761025.000720      in sec:        440.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.001100      in sec:        660.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.001440      in sec:        880.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.001820      in sec:       1100.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.002200      in sec:       1320.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.002540      in sec:       1540.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.002920      in sec:       1760.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.003300      in sec:       1980.
- not possible to compute, first iteration
-
- 
- Time of computation ->  17761025.003640      in sec:       2200.

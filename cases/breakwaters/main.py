@@ -17,6 +17,7 @@ parser.add_argument('--path_to_sim', type=str, default=False, help='path to phys
 parser.add_argument('--path_to_sur', type=str, default=False, help='path to surrogate model')
 opt = parser.parse_args()
 
+
 # ------------
 # GEFEST tools configuration
 # ------------
@@ -47,3 +48,43 @@ optimized_pop = design(n_steps=opt.n_steps,
                        extra=True)
 spend_time = timeit.default_timer() - start
 print(f'spent time {spend_time} sec')
+
+"""
+import pickle
+import matplotlib.pyplot as plt
+import numpy as np
+
+domain, task_setup = bw_domain.configurate_domain(poly_num=opt.n_polys,
+                                                  points_num=opt.n_points,
+                                                  is_closed=opt.is_closed)
+est = bw_estimator.configurate_estimator(domain=domain,
+                                         path_sim=opt.path_to_sim)
+for i in range(140):
+    with open(f'BW_SURR_2/archive_{i}.pickle', 'rb') as f:
+        data_new = pickle.load(f)
+    plt.figure(i)
+    hs = [d.objectives[1] for d in data_new]
+    idx = np.argmin(hs)
+    data = data_new[idx]
+    targets = np.array([[49, 26], [11, 37], [5, 60]])
+
+    Z, hs = est.estimate(data.genotype)
+    Z = np.clip(Z, 0, 2)
+
+    polygons = data.genotype.polygons
+    for poly in polygons:
+        x = np.array([p.x for p in poly.points]) / 2075 * 83
+        y = np.array([p.y for p in poly.points]) / 1450 * 58
+        plt.plot(x, y, '-o', color='blue', linewidth=3)
+    plt.imshow(Z, cmap='OrRd')
+    plt.gca().invert_yaxis()
+    #plt.colorbar()
+
+    X = targets[:, 1]
+    Y = targets[:, 0]
+    plt.scatter(X, Y, c='green', marker='s')
+    plt.title(f'Epoch {i}, performance {round(np.min(hs), 4)}')
+    plt.axis('off')
+
+    plt.savefig(f'imgs_for_gif/{i}.png', bbox_inches='tight', pad_inches=0)
+"""

@@ -142,7 +142,7 @@ class Geometry2D(Geometry):
         geom_poly_2 = self._poly_to_geom(poly_2)
 
         _, nearest_correct_position = nearest_points(geom_poly_1, geom_poly_2)  # Set of points as output
-        return [Point(pos.x, pos.y) for pos in nearest_correct_position]
+        return nearest_correct_position
 
     def get_convex(self, poly: 'Polygon') -> Polygon:
         """Obtaining a convex polygon to avoid intersections

@@ -56,4 +56,4 @@ def test_crossover_empty_structure():
     observed_structure = crossover(empty_structure, structure_with_polygons, domain, rate=0.999)
 
     assert all([len(observed_structure.polygons) > 0,
-                len(observed_structure.polygons) < len(structure_with_polygons.polygons)])
+                len(observed_structure.polygons) <= len(structure_with_polygons.polygons)])
