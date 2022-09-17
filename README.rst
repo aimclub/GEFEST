@@ -35,6 +35,7 @@ The evolutionary workflow of the generative design is the following:
    :align: center
 
 The dynamics of the optimisation can be visualized as (breakwaters optimisation case):
+
 .. image:: /docs/img/breakwaters.gif
 
 How to use
