@@ -34,6 +34,10 @@ The evolutionary workflow of the generative design is the following:
    :figwidth: image
    :align: center
 
+The dynamics of the optimisation can be visualized as (breakwaters optimisation case):
+
+.. image:: /docs/img/breakwaters.gif
+
 How to use
 ==========
 
@@ -47,10 +51,16 @@ The latest stable release of GEFEST is on the `main branch <https://github.com/I
 
 The repository includes the following directories:
 
-* Package `core <https://github.com/ITMO-NSS-team/GEFEST/tree/main/gefest/core>`__  contains the main classes and scripts. It is the *core* of GEFEST framework
-* Package `cases <https://github.com/ITMO-NSS-team/GEFEST/tree/main/cases>`__ includes several *how-to-use-cases* where you can start to discover how GEFEST works
-* All *unit and integration tests* can be observed in the `test <https://github.com/ITMO-NSS-team/GEFEST/tree/main/test>`__ directory
-* The sources of the documentation are in the `docs <https://github.com/ITMO-NSS-team/GEFEST/tree/main/docs>`__
+* Package `core <https://github.com/ITMO-NSS-team/GEFEST/tree/main/gefest/core>`__  contains the main classes and scripts. It is the *core* of GEFEST framework;
+* Package `cases <https://github.com/ITMO-NSS-team/GEFEST/tree/main/cases>`__ includes several *how-to-use-cases* where you can start to discover how GEFEST works;
+* All *unit and integration tests* can be observed in the `test <https://github.com/ITMO-NSS-team/GEFEST/tree/main/test>`__ directory;
+* The sources of the documentation are in the `docs <https://github.com/ITMO-NSS-team/GEFEST/tree/main/docs>`__.
+
+Cases and examples
+==================
+
+- `Experiments <https://github.com/ITMO-NSS-team/GEFEST-paper-experiments>`__ with various real and synthetic cases
+- `Case <https://github.com/ITMO-NSS-team/rbc-traps-generative-design>`__ devoted to the red blood cell traps design.
 
 Current R&D and future plans
 ============================
@@ -125,7 +135,7 @@ Citation
    :target: https://gefest.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 
-.. |license| image:: https://img.shields.io/github/license/nccr-itmo/FEDOT
+.. |license| image:: https://img.shields.io/github/license/ITMO-NSS-team/GEFEST
    :alt: Supported Python Versions
    :target: ./LICENSE.md
 

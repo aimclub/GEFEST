@@ -1,5 +1,5 @@
 Welcome to GEFEST's documentation!
-=================================
+==================================
 
 .. container::
 

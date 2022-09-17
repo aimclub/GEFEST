@@ -14,6 +14,8 @@ import os
 import datetime
 import sys
 sys.path.insert(0, os.path.abspath('../..'))
+from sphinx.builders.html import StandaloneHTMLBuilder
+
 
 # -- Project information -----------------------------------------------------
 
@@ -29,6 +31,7 @@ release = '0.0.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx_rtd_theme',
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.napoleon',
@@ -53,7 +56,12 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-
+StandaloneHTMLBuilder.supported_image_types = [
+    'image/svg+xml',
+    'image/gif',
+    'image/png',
+    'image/jpeg'
+]
 html_theme = "sphinx_rtd_theme"
 # html_logo = "/docs/img/gefest_logo.png"
 
