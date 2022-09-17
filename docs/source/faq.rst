@@ -8,6 +8,10 @@ Frequently asked questions and answers
 
     *The GEFEST framework is a modular tool for the generative design of two-dimensional physical objects.*
 
+.. topic:: Which task of generative design can be solved with GEFEST?
+
+    *The GEFEST designs the geometrically-encoded structures that interacts with solid media. The objective function(s) are estimating using physical simulator.*
+
 .. topic:: Can I install GEFEST using pip/conda?
 
     *Not yet, but for easy installing follow the* `instructions`_
@@ -20,7 +24,6 @@ Frequently asked questions and answers
 .. topic:: Why it is named GEFEST?
 
     *For naming our tool we decided to union the first literacy from Generative Evolution For Encoded STructures.*
-
 
 .. List of links:
 

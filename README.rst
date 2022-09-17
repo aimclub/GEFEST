@@ -125,7 +125,7 @@ Citation
    :target: https://gefest.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 
-.. |license| image:: https://img.shields.io/github/license/nccr-itmo/FEDOT
+.. |license| image:: https://img.shields.io/github/license/ITMO-NSS-team/GEFEST
    :alt: Supported Python Versions
    :target: ./LICENSE.md
 
