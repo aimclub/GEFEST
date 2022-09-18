@@ -7,6 +7,10 @@ def configurate_optimizer(pop_size: int,
                           crossover_rate: int,
                           mutation_rate: int,
                           task_setup):
+    """
+    ::TODO::
+    Create abstract interface for configurations
+    """
     # ------------
     # User-defined optimizer
     # it should be created as object with .step() method

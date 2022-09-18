@@ -2,6 +2,10 @@ from gefest.core.structure.domain import Domain
 
 
 class Sampler:
+    """
+    ::TODO::
+    make abstract class for all samplers
+    """
     def __init__(self, sampler, domain: 'Domain'):
         """
         Base sampler class

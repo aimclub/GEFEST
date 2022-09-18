@@ -12,4 +12,4 @@ parser.add_argument('--n_points', type=int, default=50, help='maximum number of 
 parser.add_argument('--c_rate', type=float, default=0.6, help='crossover rate')
 parser.add_argument('--m_rate', type=float, default=0.6, help='mutation rate')
 parser.add_argument('--is_closed', type=bool, default=False, help='type of polygon')
-opt = parser.parse_args()
+opt_params = parser.parse_args()
