@@ -5,6 +5,10 @@ from gefest.tools.estimators.estimator import Estimator
 
 
 def configurate_estimator(path_to_cnn=False):
+    """
+    ::TODO:: make abstract version for the configuration function and specific realizations
+    (maybe it is possible to name it like configurator class)
+    """
     # ------------
     # User-defined estimator
     # it should be created as object with .estimate() method

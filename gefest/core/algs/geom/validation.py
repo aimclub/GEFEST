@@ -79,6 +79,9 @@ def too_close(structure: 'Structure', domain: Domain) -> bool:
 
 
 def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain):
+    """
+    ::TODO:: find the answer for the question: why return 0 gives infinite computation
+    """
     if poly_1 is poly_2 or len(poly_1.points) == 0 or len(poly_2.points) == 0:
         return 9999
 
