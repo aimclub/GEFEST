@@ -10,6 +10,10 @@ from torch import nn
 
 class HeatCNN:
     """
+    ::TODO:: Make abstract version for creation own realizations for specific tasks
+    """
+
+    """
     Surrogate model for the heat components task
     """
 

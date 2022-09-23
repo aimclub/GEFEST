@@ -51,11 +51,8 @@ class StructVizualizer:
         Returns:
             .. |viz_poly| image:: https://i.ibb.co/x7B0QPY/random-poly.png
         """
-        type = info['type']
-        fitness = info['fitness']
-
         x = [pt.x for pt in poly.points]
         y = [pt.y for pt in poly.points]
 
-        plt.plot(x, y, label=f'{type}, fitness = {fitness:.3f}')
+        plt.plot(x, y, label=info)
         plt.legend()

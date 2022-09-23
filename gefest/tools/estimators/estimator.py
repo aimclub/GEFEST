@@ -3,6 +3,10 @@ from gefest.core.structure.structure import Structure
 
 
 class Estimator:
+    """
+    ::TODO:: make abstract class for further specific realizations in different problems
+    """
+
     def __init__(self, estimator, loss: Optional[Callable] = None):
         """
         Base estimator class, Structure -> Performance

@@ -14,8 +14,12 @@ USE_AVG_CONST = False
 
 class Comsol:
     """
+    ::TODO:: make abstract class for further specific realizations
+    """
+    """
     Comsol class for microfluidic problem
     """
+
     def __init__(self, path_to_mph):
         """
         :param path_to_mph: (String), path to mph file

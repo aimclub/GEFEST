@@ -15,6 +15,9 @@ matplotlib.use('agg')
 
 class BWCNN:
     """
+    ::TODO:: Make abstract version to create own realizations for specific tasks
+    """
+    """
     Surrogate model for breakwaters task
     """
 

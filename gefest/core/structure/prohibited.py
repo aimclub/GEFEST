@@ -15,6 +15,7 @@ def create_prohibited(targets: Optional[list[list]] = None, fixed_points: Option
     :param fixed_points: (Optional[list[list]]), fixed lines inside domain
     :param fixed_area: (Optional[list[list]]), fixed areas inside domain
     :return: Structure, structure of all prohibited polygons (targets, lines, areas)
+    ::TODO:: change buffer to something more interpretable
     """
     prohibited_area = []
     if targets is not None:
