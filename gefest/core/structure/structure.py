@@ -150,7 +150,7 @@ def get_random_poly(parent_structure: Optional[Structure],
 
 def get_random_point(polygon: 'Polygon',
                      structure: 'Structure',
-                     domain: 'Domain'):
+                     domain: 'Domain') -> Optional[Point]:
     # Creating a point to fill the polygon
 
     centroid = domain.geometry.get_centroid(polygon)
@@ -168,7 +168,7 @@ def get_random_point(polygon: 'Polygon',
 def create_poly(centroid: 'Point',
                 sigma: int,
                 domain: 'Domain',
-                geometry: 'Geometry'):
+                geometry: 'Geometry') -> Polygon:
     # Creating polygon in the neighborhood of the centroid
     # sigma defines neighborhood
 
@@ -189,7 +189,7 @@ def create_poly(centroid: 'Point',
 
 def create_area(domain: 'Domain',
                 structure: 'Structure',
-                geometry: 'Geometry'):
+                geometry: 'Geometry') -> (Point, float):
     n_poly = len(structure.polygons)  # Number of already existing polygons
     area_size = np.random.randint(low=3, high=15)  # Neighborhood compression ratio
     sigma = max(domain.max_x - domain.min_x, domain.max_y - domain.min_y) / area_size  # Neighborhood size
@@ -217,7 +217,7 @@ def create_area(domain: 'Domain',
     return centroid, sigma
 
 
-def create_random_point(domain: 'Domain'):
+def create_random_point(domain: 'Domain') -> Point:
     point = Point(np.random.uniform(low=domain.min_x, high=domain.max_x),
                   np.random.uniform(low=domain.min_y, high=domain.max_y))
     while not in_bound(point, domain):
@@ -228,7 +228,7 @@ def create_random_point(domain: 'Domain'):
 
 
 def create_polygon_point(centroid: 'Point',
-                         sigma: int):
+                         sigma: int) -> Point:
     # Creating polygon point inside the neighborhood defined by the centroid
     point = Point(np.random.normal(centroid.x, sigma, 1)[0],
                   np.random.normal(centroid.y, sigma, 1)[0])
@@ -237,14 +237,14 @@ def create_polygon_point(centroid: 'Point',
 
 
 def in_bound(point: 'Point',
-             domain: 'Domain'):
+             domain: 'Domain') -> bool:
     poly_domain = Polygon(polygon_id='tmp', points=[Point(c[0], c[1]) for c in domain.allowed_area])
     return domain.geometry.is_contain_point(poly_domain, point)
 
 
 def distance(point: 'Point',
              structure: 'Structure',
-             geometry: 'Geometry'):
+             geometry: 'Geometry') -> float:
     polygons = structure.polygons
     distances = []
     for poly in polygons:

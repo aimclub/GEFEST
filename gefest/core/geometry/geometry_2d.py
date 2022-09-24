@@ -23,7 +23,7 @@ class Geometry2D(Geometry):
                  is_closed=True):
         self.is_closed = is_closed
 
-    def get_coords(self, poly):
+    def get_coords(self, poly) -> List[Point]:
         """The function for getting points
         Args:
             poly: :obj:`Polygon` for processing
@@ -47,7 +47,7 @@ class Geometry2D(Geometry):
 
         return points
 
-    def resize_poly(self, poly: Polygon, x_scale: float, y_scale: float):
+    def resize_poly(self, poly: Polygon, x_scale: float, y_scale: float) -> Polygon:
         """The function for rescaling polygons along each axis.
         Scaling occurs relative to the center of mass of the polygon
         Args:
@@ -69,7 +69,7 @@ class Geometry2D(Geometry):
 
         return rescaled_poly
 
-    def rotate_poly(self, poly: Polygon, angle: float):
+    def rotate_poly(self, poly: Polygon, angle: float) -> Polygon:
         """Rotating polygon relative to the center of mass by a given angle
         Args:
             poly: :obj:`Polygon` for processing
@@ -88,7 +88,7 @@ class Geometry2D(Geometry):
 
         return rotated_poly
 
-    def get_square(self, polygon: 'Polygon'):
+    def get_square(self, polygon: 'Polygon') -> float:
         """Recieving value of the area
         Args:
             polygon: :obj:`Polygon` for processing
@@ -104,7 +104,7 @@ class Geometry2D(Geometry):
 
         return geom_polygon.area
 
-    def is_contain_point(self, poly: 'Polygon', point: Point):
+    def is_contain_point(self, poly: 'Polygon', point: Point) -> bool:
         """Checking if a point is inside a polygon
         Args:
             poly: :obj:`Polygon` that explore
@@ -159,7 +159,7 @@ class Geometry2D(Geometry):
 
         return polygon
 
-    def get_centroid(self, poly: 'Polygon'):
+    def get_centroid(self, poly: 'Polygon') -> Point:
         """Getting a point that is the center of mass of the polygon
         Args:
             poly: the :obj:`Polygon` that explore
@@ -187,7 +187,7 @@ class Geometry2D(Geometry):
         multi_geom = MultiLineString([self._poly_to_geom(poly) for poly in polygons])
         return multi_geom.is_simple
 
-    def contains(self, poly1: 'Polygon', poly2: 'Polygon'):
+    def contains(self, poly1: 'Polygon', poly2: 'Polygon') -> bool:
         geom_polygon1 = self._poly_to_geom(poly1)
         geom_polygon2 = GeomPolygon([self._pt_to_geom(pt) for pt in poly2.points])
 
@@ -206,11 +206,11 @@ class Geometry2D(Geometry):
         geom_poly_2 = self._poly_to_geom(poly_2)
         return geom_poly_1.intersects(geom_poly_2)
 
-    def _poly_to_geom(self, poly: Polygon):
+    def _poly_to_geom(self, poly: Polygon) -> LineString:
         # Transformation GEFEST polygon to shapely LineString
         return LineString([self._pt_to_geom(pt) for pt in poly.points])
 
-    def _pt_to_geom(self, pt: Point):
+    def _pt_to_geom(self, pt: Point) -> GeomPoint:
         # Transformation GEFEST point to shapely Point
         return GeomPoint(pt.x, pt.y)
 
@@ -235,7 +235,7 @@ class Geometry2D(Geometry):
 
         return distance
 
-    def centroid_distance(self, point: 'Point', poly: 'Polygon'):
+    def centroid_distance(self, point: 'Point', poly: 'Polygon') -> Point:
         # Distance from point to polygon
         geom_point = self._pt_to_geom(point)
         geom_poly = self._poly_to_geom(poly)

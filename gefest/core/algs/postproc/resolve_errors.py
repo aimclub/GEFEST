@@ -11,7 +11,7 @@ Function postprocess makes structures that satisfy the constraints given in vali
 """
 
 
-def postprocess(structure: Structure, domain: Domain):
+def postprocess(structure: Structure, domain: Domain) -> Structure:
     """The method process given :obj:`Structure` step by step while
     it is not correct.
     Args:
@@ -60,7 +60,7 @@ def postprocess(structure: Structure, domain: Domain):
 
 
 def _correct_low_points(poly: 'Polygon',
-                        domain: 'Domain'):
+                        domain: 'Domain') -> Polygon:
     new_point = Point(np.random.uniform(domain.min_x, domain.max_x),
                       np.random.uniform(domain.min_y, domain.max_y))
     poly.points.append(new_point)
@@ -76,7 +76,7 @@ def _correct_unclosed_poly(poly: Polygon) -> Polygon:
     return correct_poly
 
 
-def _correct_wrong_point(poly: Polygon, domain: Domain):
+def _correct_wrong_point(poly: Polygon, domain: Domain) -> Polygon:
     point_moved = False
     for p_id, point in enumerate(poly.points):
         # Correcting each point out of bounds
@@ -98,13 +98,13 @@ def _correct_wrong_point(poly: Polygon, domain: Domain):
     return poly
 
 
-def _correct_self_intersection(poly: Polygon, domain: Domain):
+def _correct_self_intersection(poly: Polygon, domain: Domain) -> Polygon:
     # Change self-intersected poly to convex
     convex_poly = domain.geometry.get_convex(poly)
     return convex_poly
 
 
-def _correct_closeness(structure: Structure, domain: Domain):
+def _correct_closeness(structure: Structure, domain: Domain) -> Structure:
     """
     For polygons that are closer than the specified threshold,
     one of them will be removed
@@ -125,7 +125,7 @@ def _correct_closeness(structure: Structure, domain: Domain):
     return corrected_structure
 
 
-def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain):
+def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain) -> float:
     if poly_1 is poly_2 or len(poly_1.points) == 0 or len(poly_2.points) == 0:
         return 9999
 

@@ -89,7 +89,7 @@ def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain):
     return domain.geometry.min_distance(poly_1, poly_2)
 
 
-def self_intersection(structure: 'Structure'):
+def self_intersection(structure: 'Structure') -> bool:
     """The method indicates that any :obj:`Polygon` in the :obj:`Structure`
     is self-intersected
     Args:
@@ -122,7 +122,7 @@ def unclosed_poly(structure: 'Structure', domain: 'Domain') -> bool:
 
 
 def is_contain(structure: 'Structure',
-               domain: 'Domain'):
+               domain: 'Domain') -> bool:
     is_contains = []
 
     try:

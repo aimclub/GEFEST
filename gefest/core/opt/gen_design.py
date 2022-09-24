@@ -2,6 +2,7 @@ import os
 import shutil
 import pickle
 from tqdm import tqdm
+from pathlib import Path
 
 
 def design(n_steps: int,
@@ -12,7 +13,6 @@ def design(n_steps: int,
            extra=False):
     """
     Generative design procedure
-
     :param n_steps: (Int) number of generative design steps
     :param pop_size: (Int) number of samples in population
     :param estimator: (Object) estimator with .estimate() method
@@ -29,10 +29,10 @@ def design(n_steps: int,
         :param samples: (List), samples to save
         :return: None
         """
-        with open(f'{path}/performance_{i}.pickle', 'wb') as handle:
+        with open(Path(path, f'performance_{i}.pickle'), 'wb') as handle:
             pickle.dump(performance, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-        with open(f'{path}/population_{i}.pickle', 'wb') as handle:
+        with open(Path(path, f'population_{i}.pickle'), 'wb') as handle:
             pickle.dump(samples, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         return

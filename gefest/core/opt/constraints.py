@@ -5,7 +5,7 @@ from gefest.core.algs.geom.validation import out_of_bound, self_intersection, to
 from gefest.core.structure.structure import Structure
 
 
-def check_constraints(structure: Structure, is_lightweight: bool = False, domain=None, model_func=None):
+def check_constraints(structure: Structure, is_lightweight: bool = False, domain=None, model_func=None) -> bool:
     try:
         if any([(poly is None or
                  len(poly.points) == 0 or
