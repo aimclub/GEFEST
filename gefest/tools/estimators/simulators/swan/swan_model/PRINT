@@ -1,0 +1,167 @@
+                    Execution started at 20220918.184105
+
+
+
+                    ---------------------------------------
+                                     SWAN
+                    SIMULATION OF WAVES IN NEAR SHORE AREAS
+                             VERSION NUMBER 41.10
+                    ---------------------------------------
+
+
+
+ $***********MODEL INPUT*********************************
+
+ SET NAUTical
+
+ SET nor=-30
+
+ MODE NONSTationary
+
+ COORDinates CARTesian
+
+ $
+
+ CGRID xpc=0 ypc=0 alpc=0. &
+       xlenc=2075 ylenc=1450 mxc=83 myc=58 &
+       CIRcle mdc=36 flow=0.05 fhigh=1. msc=49
+ Resolution in sigma-space: df/f =  0.0630
+
+
+
+ INPgrid BOTtom xpinp=0 ypinp=0 alpinp=0. mxinp=83 myinp=58 &
+         dxinp=25 dyinp=25 EXCeption -9
+
+ READINP BOTTOM 1 'bathymetry\port_not_bathy_25m_vobst_exp.bot' IDLA= 1  FREE
+
+ INIT PAR 1.5 2.6 45
+
+ $************ BOUNDARY CONDITIONS *********************
+
+ BOUnd SHAPespec JONswap 3.3 PEAK DSPR DEGRees
+
+ BOUndspec SEGMENT IJ 83 58 CON PAR 6.3 9.1 30 30
+
+
+
+ OBSTACLE TRANSM 0. REFL 0. LINE 471, 1445, 1335, 1448, 1323, 1236, 1361, 1173, 1395, 1123, 1459, 1045, 1485, 960
+
+ OBSTACLE TRANSM 0. REFL 0. LINE 1449, 929, 1419, 892, 1375, 886, 1321, 981, 1248, 1132, 1068, 1178, 921, 1225
+
+ OBSTACLE TRANSM 0. REFL 0. LINE 804, 1219, 732, 1184, 634, 1119, 548, 1045, 485, 968, 424, 881, 381, 825
+
+ OBSTACLE TRANSM 0. REFL 0. LINE 310, 788, 271, 766, 244, 744, 203, 742, 182, 803, 214, 812, 234, 818
+
+ OBSTACLE TRANSM 0. REFL 0. LINE 275, 862, 346, 975, 427, 1084, 504, 1210, 574, 1284, 471, 1445
+
+ OBSTACLE TRANSM 0. REFL 0. LINE 652, 0, 580, 115, 544, 197, 468, 260, 439, 280, 395, 300, 378, 335, 438, 380, 481, 391,
+
+
+
+
+
+
+
+ OBSTACLE TRANSM 0. REFL 0. LINE 281, 1422, 64, 1172, 14, 1008, 185, 854, 1037, 1080, 555, 1357
+
+ OBSTACLE TRANSM 0. REFL 0. LINE 1961, 1447, 1726, 1440, 1475, 1393, 1833, 929, 2012, 1329
+
+ OBSTACLE TRANSM 0. REFL 0. LINE 712, 384, 191, 351, 99, 332, 189, 109, 451, 41, 725, 34
+
+ $optline
+
+ WIND 28.1 90
+
+ $************ OUTPUT REQUESTS *************************
+
+ $
+
+ OUTPUT OPTIONS '%' TABLE 16 BLOCK 6 84
+
+ FRAME 'HRMSport' xpfr=0 ypfr=0 alpfr=0. xlenfr=2075 ylenfr=1450 mxfr=83 myfr=58
+
+ BLOck 'HRMSport' NOHEADer 'r\hs47dd8b1c0d4447478fec6f956c7e32d9.d' LAYout 1 HSign OUTput 17761025.020000 1. HR
+
+ GEN3
+
+ TRIad
+
+ FRiction
+
+ DIFFRACtion SMNUM=9
+
+ COMPUTE NONSTat 17761025.000000 220 SEC 17761025.020000
+ ** Warning          : DT is not a fraction of the computational period
+ Time of computation ->  17761025.000340      in sec:        220.
+
+----------------------------------------------------------------
+                  COMPUTATIONAL PART OF SWAN
+----------------------------------------------------------------
+
+ Gridresolution       : MXC              84 MYC             59
+                      : MCGRD          4957
+                      : MSC              50 MDC             36
+                      : MTC              33
+                      : NSTATC            1 ITERMX           1
+ Propagation flags    : ITFRE             1 IREFR            1
+ Source term flags    : IBOT              1 ISURF            1
+                      : IWCAP             1 IWIND            3
+                      : ITRIAD            1 IQUAD            2
+                      : IVEG              0 ITURBV           0
+                      : IMUD              0
+ Spatial step         : DX       0.2500E+02 DY      0.2500E+02
+ Spectral bin         : df/f     0.6304E-01 DDIR    0.1000E+02
+ Physical constants   : GRAV     0.9810E+01 RHO     0.1025E+04
+ Wind input           : WSPEED   0.2810E+02 DIR     0.6000E+02
+ Tail parameters      : E(f)     0.4000E+01 E(k)    0.2500E+01
+                      : A(f)     0.5000E+01 A(k)    0.3000E+01
+ Accuracy parameters  : DREL     0.1000E-01 NPNTS   0.9950E+02
+                      : DHABS    0.5000E-02 CURVAT  0.5000E-02
+                      : GRWMX    0.1000E+00
+ Drying/flooding      : LEVEL    0.0000E+00 DEPMIN  0.5000E-01
+ The nautical  convention for wind and wave directions is used
+ Scheme for geographic propagation is BSBT
+ Scheme geogr. space  : PROPSC            1 ICMAX            5
+ Scheme spectral space: CSS      0.5000E+00 CDD     0.5000E+00
+ Current is off
+ Quadruplets          : IQUAD             2
+                      : LAMBDA   0.2500E+00 CNL4    0.3000E+08
+                      : CSH1     0.5500E+01 CSH2    0.8330E+00
+                      : CSH3    -0.1250E+01
+ Maximum Ursell nr for Snl4 :    0.1000E+02
+ Triads               : ITRIAD            1 TRFAC   0.8000E+00
+                      : CUTFR    0.2500E+01 URCRI   0.2000E+00
+ Minimum Ursell nr for Snl3 :    0.1000E-01
+ JONSWAP (`73)        : GAMMA    0.3800E-01
+ Vegetation is off
+ Turbulence is off
+ Fluid mud is off
+ W-cap Komen (`84)    : EMPCOF (CDS2):   0.2360E-04
+ W-cap Komen (`84)    : APM (STPM)   :   0.3020E-02
+ W-cap Komen (`84)    : POWST        :   0.2000E+01
+ W-cap Komen (`84)    : DELTA        :   0.1000E+01
+ W-cap Komen (`84)    : POWK         :   0.1000E+01
+ Wind drag is fit
+ Snyder/Komen wind input
+ Battjes&Janssen (`78): ALPHA    0.1000E+01 GAMMA   0.7300E+00
+ Set-up is off
+ Diffraction          : SMPAR    0.0000E+00 SMNUM            9
+ Janssen (`89,`90)    : ALPHA    0.1000E-01 KAPPA   0.4100E+00
+ Janssen (`89,`90)    : RHOA     0.1280E+01 RHOW    0.1025E+04
+
+ 1st and 2nd gen. wind: CF10     0.1880E+03 CF20    0.5900E+00
+                      : CF30     0.1200E+00 CF40    0.2500E+03
+                      : CF50     0.2300E-02 CF60   -0.2230E+00
+                      : CF70     0.0000E+00 CF80   -0.5600E+00
+                      : RHOAW    0.1249E-02 EDMLPM  0.3600E-02
+                      : CDRAG    0.1230E-02 UMIN    0.1000E+01
+                      : LIM_PM   0.1300E+00
+
+ not possible to compute, first iteration
+
+
+ Time of computation ->  17761025.000720      in sec:        440.
+ not possible to compute, first iteration
+
+
+ Time of computation ->  17761025.001100      in sec:        660.
