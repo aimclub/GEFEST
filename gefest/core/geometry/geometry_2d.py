@@ -1,7 +1,6 @@
 from typing import List
 from uuid import uuid4
 
-import bezier
 import numpy as np
 from shapely import affinity
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon, LineString, MultiLineString
@@ -11,33 +10,28 @@ from gefest.core.geometry.geometry import Geometry
 from gefest.core.structure.point import Point
 from gefest.core.structure.polygon import Polygon
 
-from typing import TypeVar
-poly_pt = TypeVar('poly_pt', Polygon, Point)
-
 
 class Geometry2D(Geometry):
     """Overriding the geometry base class for 2D structures.
     The input receives information about the closeness of the polygon
-
     Args:
         is_closed: ``True`` if the :obj:`Polygon` must have close borders
             (first Point is equal to the last one), otherwise ``False``. Default value is ``True``
     """
 
     def __init__(self,
-                 is_closed: bool = True):
+                 is_closed=True):
         self.is_closed = is_closed
 
-    def get_coords(self, poly: 'Polygon') -> list:
+    def get_coords(self, poly) -> List[Point]:
         """The function for getting points
-
         Args:
             poly: :obj:`Polygon` for processing
-
         Returns:
             all :obj:`Point` that :obj:`poly`contains
         """
 
+        # Transformation from shapely coords to GEFEST points for further analysis
         if isinstance(poly, GeomPolygon):
             # Converting  shapely.Polygon to shapely.LineString translation for correct conversion
             poly = LineString(poly.exterior.coords)
@@ -53,19 +47,16 @@ class Geometry2D(Geometry):
 
         return points
 
-    def resize_poly(self, poly: 'Polygon', x_scale: float, y_scale: float) -> 'Polygon':
+    def resize_poly(self, poly: Polygon, x_scale: float, y_scale: float) -> Polygon:
         """The function for rescaling polygons along each axis.
         Scaling occurs relative to the center of mass of the polygon
-
         Args:
             poly: :obj:`Polygon` for processing
             x_scale: scale value for **x** axis
             y_scale: scale value for **y** axis
-
         Returns:
             scaled :obj:`poly` by ``(x,y)`` axes
         """
-
         geom_polygon = self._poly_to_geom(poly)  # Transformation to shapely structure
 
         rescaled_geom_polygon = affinity.scale(geom_polygon,
@@ -78,13 +69,11 @@ class Geometry2D(Geometry):
 
         return rescaled_poly
 
-    def rotate_poly(self, poly: 'Polygon', angle: float) -> 'Polygon':
+    def rotate_poly(self, poly: Polygon, angle: float) -> Polygon:
         """Rotating polygon relative to the center of mass by a given angle
-
         Args:
             poly: :obj:`Polygon` for processing
             angle: value of degree rotation
-
         Returns:
             rotated :obj:`poly`
         """
@@ -101,10 +90,8 @@ class Geometry2D(Geometry):
 
     def get_square(self, polygon: 'Polygon') -> float:
         """Recieving value of the area
-
         Args:
             polygon: :obj:`Polygon` for processing
-
         Returns:
             value of the :obj:`polygon` area
         """
@@ -117,115 +104,53 @@ class Geometry2D(Geometry):
 
         return geom_polygon.area
 
-    def is_contain_point(self, poly: 'Polygon', point: 'Point') -> bool:
+    def is_contain_point(self, poly: 'Polygon', point: Point) -> bool:
         """Checking if a point is inside a polygon
-
         Args:
             poly: :obj:`Polygon` that explore
             point: :obj:`Point` for checking presence inside the :obj:`Polygon`
-
         Returns:
             ``True`` if :obj:`point` is into :obj:`poly`, otherwise ``False``
         """
-
         geom_poly_allowed = GeomPolygon([self._pt_to_geom(pt) for pt in poly.points])
         geom_pt = GeomPoint(point.x, point.y)
 
         return geom_poly_allowed.contains(geom_pt)
 
-    def is_contain_poly(self, poly_1: 'Polygon', poly_2: 'Polygon') -> bool:
-        """Checking if a poly_1 is inside into poly_2
-
-        Args:
-            poly_1: the first :obj:`Polygon` that explore
-            poly_2: the second :obj:`Polygon` that explore
-
-        Returns:
-            ``True`` if :obj:`poly_1` is into :obj:`poly_2` (poly_2 covers whole area of poly_1), otherwise ``False``
-        """
-
-        geom_poly_allowed = GeomPolygon([self._pt_to_geom(pt) for pt in poly_2.points])
-        geom_poly = GeomPolygon([self._pt_to_geom(pt) for pt in poly_1.points])
-
-        return geom_poly_allowed.covers(geom_poly)
-
-    def nearest_point(self, point: 'Point', poly: 'Polygon') -> 'Point':
+    def nearest_point(self, point: Point, poly: Polygon) -> Point:
         """Calculating closest point between input point and polygon.
-
         Args:
             point: the :obj:`Point` that explore
             poly: the :obj:`Polygon` that explore
-
         Returns:
             returns the nearest :obj:`Point` from ``point`` among all points in the ``poly``
         """
-
         geom_poly = self._poly_to_geom(poly)
         geom_point = GeomPoint(point.x, point.y)
         _, nearest_correct_position = nearest_points(geom_point, geom_poly)  # One point as output
-
         return Point(nearest_correct_position.x, nearest_correct_position.y)
 
-    def nearest_points(self, poly_1: 'Polygon', poly_2: 'Polygon') -> List[Point]:
+    def nearest_points(self, poly_1: Polygon, poly_2: Polygon) -> List[Point]:
         """Calculating closest point between two polygons
-
         Args:
             poly_1: the first :obj:`Polygon` that explore
             poly_2: the second :obj:`Polygon` that explore
-
         Returns:
             the couple of :obj:`Point` where the first one from :obj:`poly_1` and the second one from :obj:`poly_2`
         """
-
         geom_poly_1 = self._poly_to_geom(poly_1)
         geom_poly_2 = self._poly_to_geom(poly_2)
 
         _, nearest_correct_position = nearest_points(geom_poly_1, geom_poly_2)  # Set of points as output
+        return nearest_correct_position
 
-        return [Point(pos.x, pos.y) for pos in nearest_correct_position]
-
-    def bezier_transform(self, poly: 'Polygon') -> 'Polygon':
-        """Function for bezier transformation over the polygon.
-        The polygon is transformed into a convex spherical figure without self-intersections.
-        Such transformation might be useful if you are working with round-shaped figures
-
-        Args:
-            poly: :obj:`Polygon` for processing
-
-        Returns:
-            ransformed :obj:`poly`
-        """
-
-        poly = GeomPolygon([self._pt_to_geom(pt) for pt in poly.points])  # Transform to shapely Polygon
-        points = LineString(poly.boundary).xy  # Getting points of polygon
-
-        x = points[0]
-        y = points[1]
-        z = np.asfortranarray([x, y])  # Create a sequence of control points needed to define a bezier curve
-
-        bezier_curve = bezier.Curve.from_nodes(z)  # Bezier curve on a sequence of control points
-        number_of_points = len(poly.points)
-        bezier_params = np.linspace(0, 1, number_of_points)  # Values to put as bezier parameters
-
-        transform_poly = Polygon(polygon_id=str(uuid4()),
-                                 points=[(Point(bezier_curve.evaluate(param)[0][0], bezier_curve.evaluate(param)[1][0]))
-                                         for param in
-                                         bezier_params])  # Bezier transformation as GEFEST polygon
-
-        transform_geom = GeomPolygon([self._pt_to_geom(pt) for pt in transform_poly.points])
-
-        return transform_geom
-
-    def get_convex(self, poly: 'Polygon') -> 'Polygon':
+    def get_convex(self, poly: 'Polygon') -> Polygon:
         """Obtaining a convex polygon to avoid intersections
-
         Args:
             poly: :obj:`Polygon` for processing
-
         Returns:
             convex :obj:`Polygon`
         """
-
         if len(poly.points) < 3:
             return poly
         geom_poly = self._poly_to_geom(poly).convex_hull
@@ -234,73 +159,66 @@ class Geometry2D(Geometry):
 
         return polygon
 
-    def get_centroid(self, poly: 'Polygon') -> 'Point':
+    def get_centroid(self, poly: 'Polygon') -> Point:
         """Getting a point that is the center of mass of the polygon
-
         Args:
             poly: the :obj:`Polygon` that explore
-
         Returns:
             central :obj:`Point` of :obj:`poly`
         """
-
         points = [pt for pt in poly.points]
         if len(points) < 3:
             points.append(points[0])
         geom_poly = GeomPolygon([self._pt_to_geom(pt) for pt in points])
         geom_point = geom_poly.centroid
         point = Point(geom_point.x, geom_point.y)
-
         return point
 
     def intersects(self, structure: 'Structure') -> bool:
         """Function to check for any intersection in structure of polygons
         Whole structure appears like shapely MultiLineString for which uses method is simple
-
         Args:
             structure: the :obj:`Structure` that explore
-
         Returns:
             ``True`` if any :obj:`Polygon` in :obj:`structure` intersects with another one,
                otherwise - ``False``
         """
-
         polygons = structure.polygons
         multi_geom = MultiLineString([self._poly_to_geom(poly) for poly in polygons])
-
         return multi_geom.is_simple
+
+    def contains(self, poly1: 'Polygon', poly2: 'Polygon') -> bool:
+        geom_polygon1 = self._poly_to_geom(poly1)
+        geom_polygon2 = GeomPolygon([self._pt_to_geom(pt) for pt in poly2.points])
+
+        is_contain = geom_polygon2.contains(geom_polygon1)
+        return is_contain
 
     def intersects_poly(self, poly_1: 'Polygon', poly_2: 'Polygon') -> bool:
         """Intersection between two polygons
-
         Args:
             poly_1: the first :obj:`Polygon` that explore
             poly_2: the second :obj:`Polygon` that explore
-
         Returns:
             ``True`` if the :obj:`poly_1` intersects with :obj:`poly_2`, otherwise - ``False``
         """
-
         geom_poly_1 = self._poly_to_geom(poly_1)
         geom_poly_2 = self._poly_to_geom(poly_2)
-
         return geom_poly_1.intersects(geom_poly_2)
 
-    def _poly_to_geom(self, poly: Polygon):
+    def _poly_to_geom(self, poly: Polygon) -> LineString:
         # Transformation GEFEST polygon to shapely LineString
         return LineString([self._pt_to_geom(pt) for pt in poly.points])
 
-    def _pt_to_geom(self, pt: Point):
+    def _pt_to_geom(self, pt: Point) -> GeomPoint:
         # Transformation GEFEST point to shapely Point
         return GeomPoint(pt.x, pt.y)
 
-    def min_distance(self, obj_1: poly_pt, obj_2: poly_pt) -> float:
+    def min_distance(self, obj_1, obj_2) -> float:
         """Smallest distance between two objects
-
         Args:
             obj_1: the first :obj:`obj_1` that explore
             obj_2: the second :obj:`obj_2` that explore
-
         Returns:
             value of distance between the nearest points of the explored objects
         """
@@ -316,6 +234,14 @@ class Geometry2D(Geometry):
         distance = obj_1.distance(obj_2)
 
         return distance
+
+    def centroid_distance(self, point: 'Point', poly: 'Polygon') -> Point:
+        # Distance from point to polygon
+        geom_point = self._pt_to_geom(point)
+        geom_poly = self._poly_to_geom(poly)
+        d = geom_point.distance(geom_poly)
+
+        return d
 
 
 # Function to create a circle, needed for one of the synthetic examples
@@ -336,7 +262,7 @@ def create_circle(struct: 'Structure') -> 'Structure':
     a = radius * np.cos(theta) + center_x + 2.2 * radius
     b = radius * np.sin(theta) + center_y
 
-    struct = [Polygon(polygon_id=str(uuid4()),
-                      points=[(Point(x, y)) for x, y in zip(a, b)])]
+    struct = Polygon(polygon_id=str(uuid4()),
+                     points=[(Point(x, y)) for x, y in zip(a, b)])
 
     return struct
