@@ -3,7 +3,8 @@ from gefest.core.structure.polygon import Polygon
 from gefest.core.structure.structure import Structure
 from gefest.core.structure.point import Point
 from cases.breakwaters.one_segment import cost, optimized_structure
-
+from gefest.core.algs.geom.validation import out_of_bound, too_close, intersection
+import random
 
 class Breakwaters():
 
@@ -12,51 +13,28 @@ class Breakwaters():
         self.cost = cost
 
     def moving_position(self):
-        structure = optimized_structure
-        init_fitnes = cost(structure)
-        directions = ['north', 'south', 'east', 'west',
-                      'n-w', 's-w', 'n-e', 's-e']
+        structure = self.optimized_structure
+        best_fitnes = self.cost(structure)
+        number_poly = len(structure.polygons)
 
-        best_structures = {}
-        best_fitnes = init_fitnes
+        max_attempts = 50
 
-        for poly_id, poly in enumerate(structure.polygons):
-            moving_step = Geometry2D.get_square(poly)*0.001
-            fitnes = best_fitnes
+        while max_attempts > 0:
 
-            for direction in directions:
-                best_directions = {}
-                moved_poly_to_dir = _moving_for_one_step(poly, moving_step, direction)
-                moved_structure = structure.copy()
-                moved_structure.polygons[poly_id] = moved_poly_to_dir
-                fitnes_dir = cost(moved_structure)
+            choosen_poly = random.choice(range(number_poly))
+            moving_step = Geometry2D.get_square(structure.polygons[choosen_poly])*0.001
 
-                if fitnes_dir < fitnes:
-                    best_directions[direction] = fitnes_dir
+            best_structure, best_fitnes = _moving_for_one_step(structure=structure,
+                                                               poly_number=choosen_poly,
+                                                               moving_step=moving_step,
+                                                               cost=self.cost,
+                                                               current_fitnes=best_fitnes)
 
-            if best_directions:
-                fitnes_tmp = fitnes
-                best_dir = min(best_directions, key=best_directions.get)
-                moved_structure = structure.copy()
-                while fitnes_tmp < fitnes:
-
-                    moved_poly_to_dir = _moving_for_one_step(poly, moving_step, best_dir)              
-                    moved_structure.polygons[poly_id] = moved_poly_to_dir
-                    fitnes_tmp = cost(moved_structure)
-                    if fitnes_tmp < fitnes:
-                        fitnes = fitnes_tmp
-                        poly = moved_poly_to_dir
-
-            best_structures[moved_structure] = fitnes
-
-            best_structure = min(best_structures, key=best_structures.get)
-            best_fitnes = best_structures[best_structure]
-
-            return init_fitnes, best_fitnes, best_structure
+            return best_structure, best_fitnes
 
 
-def _moving_for_one_step(poly: Polygon, moving_step, direction):
-    moved_poly = poly.copy()
+def _moving_for_one_step(structure: Structure, poly_number: int, moving_step, cost, current_fitnes) -> Structure:
+    moved_poly = structure.polygons[poly_number]
     directions = {'north': Point(point.x + moving_step, point.y),
                   'south': Point(point.x - moving_step, point.y),
                   'east': Point(point.x, point.y + moving_step),
@@ -65,11 +43,27 @@ def _moving_for_one_step(poly: Polygon, moving_step, direction):
                   's-w': Point(point.x - moving_step, point.y - moving_step),
                   'n-e': Point(point.x + moving_step, point.y + moving_step),
                   's-e': Point(point.x - moving_step, point.y - moving_step)}
+    results = {}
 
-    for idx, point in enumerate(moved_poly.points):
-        moved_poly.points[idx] = directions[direction]
+    for direct in directions.keys():
+        for idx, point in enumerate(moved_poly.points):
+            moved_poly.points[idx] = directions[direct]
 
-    return moved_poly
+        tmp_structure = structure.copy()
+        tmp_structure.polygons[poly_number] = moved_poly
+        fitnes = cost(tmp_structure)
+        non_unvalid = not any([out_of_bound(tmp_structure),
+                               too_close(tmp_structure),
+                               intersection(tmp_structure)])
+        if fitnes < current_fitnes and non_unvalid:
+            results[moved_poly] = fitnes
+
+    best_poly = max(results, key=results.get)
+    best_fitnes = max(results.values())
+    if best_poly:
+        structure.polygons[poly_number] = moved_poly
+
+    return structure, best_fitnes
 
 
 breakw = Breakwaters()
