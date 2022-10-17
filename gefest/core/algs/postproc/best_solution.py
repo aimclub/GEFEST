@@ -6,6 +6,7 @@ from cases.breakwaters.one_segment import cost, optimized_structure
 from gefest.core.algs.geom.validation import out_of_bound, too_close, intersection
 import random
 
+
 class Breakwaters():
 
     def __init__(self) -> Structure:
@@ -15,22 +16,30 @@ class Breakwaters():
     def moving_position(self):
         structure = self.optimized_structure
         best_fitnes = self.cost(structure)
+        best_structure = structure
         number_poly = len(structure.polygons)
 
-        max_attempts = 50
+        max_attempts = 15
+        step = 0
+        fitnes_history = {}
 
-        while max_attempts > 0:
+        while max_attempts > step:
 
             choosen_poly = random.choice(range(number_poly))
             moving_step = Geometry2D.get_square(structure.polygons[choosen_poly])*0.001
 
-            best_structure, best_fitnes = _moving_for_one_step(structure=structure,
+            step_structure, step_fitnes = _moving_for_one_step(structure=structure,
                                                                poly_number=choosen_poly,
                                                                moving_step=moving_step,
                                                                cost=self.cost,
                                                                current_fitnes=best_fitnes)
+            fitnes_history[step] = step_fitnes
+            if step_fitnes <= best_fitnes:
+                best_fitnes = step_fitnes
+                best_structure = step_structure
+            step += 1
 
-            return best_structure, best_fitnes
+        return best_structure, fitnes_history
 
 
 def _moving_for_one_step(structure: Structure, poly_number: int, moving_step, cost, current_fitnes) -> Structure:

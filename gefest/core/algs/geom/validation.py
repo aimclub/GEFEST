@@ -126,3 +126,6 @@ def unclosed_poly(structure: 'Structure', domain: 'Domain') -> bool:
         return any([poly.points[0] != poly.points[-1] for poly in structure.polygons])
     else:
         return False
+
+def nenough_points(structure: Structure):
+    return int(any([len(poly.points) <= 2 for poly in structure.polygons]))

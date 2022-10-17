@@ -8,7 +8,7 @@ from copy import deepcopy
 from itertools import permutations
 from collections import Counter
 
-from gefest.core.algs.geom.validation import out_of_bound, self_intersection, too_close, unclosed_poly, intersection
+from gefest.core.algs.geom.validation import out_of_bound, self_intersection, too_close, unclosed_poly, nenough_points
 from gefest.core.structure.domain import Domain
 from gefest.core.structure.point import Point
 from gefest.core.structure.polygon import Polygon
@@ -59,6 +59,16 @@ def postprocess(structure: Structure, domain: Domain) -> Structure:
         elif unclosed_poly(local_structure, domain) and domain.is_closed:
             corrected_structure.polygons[i] = _correct_unclosed_poly(poly)
 
+    for i, poly in enumerate(corrected_structure.polygons):
+        local_structure = Structure([poly])
+        if self_intersection(local_structure):
+            corrected_structure.polygons[i] = _correct_self_intersection(poly, domain)
+        elif nenough_points(local_structure):
+            corrected_structure.polygons[i] = _correct_low_points(poly, domain)
+        elif unclosed_poly(local_structure, domain) and domain.is_closed:
+            corrected_structure.polygons[i] = _correct_unclosed_poly(poly)
+        elif out_of_bound(local_structure, domain):
+            corrected_structure.polygons[i] = _correct_wrong_point(poly, domain)
     return corrected_structure
 
 
