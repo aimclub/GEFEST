@@ -11,9 +11,6 @@ class GA(BaseGA):
         self.init_populations(population)
         self.init_fitness(performance)
 
-        best = sorted(self._pop, key=lambda x: x.fitness)[0]
-        print(f'\n Best fitness is {best.fitness}')
-
         selected = self.tournament_selection()
         self._pop = sorted(selected, key=lambda x: x.fitness)
 
