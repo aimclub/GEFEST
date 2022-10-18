@@ -81,7 +81,8 @@ def drop_poly(new_structure: Structure, polygon_to_mutate_idx, domain: Domain) -
 
 def add_poly(new_structure: Structure, polygon_to_mutate_idx, domain: Domain) -> Structure:
     new_poly = get_random_poly(new_structure, domain)
-    new_structure.polygons.append(new_poly)
+    if new_poly is not None:
+        new_structure.polygons.append(new_poly)
     return new_structure
 
 
