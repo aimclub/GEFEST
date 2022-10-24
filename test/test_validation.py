@@ -31,10 +31,10 @@ def test_intersection():
     intersected_points = [(1, 1), (1, poly_length), (poly_width, poly_length), (poly_width, 1)]
     intersected_rectangle_poly = Polygon('rectangle', points=[Point(*coords) for coords in intersected_points])
     structure = Structure([rectangle_poly, intersected_rectangle_poly])
-    assert intersection(structure, geometry)
+    assert intersection(structure, domain)
 
     structure = Structure([rectangle_poly, out_poly])
-    assert not intersection(structure, geometry)
+    assert not intersection(structure, domain)
 
 
 def test_out_off_bound():
