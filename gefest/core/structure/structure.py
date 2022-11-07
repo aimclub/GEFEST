@@ -76,20 +76,44 @@ class Structure:
     def size(self):
         return sum([len(p.points) for p in self.polygons])
 
-    def plot(self, structure, domain=None, title=None):
-        """Visualization with drawn :obj:`Strucrure`
+    def plot(self, title=None, legend=False, color=None, ax=None):
+        '''Visualization with drawn :obj:`Strucrure`
+
         Args:
             title: the name of drawing, by default ``None``
+
         Examples:
             >>> struct.plot()
+
         Returns:
             plot: |viz|
-        """
-        x = [point._x for point in structure.polygons[0].points]
-        y = [point._y for point in structure.polygons[0].points]
-        plt.plot(x, y)
+
+        .. |viz| image:: https://i.ibb.co/1q0CVNJ/structure-plot.png
+        '''
+
+        for poly in self.polygons:
+            if ax:
+                x = [point._x for point in poly.points]
+                y = [point._y for point in poly.points]
+
+                ax.plot(x, y, label=poly.id, c=color)
+                ax.scatter(x,y, marker='o', c=color)
+                text_x = [str(round(x,1)) for x in x]
+                text_y = [str(round(y,1)) for y in y]
+                for idx, text in enumerate(zip(text_x,text_y)):
+                    ax.annotate(str(text), (x[idx]+0.01, y[idx]+0.01), rotation=45.0, fontsize=8)
+            else:
+                x = [point._x for point in poly.points]
+                y = [point._y for point in poly.points]
+                plt.plot(x, y, label=poly.id, c=color)
+                plt.scatter(x,y, marker='o', c=color)
+                text_x = [str(round(x,1)) for x in x]
+                text_y = [str(round(y,1)) for y in y]
+                for idx, text in enumerate(zip(text_x,text_y)):
+                    plt.annotate(str(text), (x[idx]+0.01, y[idx]+0.01), rotation=45.0, fontsize=8)
+        if legend:
+            plt.legend()
         plt.title(title)
-        plt.show()
 
 
 def get_random_structure(domain) -> Structure:
