@@ -1,10 +1,51 @@
-from gefest.core.structure.structure import Structure
+from shutil import move
+import sys
+sys.path.append('C:/Users/user2/GEFEST')
+
 import matplotlib.pyplot as plt
+from copy import deepcopy
+import pickle
+
+from gefest.core.structure.structure import Structure
 from gefest.core.structure.point import Point
 from gefest.core.algs.geom.validation import out_of_bound, too_close, intersection
-from copy import deepcopy
-from cases.breakwaters.main import optimized_pop, estimator, domain
+from gefest.core.opt.gen_design import design
+from cases.breakwaters.configuration_de import bw_domain
+from cases.breakwaters.configuration_spea2 import bw_optimizer, bw_sampler, bw_estimator
+from cases.main_conf import opt_params
 
+opt_params.path_to_sim = False
+opt_params.path_to_sur = False
+
+domain, task_setup = bw_domain.configurate_domain(poly_num=opt_params.n_polys,
+                                                  points_num=opt_params.n_points,
+                                                  is_closed=opt_params.is_closed)
+
+estimator = bw_estimator.configurate_estimator(domain=domain,
+                                               path_sim=opt_params.path_to_sim)
+
+# sampler = bw_sampler.configurate_sampler(domain=domain)
+
+# optimizer = bw_optimizer.configurate_optimizer(pop_size=opt_params.pop_size,
+#                                                crossover_rate=opt_params.c_rate,
+#                                                mutation_rate=opt_params.m_rate,
+#                                                task_setup=task_setup)
+
+# optimized_population = design(n_steps=opt_params.n_steps,
+#                        pop_size=opt_params.pop_size,
+#                        estimator=estimator,
+#                        sampler=sampler,
+#                        optimizer=optimizer,
+#                        extra=True)
+
+file_name = "optimized.pkl"
+# open_file = open(file_name, "wb")
+# pickle.dump(optimized_population, open_file)
+# open_file.close()
+
+open_file = open(file_name, "rb")
+optimized_pop = pickle.load(open_file)
+open_file.close()
 
 class Breakwaters():
 
@@ -54,11 +95,12 @@ class Breakwaters():
                              poly_number: int,
                              moving_step,
                              init_fitnes) -> Structure:
-        moved_poly = structure.polygons[poly_number]
+        moved_init_poly = structure.polygons[poly_number]
         directions = ['north', 'south', 'east', 'west', 'n-w', 's-w', 'n-e', 's-e']
         results = {}
 
         for direct in directions:
+            moved_poly = deepcopy(moved_init_poly)
             for idx, point in enumerate(moved_poly.points):
                 moved_poly.points[idx] = self._moving_point(direct, point, moving_step)
                 print(moved_poly.points[idx])

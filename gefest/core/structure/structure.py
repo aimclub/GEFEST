@@ -76,19 +76,25 @@ class Structure:
     def size(self):
         return sum([len(p.points) for p in self.polygons])
 
-    def plot(self, title=None, legend=False, color=None, ax=None):
+    def plot(self, title=None, legend=False, color=None, ax=None, show_coords=False):
         '''Visualization with drawn :obj:`Strucrure`
 
         Args:
             title: the name of drawing, by default ``None``
+            legend: show legend (id of polygons), by default ``False``
+            color: set special color for all polygons, see variants of colors in `matplotlib documentation`_
+            ax: set name of axes where drown structure has to be part of complicated matplotlib figure, by default `None`
+            show_coords: print coords for every apex of polygon(s) if `True`, by default `False`
 
         Examples:
-            >>> struct.plot()
+            >>> struct.plot(legend=True)
 
         Returns:
             plot: |viz|
 
         .. |viz| image:: https://i.ibb.co/1q0CVNJ/structure-plot.png
+        .. matplotlib documentation:
+            https://matplotlib.org/stable/gallery/color/named_colors.html#sphx-glr-gallery-color-named-colors-py
         '''
 
         for poly in self.polygons:
@@ -97,20 +103,22 @@ class Structure:
                 y = [point._y for point in poly.points]
 
                 ax.plot(x, y, label=poly.id, c=color)
-                ax.scatter(x,y, marker='o', c=color)
-                text_x = [str(round(x,1)) for x in x]
-                text_y = [str(round(y,1)) for y in y]
-                for idx, text in enumerate(zip(text_x,text_y)):
-                    ax.annotate(str(text), (x[idx]+0.01, y[idx]+0.01), rotation=45.0, fontsize=8)
+                if show_coords:
+                    ax.scatter(x,y, marker='o', c=color)
+                    text_x = [str(round(x,1)) for x in x]
+                    text_y = [str(round(y,1)) for y in y]
+                    for idx, text in enumerate(zip(text_x,text_y)):
+                        ax.annotate(str(text), (x[idx]+0.01, y[idx]+0.01), rotation=45.0, fontsize=8)
             else:
                 x = [point._x for point in poly.points]
                 y = [point._y for point in poly.points]
                 plt.plot(x, y, label=poly.id, c=color)
-                plt.scatter(x,y, marker='o', c=color)
-                text_x = [str(round(x,1)) for x in x]
-                text_y = [str(round(y,1)) for y in y]
-                for idx, text in enumerate(zip(text_x,text_y)):
-                    plt.annotate(str(text), (x[idx]+0.01, y[idx]+0.01), rotation=45.0, fontsize=8)
+                if show_coords:
+                    plt.scatter(x,y, marker='o', c=color)
+                    text_x = [str(round(x,1)) for x in x]
+                    text_y = [str(round(y,1)) for y in y]
+                    for idx, text in enumerate(zip(text_x,text_y)):
+                        plt.annotate(str(text), (x[idx]+0.01, y[idx]+0.01), rotation=45.0, fontsize=8)
         if legend:
             plt.legend()
         plt.title(title)
