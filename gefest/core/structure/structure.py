@@ -1,4 +1,5 @@
 import json
+from uuid import uuid4
 from dataclasses import dataclass
 from random import randint
 from typing import List, Optional
@@ -93,7 +94,7 @@ class Structure:
             plot: |viz|
 
         .. |viz| image:: https://i.ibb.co/1q0CVNJ/structure-plot.png
-        .. matplotlib documentation:
+        .. _matplotlib documentation:
             https://matplotlib.org/stable/gallery/color/named_colors.html#sphx-glr-gallery-color-named-colors-py
         '''
 
@@ -214,7 +215,7 @@ def create_poly(centroid: 'Point',
     if domain.is_closed:
         points.append(points[0])
 
-    poly = geometry.get_convex(Polygon('tmp', points=points))  # avoid self intersection in polygon
+    poly = geometry.get_convex(Polygon(polygon_id=str(uuid4()), points=points))  # avoid self intersection in polygon
 
     return poly
 
@@ -270,7 +271,7 @@ def create_polygon_point(centroid: 'Point',
 
 def in_bound(point: 'Point',
              domain: 'Domain') -> bool:
-    poly_domain = Polygon(polygon_id='tmp', points=[Point(c[0], c[1]) for c in domain.allowed_area])
+    poly_domain = Polygon(points=[Point(c[0], c[1]) for c in domain.allowed_area])
     return domain.geometry.is_contain_point(poly_domain, point)
 
 

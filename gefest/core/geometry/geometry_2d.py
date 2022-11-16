@@ -155,7 +155,7 @@ class Geometry2D(Geometry):
             return poly
         geom_poly = self._poly_to_geom(poly).convex_hull
         points = self.get_coords(geom_poly)
-        polygon = Polygon(polygon_id='tmp', points=points)
+        polygon = Polygon(polygon_id=poly.id, points=points)
 
         return polygon
 

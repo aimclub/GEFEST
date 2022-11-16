@@ -1,10 +1,15 @@
+from ast import Break
+from enum import unique
 from shutil import move
 import sys
+
+from numpy import poly1d
 sys.path.append('C:/Users/user2/GEFEST')
 
 import matplotlib.pyplot as plt
 from copy import deepcopy
 import pickle
+import itertools
 
 from gefest.core.structure.structure import Structure
 from gefest.core.structure.point import Point
@@ -47,15 +52,17 @@ open_file = open(file_name, "rb")
 optimized_pop = pickle.load(open_file)
 open_file.close()
 
-class Breakwaters():
+class SA_methods():
 
-    def __init__(self) -> Structure:
+    def __init__(self):
         self.optimized_structure = optimized_pop[0]
         self.cost = estimator.estimate
         self.input_domain = domain
 
     def moving_position(self):
         structure = self.optimized_structure
+        for poly_num, poly in enumerate(structure.polygons):
+            poly.id = 'poly_' + str(poly_num)
         init_fitnes = round(self.cost([structure])[0][0], 3) #only high of wave in multicreterial loss
 
         fitnes_history = []
@@ -63,7 +70,7 @@ class Breakwaters():
         polygon_history = []
         fitnes_history.append(init_fitnes)
         structure_history.append(structure)
-        polygon_history.append('init_step')
+        polygon_history.append('init_moving')
         current_fitnes = init_fitnes
 
         for poly_num, poly in enumerate(structure.polygons):
@@ -80,7 +87,7 @@ class Breakwaters():
                                                                             init_fitnes=current_fitnes)
                     structure_history.append(step_structure)
                     fitnes_history.append(step_fitnes)
-                    polygon_history.append('P' + str(poly_num) + ', step=' + str(round(moving_step, 1)))
+                    polygon_history.append(str(poly.id) + ', step=' + str(round(moving_step, 1)))
                     if step_fitnes >= current_fitnes:
                         max_attempts -= 1
                         moving_step = moving_step/2
@@ -94,7 +101,7 @@ class Breakwaters():
                              structure: Structure,
                              poly_number: int,
                              moving_step,
-                             init_fitnes) -> Structure:
+                             init_fitnes):
         moved_init_poly = structure.polygons[poly_number]
         directions = ['north', 'south', 'east', 'west', 'n-w', 's-w', 'n-e', 's-e']
         results = {}
@@ -103,7 +110,6 @@ class Breakwaters():
             moved_poly = deepcopy(moved_init_poly)
             for idx, point in enumerate(moved_poly.points):
                 moved_poly.points[idx] = self._moving_point(direct, point, moving_step)
-                print(moved_poly.points[idx])
 
             tmp_structure = deepcopy(structure)
             tmp_structure.polygons[poly_number] = moved_poly
@@ -113,14 +119,10 @@ class Breakwaters():
                                 intersection(tmp_structure, self.input_domain)])
             if fitnes < init_fitnes and non_unvalid:
                 results[fitnes] = tmp_structure
-                tmp_structure.plot(f'changed poly {poly_number} by direction {direct} TMP')
-                # plt.savefig(f'tmp_struct- {poly_number} and {direct}.png')
-                # plt.clf()
+
         if results:
             best_structure = results[min(results)]
             best_fitnes = min(results)
-            # best_structure.plot(f'best struct for poly {poly_number}')
-            # plt.savefig(f'best struct for poly {poly_number}')
             return best_structure, best_fitnes
         else:
             return structure, init_fitnes
@@ -137,11 +139,109 @@ class Breakwaters():
                       's-e': Point(point.x - moving_step, point.y - moving_step)}
         return directions[direction]
 
+    def exploring_combinations(self, structure: Structure, init_fitnes):
+        current_fitnes = init_fitnes
 
-breakw = Breakwaters()
-fitnes, structure, poly = breakw.moving_position()
-print('number of structures: ', len(structure))
-print([struct.polygons for struct in structure])
+        fitnes_history = []
+        structure_history = []
+        polygon_history = []
+
+        fitnes_history.append(init_fitnes)
+        structure_history.append(structure)
+        polygon_history.append('init_del')
+
+        for length in range(1, len(structure.polygons)+1):
+
+            for unique_comb in itertools.combinations(structure.polygons, length):
+
+                tmp_structure = deepcopy(structure)
+                tmp_structure.polygons = unique_comb
+                fitnes = round(self.cost([tmp_structure])[0][0], 3)
+
+                if fitnes < current_fitnes:
+                    current_fitnes = fitnes
+                    structure_history.append(tmp_structure)
+                    fitnes_history.append(fitnes)
+                    ids = []
+                    for polygon in tmp_structure.polygons:
+                        ids.append(polygon.id)
+                    polygon_history.append(ids)
+
+        return fitnes_history, structure_history, polygon_history
+
+    def removing_points(self, structure: Structure, init_fitnes):
+        fitnes_history = []
+        structure_history = []
+        polygon_history = []
+
+        fitnes_history.append(init_fitnes)
+        structure_history.append(structure)
+        polygon_history.append('init_rm_points')
+
+        current_fitnes = init_fitnes
+
+        for poly_number, polygon in enumerate(structure.polygons):
+
+            closed = bool(polygon.points[0] == polygon.points[-1])
+
+            if closed:
+                for idx_point in range(1, len(polygon.points)):
+                    exploring_polygon = deepcopy(polygon)
+                    tmp_structure = deepcopy(structure)
+
+                    exploring_point_coords = tmp_structure.polygons[poly_number].points[idx_point].coords()
+                    exploring_polygon.points.pop(idx_point)
+                    tmp_structure.polygons[poly_number] = exploring_polygon
+
+                    fitnes = round(self.cost([tmp_structure])[0][0], 3)
+
+                    if fitnes < current_fitnes:
+                        current_fitnes = fitnes
+
+                        structure_history.append(tmp_structure)
+                        fitnes_history.append(fitnes)
+                        polygon_history.append(str(polygon.id) + ', del_point=' + str(exploring_point_coords))
+
+            else:
+                for idx, point in enumerate(polygon.points):
+                    exploring_polygon = deepcopy(polygon)
+                    tmp_structure = deepcopy(structure)
+
+                    exploring_point_coords = point.coords()
+                    exploring_polygon.points.pop(idx)
+                    tmp_structure.polygons[poly_number] = exploring_polygon
+
+                    fitnes = round(self.cost([tmp_structure])[0][0], 3)
+
+                    if fitnes < current_fitnes:
+                        current_fitnes = fitnes
+
+                        structure_history.append(tmp_structure)
+                        fitnes_history.append(fitnes)
+                        polygon_history.append(str(polygon.id) + ', del_point=' + str(exploring_point_coords))
+
+        return fitnes_history, structure_history, polygon_history
+
+
+class SA(SA_methods):
+
+    def __init__(self) -> Structure:
+        super().__init__()
+        
+    def analysis(self):
+        mov_fitnes, mov_structure, mov_poly = self.moving_position()
+        del_fitnes, del_structure, del_poly = self.exploring_combinations(mov_structure[-1], mov_fitnes[-1])
+        rm_points_fitnes, rm_point_structure, rm_points_poly = self.removing_points(del_structure[-1], del_fitnes[-1])
+
+        fitnes_history = mov_fitnes + del_fitnes + rm_points_fitnes
+        structure_history = mov_structure + del_structure + rm_point_structure
+        poly_history = mov_poly + del_poly + rm_points_poly
+        
+        return fitnes_history, structure_history, poly_history
+
+
+sensitivity = SA()
+fitnes, structure, poly = sensitivity.analysis()
 descriptions = poly
 x= list(range(len(poly)))
 y= fitnes
@@ -152,9 +252,9 @@ fig, axd = plt.subplot_mosaic([['upper', 'upper'],
 
 fig.suptitle('SA of moving objects')
 
-structure[0].plot(color = 'r', ax=axd['lower left'])
+structure[0].plot(color = 'r', ax=axd['lower left'], legend=True)
 axd['lower left'].set_title('Initial structure')
-structure[-1].plot(color='c', ax=axd['lower right'])
+structure[-1].plot(ax=axd['lower right'], legend=True)
 axd['lower right'].set_title('Processed structure')
 
 axd['upper'].plot(fitnes, c='c')
@@ -166,7 +266,3 @@ axd['upper'].set_ylabel('loss - height of waves')
 
 fig.tight_layout()
 fig.savefig('experiment_moving.png')
-
-# for idx, obj_fit in enumerate(zip(structure, fitnes)):
-#     obj_fit[0].plot(title=f'structure {idx} has fitnes {obj_fit[1]}')
-#     plt.savefig(f'structure {idx}.png')
