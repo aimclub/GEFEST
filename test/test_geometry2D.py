@@ -19,7 +19,7 @@ rectangle_poly = Polygon('rectangle', points=[Point(*coords) for coords in recta
 triangle_points = [(0, 0), (poly_width, poly_length), (0, poly_length)]
 triangle_poly = Polygon('triangle', points=[Point(*coords) for coords in triangle_points])
 
-incorrect_points = [(0, 0), (0, poly_length), (poly_width, poly_length), (0, poly_length), (poly_width, 0)]
+incorrect_points = [(0, 0), (0, poly_length), (poly_width, poly_length), (poly_width-5, poly_length-5), (-poly_width, -poly_length), (0,0)]
 incorrect_poly = Polygon('incorrect_poly', points=[Point(*coords) for coords in incorrect_points])
 
 # creating an expected rotated polygon for testing rotate_poly() function

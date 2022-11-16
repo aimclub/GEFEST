@@ -56,7 +56,7 @@ def test_too_close():
 
 
 def test_self_intersection():
-    incorrect_points = [(0, 0), (0, poly_length), (poly_width, poly_length), (0, poly_length), (poly_width, 0)]
+    incorrect_points = [(0, 0), (0, poly_length), (poly_width, poly_length), (poly_width-5, poly_length-5), (poly_width, poly_length+10), (0,0)]
     incorrect_poly = Polygon('incorrect_poly', points=[Point(*coords) for coords in incorrect_points])
     structure = Structure([incorrect_poly])
     assert self_intersection(structure)

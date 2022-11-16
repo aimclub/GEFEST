@@ -20,6 +20,9 @@ unclosed_triangle_poly = Polygon('triangle', points=[Point(*coords) for coords i
 incorrect_points = [(5, 5), (5, poly_length), (8, poly_length), (5, 5), (5, 30)]
 incorrect_poly = Polygon('incorrect_poly', points=[Point(*coords) for coords in incorrect_points])
 
+intersected_points = [(0, 0), (0, poly_length), (poly_width, poly_length), (poly_width-5, poly_length-5), (poly_width, poly_length+10), (0,0)]
+intersected_poly = Polygon('incorrect_poly', points=[Point(*coords) for coords in intersected_points])
+
 domain = Domain()
 
 
@@ -32,7 +35,7 @@ def test_unclosed_poly():
 
 
 def test_self_intersection():
-    input_structure = Structure([incorrect_poly])
+    input_structure = Structure([intersected_poly])
     observed_structure = postprocess(input_structure, domain)
 
     assert self_intersection(input_structure)
