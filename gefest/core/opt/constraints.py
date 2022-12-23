@@ -23,11 +23,11 @@ def check_constraints(structure: Structure, is_lightweight: bool = False, domain
         structurally_correct = not any(cts)
 
         if not structurally_correct:
-            return False
+            return structure
     except Exception as ex:
         print(ex)
         import traceback
         print(traceback.format_exc())
         return False
 
-    return structurally_correct
+    return structure
