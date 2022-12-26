@@ -1,7 +1,8 @@
 import json
+import pickle
 from uuid import uuid4
 from dataclasses import dataclass
-from random import randint
+from random import randint, choice, random
 from typing import List, Optional
 
 import matplotlib.pyplot as plt
@@ -222,7 +223,7 @@ def create_poly(centroid: 'Point',
 
 def create_area(domain: 'Domain',
                 structure: 'Structure',
-                geometry: 'Geometry') -> (Point, float):
+                geometry: 'Geometry'):
     n_poly = len(structure.polygons)  # Number of already existing polygons
     area_size = np.random.randint(low=3, high=15)  # Neighborhood compression ratio
     sigma = max(domain.max_x - domain.min_x, domain.max_y - domain.min_y) / area_size  # Neighborhood size
@@ -285,3 +286,22 @@ def distance(point: 'Point',
         distances.append(d)
 
     return min(distances)
+
+def get_structure_from_path(path: str):
+    """Allows to get structure from ``.pkl``
+
+    Args:
+        path (str): path to ``.pkl`` file contains ``Structure``
+
+    Returns:
+        Structure: structure from file
+    """
+
+    open_file = open(path, "rb")
+    structure = pickle.load(open_file)
+    open_file.close()
+
+    return structure[0]
+
+
+

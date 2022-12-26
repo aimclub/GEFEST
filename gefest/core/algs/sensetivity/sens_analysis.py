@@ -1,9 +1,8 @@
 from ast import Break
 from enum import unique
 from shutil import move
-import sys
-
 from numpy import poly1d
+import sys
 sys.path.append('C:/Users/user2/GEFEST')
 
 import matplotlib.pyplot as plt
@@ -81,13 +80,20 @@ class SA_methods():
                 moving_step = self.input_domain.geometry.get_length(polygon=poly)*0.2
 
                 while step_fitnes <= current_fitnes and max_attempts > 0:
-                    step_structure, step_fitnes = self._moving_for_one_step(structure=structure,
+                    step_structure, step_fitnes, worse_res = self._moving_for_one_step(structure=structure,
                                                                             poly_number=poly_num,
                                                                             moving_step=moving_step,
                                                                             init_fitnes=current_fitnes)
                     structure_history.append(step_structure)
                     fitnes_history.append(step_fitnes)
-                    polygon_history.append(str(poly.id) + ', step=' + str(round(moving_step, 1)))
+                    
+                    if worse_res:
+                        fitnes_diff = round(100 * ((worse_res - current_fitnes)/current_fitnes), 1)
+                        polygon_history.append(str(poly.id) + ', cannot be moved, fitnes +' + str(fitnes_diff) + '%')
+                    else:
+                        fitnes_diff = round(100 * ((step_fitnes - current_fitnes)/current_fitnes), 1)
+                        polygon_history.append(str(poly.id) + ', fitnes ' + str(fitnes_diff) + '%')
+
                     if step_fitnes >= current_fitnes:
                         max_attempts -= 1
                         moving_step = moving_step/2
@@ -105,6 +111,7 @@ class SA_methods():
         moved_init_poly = structure.polygons[poly_number]
         directions = ['north', 'south', 'east', 'west', 'n-w', 's-w', 'n-e', 's-e']
         results = {}
+        worse_results = {}
 
         for direct in directions:
             moved_poly = deepcopy(moved_init_poly)
@@ -119,13 +126,16 @@ class SA_methods():
                                 intersection(tmp_structure, self.input_domain)])
             if fitnes < init_fitnes and non_unvalid:
                 results[fitnes] = tmp_structure
+            else:
+                worse_results[fitnes] = tmp_structure
 
         if results:
             best_structure = results[min(results)]
             best_fitnes = min(results)
-            return best_structure, best_fitnes
+            return best_structure, best_fitnes, 0
         else:
-            return structure, init_fitnes
+            best_worse_fitnes = min(worse_results)
+            return structure, init_fitnes, best_worse_fitnes
 
 
     def _moving_point(self, direction: str, point: Point, moving_step) -> Point:
@@ -159,15 +169,25 @@ class SA_methods():
                 fitnes = round(self.cost([tmp_structure])[0][0], 3)
 
                 if fitnes < current_fitnes:
+                    fitnes_diff = round(100 * ((fitnes - current_fitnes)/current_fitnes), 1)
                     current_fitnes = fitnes
                     structure_history.append(tmp_structure)
                     fitnes_history.append(fitnes)
                     ids = []
                     for polygon in tmp_structure.polygons:
                         ids.append(polygon.id)
-                    polygon_history.append(ids)
+                    polygon_history.append(str(ids) + ', fitnes ' + str(fitnes_diff) + '%')
+                else:
+                    structure_history.append(tmp_structure)
+                    fitnes_history.append(current_fitnes)
+                    fitnes_diff = round(100 * ((fitnes - current_fitnes)/current_fitnes), 1)
+                    ids = []
+                    for polygon in tmp_structure.polygons:
+                        ids.append(polygon.id)
+                    polygon_history.append(str(ids) + ', cannot be used, fitnes +' + str(fitnes_diff) + '%')
 
         return fitnes_history, structure_history, polygon_history
+
 
     def removing_points(self, structure: Structure, init_fitnes):
         fitnes_history = []
