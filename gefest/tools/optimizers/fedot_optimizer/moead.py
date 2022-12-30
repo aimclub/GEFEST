@@ -28,33 +28,16 @@ class MOEAD(EvoGraphOptimizer, BaseGA):
                                     crossover_rate=crossover_rate,
                                     mutation_rate=mutation_rate,
                                     mutation_value_rate=[])
-        self.evolutionary_operators = default_operators()
-        self.crossover = self.evolutionary_operators.crossover
-        self.mutation = self.evolutionary_operators.mutation
+        BaseGA.__init__(self, self.params,
+                        default_operators(),
+                        task_setup)
 
         self.num_of_individuals = pop_size
-
-        self.adapter = adapter
+        self.n_neighbors = n_neighbors
         self.task_setup = task_setup
 
-        self.mutation_rate = mutation_rate
-        self.crossover_rate = crossover_rate
-
-        self.n_neighbors = n_neighbors
-
+        self.adapter = adapter
         self.fedot_params = {}
-
-    def _init_populations(self, population):
-        """
-        Initialization of the population
-        """
-        self._pop = [Individual(genotype=gen) for gen in population]
-
-    def _init_performance(self, performance):
-        for i, ind in enumerate(self._pop):
-            ind.objectives = performance[i]
-        self._pop = [ind for ind in self._pop if ind is not None]
-        self.initial_graphs = self._pop
 
     def _setup(self):
         n_obj = len(self._pop[0].objectives)
@@ -75,8 +58,8 @@ class MOEAD(EvoGraphOptimizer, BaseGA):
         graph_pop = population
 
         # 1. Initializations
-        self._init_populations(graph_pop)
-        self._init_performance(performance)
+        self.init_populations(graph_pop)
+        self.init_performance(performance)
         self._setup()
 
         self._evolve_population()

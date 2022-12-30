@@ -13,7 +13,7 @@ def configurate_estimator(domain):
     # User-defined estimator
     # it should be created as object with .estimate() method
     # ------------
-    def len_num_ration(struct: Structure):
+    def len_num_ratio(struct: Structure):
         if len(struct.polygons) > 1 or len(struct.polygons[0].points) < 3:
             return [100000, 100000]
         else:
@@ -33,7 +33,7 @@ def configurate_estimator(domain):
         return objective
 
     estimator = SimpleNamespace()
-    estimator.estimate = len_num_ration
+    estimator.estimate = len_num_ratio
 
     # ------------
     # GEFEST estimator

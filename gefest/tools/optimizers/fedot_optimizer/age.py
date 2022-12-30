@@ -25,9 +25,9 @@ class AGE(EvoGraphOptimizer, BaseGA):
                                     crossover_rate=crossover_rate,
                                     mutation_rate=mutation_rate,
                                     mutation_value_rate=[])
-        self.evolutionary_operators = default_operators()
-        self.crossover = self.evolutionary_operators.crossover
-        self.mutation = self.evolutionary_operators.mutation
+        BaseGA.__init__(self, self.params,
+                        default_operators(),
+                        task_setup)
 
         self._pop = None
         self._fronts = None
@@ -35,24 +35,8 @@ class AGE(EvoGraphOptimizer, BaseGA):
         self.num_of_individuals = pop_size
 
         self.adapter = adapter
-        self.task_setup = task_setup
-
-        self.mutation_rate = mutation_rate
-        self.crossover_rate = crossover_rate
 
         self.fedot_params = {}
-
-    def _init_populations(self, population):
-        """
-        Initialization of the population
-        """
-        self._pop = [Individual(genotype=gen) for gen in population]
-
-    def _init_performance(self, performance):
-        for i, ind in enumerate(self._pop):
-            ind.objectives = performance[i]
-        self._pop = [ind for ind in self._pop if ind is not None]
-        self.initial_graphs = self._pop
 
     def step(self, population, performance, n_step):
         """
@@ -66,8 +50,9 @@ class AGE(EvoGraphOptimizer, BaseGA):
         graph_pop = population
 
         # 1. Initializations
-        self._init_populations(graph_pop)
-        self._init_performance(performance)
+        #self.__init_operators()
+        self.init_populations(graph_pop)
+        self.init_performance(performance)
 
         self._evolve_population()
 
@@ -250,12 +235,12 @@ class AGE(EvoGraphOptimizer, BaseGA):
             return np.arange(m)
 
         # let's define the axes of the n-dimensional spaces
-        W = 1e-6 + np.eye(n)
-        r = W.shape[0]
+        w = 1e-6 + np.eye(n)
+        r = w.shape[0]
         indexes = np.zeros(n, dtype=int)
         selected = np.zeros(m, dtype=int)
         for i in range(r):
-            dists = self.point_2_line_distance(front, np.zeros(n), W[i, :])
+            dists = self.point_2_line_distance(front, np.zeros(n), w[i, :])
             dists[selected] = np.inf  # prevent already selected to be reselected
             index = np.argmin(dists)
             indexes[i] = index
