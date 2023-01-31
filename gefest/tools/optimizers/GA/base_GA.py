@@ -45,6 +45,12 @@ class BaseGA:
             ind.fitness = performance[i]
         self._pop = [ind for ind in self._pop if ind.fitness is not None]
 
+    def init_performance(self, performance):
+        for i, ind in enumerate(self._pop):
+            ind.objectives = performance[i]
+        self._pop = [ind for ind in self._pop if ind is not None]
+        self.initial_graphs = self._pop
+
     class Params:
         def __init__(self, pop_size, crossover_rate, mutation_rate, mutation_value_rate):
             self.pop_size = pop_size
