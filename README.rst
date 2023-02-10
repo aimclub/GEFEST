@@ -106,29 +106,14 @@ Supported by
 Citation
 ========
 
-@article{starodubcev2022generative,
-  title={Generative Design of Physical Objects using Modular Framework},
-  author={Starodubcev, Nikita O and Nikitin, Nikolay O and Gavaza, Konstantin G and Andronova, Elizaveta A and Sidorenko, Denis O and Kalyuzhnaya, Anna V},
-  journal={arXiv preprint arXiv:2207.14621},
-  year={2022}
-}
-
-@article{starodubcev2022surrogate,
-  title={Surrogate-Assisted Evolutionary Generative Design Of Breakwaters Using Deep Convolutional Networks},
-  author={Starodubcev, Nikita O and Nikitin, Nikolay O and Kalyuzhnaya, Anna V},
-  journal={arXiv preprint arXiv:2204.03400},
-  year={2022}
-}
-
-@article{grigorev2022single,
-  title={Single Red Blood Cell Hydrodynamic Traps via the Generative Design},
-  author={Grigorev, Georgii V and Nikitin, Nikolay O and Hvatov, Alexander and Kalyuzhnaya, Anna V and Lebedev, Alexander V and Wang, Xiaohao and Qian, Xiang and Maksimov, Georgii V and Lin, Liwei},
-  journal={Micromachines},
-  volume={13},
-  number={3},
-  pages={367},
-  year={2022},
-  publisher={MDPI}
+@article{starodubcev2023generative,
+  title={Generative design of physical objects using modular framework},
+  author={Starodubcev, Nikita O and Nikitin, Nikolay O and Andronova, Elizaveta A and Gavaza, Konstantin G and Sidorenko, Denis O and Kalyuzhnaya, Anna V},
+  journal={Engineering Applications of Artificial Intelligence},
+  volume={119},
+  pages={105715},
+  year={2023},
+  publisher={Elsevier}
 }
 
 .. |docs| image:: https://readthedocs.org/projects/gefest/badge/?version=latest
