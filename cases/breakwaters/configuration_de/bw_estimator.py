@@ -16,7 +16,7 @@ def configurate_estimator(domain, path_sim=False):
         root_path = Path(__file__).parent.parent.parent.parent
         path_sim = f'{root_path}/gefest/tools/estimators/simulators/swan/swan_model/'
 
-    swan = Swan(path=path_sim,
+    SWAN = Swan(path=path_sim,
                 targets=area.targets,
                 grid=area.grid,
                 domain=domain)
