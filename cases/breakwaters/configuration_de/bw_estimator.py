@@ -41,7 +41,7 @@ def configurate_estimator(domain, path_sim=False):
     # ------------
 
     # Here loss is an optional argument, otherwise estimator will be considered as loss for minimizing
-    estimator = Estimator(estimator=swan,
+    estimator = Estimator(estimator=SWAN,
                           loss=loss)
 
     return estimator
