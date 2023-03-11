@@ -16,7 +16,7 @@ def configurate_estimator(domain, path_sim=False):
         root_path = Path(__file__).parent.parent.parent.parent
         path_sim = f'{root_path}/gefest/tools/estimators/simulators/swan/swan_model/'
 
-    SWAN = Swan(path=path_sim,
+    SWAN2 = Swan(path=path_sim,
                 targets=area.targets,
                 grid=area.grid,
                 domain=domain)
@@ -41,7 +41,7 @@ def configurate_estimator(domain, path_sim=False):
     # ------------
 
     # Here loss is an optional argument, otherwise estimator will be considered as loss for minimizing
-    estimator = Estimator(estimator=SWAN,
+    estimator = Estimator(estimator=SWAN2,
                           loss=loss)
 
     return estimator
