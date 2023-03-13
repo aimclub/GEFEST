@@ -38,5 +38,5 @@ optimized_pop = design(n_steps=opt_params.n_steps,
                        sampler=sampler,
                        optimizer=optimizer,
                        extra=True)
-spend_time = timeit.default_timer() - start
-print(f'spent time {spend_time} sec')
+SpendTime = timeit.default_timer() - start
+print(f'spent time {SpendTime} sec')
