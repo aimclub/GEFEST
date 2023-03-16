@@ -1,7 +1,7 @@
 from typing import Any, Dict, Optional
 
-from fedot.core.optimisers.adapters import BaseOptimizationAdapter
-from fedot.core.optimisers.graph import OptGraph, OptNode
+from golem.core.adapter.adapter import BaseOptimizationAdapter
+from golem.core.optimisers.graph import OptGraph, OptNode
 
 from gefest.core.structure.point import Point
 from gefest.core.structure.polygon import Polygon
