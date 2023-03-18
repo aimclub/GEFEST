@@ -48,9 +48,9 @@ class Structure:
     def __str__(self):
         out_str = ''
         for i, pol in enumerate(self.polygons):
-            out_str += f'\r\n Polygon {i}, size {len(pol.points)}: \r\n'
-            for j, pt in enumerate(pol.points):
-                out_str += f'Point {j}: x={round(pt.x, 2)}, y={round(pt.y, 2)}; '
+            out_str += f'\nPolygon {i}, size {len(pol.points)}:\n'
+            out_str += ''.join(
+                [f'Point {j}: x={round(pt.x, 2)}, y={round(pt.y, 2)}; ' for j, pt in enumerate(pol.points)])
         return out_str
 
     def __repr__(self):

@@ -1,10 +1,7 @@
-import pytest
-from gefest.core.geometry.geometry import Geometry
+from gefest.core.algs.geom.validation import *
 from gefest.core.geometry.geometry_2d import Geometry2D
 from gefest.core.structure.point import Point
-from gefest.core.structure.polygon import Polygon
 from gefest.core.structure.structure import Structure
-from gefest.core.algs.geom.validation import *
 
 geometry = Geometry2D()
 domain = Domain()
@@ -23,7 +20,7 @@ rectangle_poly = Polygon('rectangle', points=[Point(*coords) for coords in recta
 triangle_points = [(0, 0), (poly_width, poly_length), (0, poly_length)]
 triangle_poly = Polygon('triangle', points=[Point(*coords) for coords in triangle_points])
 
-out_points = [Point(x+200, y+200) for (x, y) in rectangle_points]
+out_points = [Point(x + 200, y + 200) for (x, y) in rectangle_points]
 out_poly = Polygon('out_rectangle', points=out_points)
 
 
