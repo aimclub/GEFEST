@@ -123,15 +123,14 @@ def unclosed_poly(structure: 'Structure', domain: 'Domain') -> bool:
 
 def is_contain(structure: 'Structure',
                domain: 'Domain') -> bool:
-    is_contains = []
-
     try:
-        for poly_area in domain.prohibited_area.polygons:
-            if poly_area.id == 'prohibited_area':
-                for poly in structure.polygons:
-                    is_contains.append(domain.geometry.contains(poly, poly_area))
+        prohibited_polygons = [p for p in domain.prohibited_area.polygons if p.id == 'prohibited_area']
 
-        return any(is_contains)
+        for poly in structure.polygons:
+            for poly_area in prohibited_polygons:
+                if domain.geometry.contains(poly, poly_area):
+                    return True
+        return False
 
     except AttributeError:
         return False
