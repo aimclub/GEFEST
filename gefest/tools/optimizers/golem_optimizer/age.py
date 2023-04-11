@@ -1,6 +1,6 @@
 import numpy as np
 
-from fedot.core.optimisers.gp_comp.gp_optimizer import EvoGraphOptimizer
+from golem.core.optimisers.genetic.gp_optimizer import EvoGraphOptimizer
 
 from gefest.core.opt.individual import Individual
 from gefest.core.opt.operators.operators import default_operators
@@ -9,7 +9,7 @@ from gefest.tools.optimizers.GA.base_GA import BaseGA
 
 class AGE(EvoGraphOptimizer, BaseGA):
     """
-    FEDOT based optimizer of GEFEST structures
+    GOLEM based optimizer of GEFEST structures
     """
 
     def __init__(self,
@@ -36,7 +36,7 @@ class AGE(EvoGraphOptimizer, BaseGA):
 
         self.adapter = adapter
 
-        self.fedot_params = {}
+        self.golem_params = {}
 
     def step(self, population, performance, n_step):
         """

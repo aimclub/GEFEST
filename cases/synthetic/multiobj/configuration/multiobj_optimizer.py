@@ -1,19 +1,19 @@
 from functools import partial
 
-from fedot.core.composer.gp_composer.gp_composer import PipelineComposerRequirements
-from fedot.core.optimisers.gp_comp.gp_optimizer import GPGraphOptimizerParameters
-from fedot.core.optimisers.gp_comp.operators.inheritance import GeneticSchemeTypesEnum
-from fedot.core.optimisers.gp_comp.operators.regularization import RegularizationTypesEnum
-from fedot.core.optimisers.optimizer import GraphGenerationParams
-from fedot.core.optimisers.objective import Objective
+from golem.core.optimisers.optimization_parameters import GraphRequirements
+from golem.core.optimisers.genetic.gp_params import GPAlgorithmParameters
+from golem.core.optimisers.genetic.operators.inheritance import GeneticSchemeTypesEnum
+from golem.core.optimisers.genetic.operators.regularization import RegularizationTypesEnum
+from golem.core.optimisers.optimizer import GraphGenerationParams
+from golem.core.optimisers.objective import Objective
 
 from gefest.core.opt.adapter import StructureAdapter
 from gefest.core.opt.constraints import check_constraints
 from gefest.tools.optimizers.optimizer import Optimizer
 
-from gefest.tools.optimizers.fedot_optimizer.nsga2 import NSGA2
-from gefest.tools.optimizers.fedot_optimizer.moead import MOEAD
-from gefest.tools.optimizers.fedot_optimizer.age import AGE
+from gefest.tools.optimizers.golem_optimizer.nsga2 import NSGA2
+from gefest.tools.optimizers.golem_optimizer.moead import MOEAD
+from gefest.tools.optimizers.golem_optimizer.age import AGE
 
 
 def configurate_optimizer(pop_size: int,
@@ -26,15 +26,9 @@ def configurate_optimizer(pop_size: int,
     # ------------
     rules = [partial(check_constraints, domain=task_setup.domain)]
 
-    requirements = PipelineComposerRequirements(
-        primary=['point'],
-        secondary=['point'],
-        max_arity=1,
-        max_depth=100,
-        num_of_generations=1,
-        timeout=None)
+    requirements = GraphRequirements()
 
-    optimiser_parameters = GPGraphOptimizerParameters(
+    optimiser_parameters = GPAlgorithmParameters(
         crossover_prob=crossover_rate,
         mutation_prob=mutation_rate,
         genetic_scheme_type=GeneticSchemeTypesEnum.steady_state,

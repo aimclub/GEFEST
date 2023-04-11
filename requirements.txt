@@ -13,4 +13,4 @@ shapely==1.7.1
 pytest>=6.2.*
 autodocsumm
 tqdm
-fedot==0.6.1
+thegolem
