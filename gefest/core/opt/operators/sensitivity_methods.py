@@ -145,7 +145,7 @@ def removing_point(polygon: Polygon):
 
 def get_structure_for_analysis(path: str):
     structure = get_structure_from_path(path=path)
-    if random.random() < 0.1:
+    if random.random() < 0.2 and len(structure.polygons) > 1:
         polygons = structure.polygons
         rand_idx = random.randint(0, len(polygons)-1)
         polygons.pop(rand_idx)
@@ -161,9 +161,8 @@ def get_structure_for_analysis(path: str):
 
 
 def rotate_poly(polygon: Polygon):
-    angles = [0, 90, 180, 270]
+    angle = random.randint(1,360)
     poly = deepcopy(polygon)
-    angle = random.choice(angles)
     rotated_poly = geometry.rotate_poly(poly=poly, angle=angle)
 
     return rotated_poly

@@ -78,7 +78,12 @@ class Structure:
     def size(self):
         return sum([len(p.points) for p in self.polygons])
 
-    def plot(self, title=None, legend=False, color=None, ax=None, show_coords=False):
+    def plot(self, title=None,
+             legend=False,
+             color=None,
+             grid=False,
+             ax=None,
+             show_coords=False):
         '''Visualization with drawn :obj:`Strucrure`
 
         Args:
@@ -100,11 +105,18 @@ class Structure:
         '''
 
         for poly in self.polygons:
+            
+            try:
+                poly_id = poly.id
+                poly_id = poly_id.split('-')[-1]
+            except:
+                poly_id = poly.id
+
             if ax:
                 x = [point._x for point in poly.points]
                 y = [point._y for point in poly.points]
 
-                ax.plot(x, y, label=poly.id, c=color)
+                ax.plot(x, y, label=poly.id, c=color, marker='o')
                 if show_coords:
                     ax.scatter(x,y, marker='o', c=color)
                     text_x = [str(round(x,1)) for x in x]
@@ -114,7 +126,7 @@ class Structure:
             else:
                 x = [point._x for point in poly.points]
                 y = [point._y for point in poly.points]
-                plt.plot(x, y, label=poly.id, c=color)
+                plt.plot(x, y, label=poly.id, c=color, marker='o')
                 if show_coords:
                     plt.scatter(x,y, marker='o', c=color)
                     text_x = [str(round(x,1)) for x in x]
@@ -123,6 +135,8 @@ class Structure:
                         plt.annotate(str(text), (x[idx]+0.01, y[idx]+0.01), rotation=45.0, fontsize=8)
         if legend:
             plt.legend()
+        if grid:
+            plt.grid()
         plt.title(title)
 
 
