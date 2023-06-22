@@ -145,6 +145,8 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
                             evolutionary_operators=default_operators(),
                             task_setup=task_setup)
 
+**10. Run optimization**
+
 .. code-block:: python
 
     n_steps = 10
@@ -157,13 +159,13 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
                            optimizer=spea2_optimizer)
     spend_time = timeit.default_timer() - start
 
-**9. Vizualization of the result**
+**11. Vizualization of the result**
 
 .. code-block:: python
 
     with open(f'HistoryFiles/performance_{n_steps-1}.pickle', 'rb') as f:
     performance = pickle.load(f)
-    
+
     with open(f'HistoryFiles/population_{n_steps-1}.pickle', 'rb') as f:
         population = pickle.load(f)
         

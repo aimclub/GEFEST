@@ -51,6 +51,7 @@ Loss function for finding a polygon that seems like circle showed below.
 Put the *Domain* to *Setup()* class for creating a task variable.
 
 .. code:: python
+    
  from gefest.core.geometry.geometry_2d import Geometry2D
  from gefest.core.structure.domain import Domain
  from gefest.core.opt.setup import Setup
@@ -121,7 +122,7 @@ Put the *Domain* to *Setup()* class for creating a task variable.
                                sampler=sampler,
                                optimizer=optimizer)
 
--  **Step 6**. Create visualization of best structure in designed population.
+-  **Step 6**. Create visualization of the best structure in designed population.
 
 .. code:: python
     
