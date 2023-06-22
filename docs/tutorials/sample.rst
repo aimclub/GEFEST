@@ -17,18 +17,28 @@ Output file (wave height at each point of the water are) located is in the 'r' f
 .. code-block:: python
 
     import timeit
+    import pickle
+    from pathlib import Path
+    from types import SimpleNamespace
 
     import matplotlib.pyplot as plt
     import numpy as np
 
     from gefest.core.geometry.geometry_2d import Geometry2D
-    from gefest.simulators.swan.swan_interface import Swan
-    from gefest.core.opt.optimize import optimize
+    from gefest.tools.estimators.simulators.swan.swan_interface import Swan
     from gefest.core.opt.setup import Setup
+    from gefest.tools.optimizers.optimizer import Optimizer
     from gefest.core.structure.domain import Domain
     from gefest.core.structure.structure import Structure
     from gefest.core.opt.analytics import EvoAnalytics
     from gefest.core.viz.struct_vizualizer import StructVizualizer
+    from gefest.tools.estimators.estimator import Estimator
+    from gefest.tools.samplers.standard.standard import StandardSampler
+    from gefest.tools.samplers.sampler import Sampler
+    from gefest.tools.optimizers.SPEA2.SPEA2 import SPEA2
+    from gefest.core.opt.operators.operators import default_operators
+    from gefest.core.opt.gen_design import design
+    import gefest.tools.estimators.simulators.swan.swan_model as sm
 
 **3. Settings for domain to be researched**
 
@@ -60,8 +70,8 @@ and coordinates of your target (or targets) for which you want to optimize heigh
 
 .. code-block:: python
 
-
-    fixed_points = [[[1000, 50], [700, 600], [800, 800]], [[1900, 540], [1750, 1000]]]
+    fixed_points = [[[1000, 50], [700, 600], [800, 800]], 
+                    [[1900, 540], [1750, 1000]]]
     is_closed = False
     geometry = Geometry2D(is_closed=is_closed)
     domain = Domain(allowed_area=[(min(coord_X), min(coord_Y)),
@@ -84,46 +94,89 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
 
 .. code-block:: python
 
-    path = '../../gefest/simulators/swan/swan_model/' #set your own path to SWAN in GEFEST on the local machine
+    path = str(Path(sm.__file__).parent) +'\\'
     swan = Swan(path=path,
-                targets=targets,
-                grid=grid,
-                domain=domain)
-
+            targets=targets,
+            grid=grid,
+            domain=domain)
     max_length = np.linalg.norm(np.array([max(coord_X) - min(coord_X), max(coord_Y) - min(coord_Y)]))
 
-**7. Definition of the cost function**
+**7. Definition of the cost function and estimator**
 
 *There is a cost function as sum of cost of structure and wave height at the target points*
 
 .. code-block:: python
 
-    def cost(struct: Structure):
+    def cost(struct, estimator):
+        max_length = np.linalg.norm(
+            np.array([max(coord_X) - min(coord_X), 
+                    max(coord_Y) - min(coord_Y)]))
         lengths = 0
         for poly in struct.polygons:
             if poly.id != 'fixed':
                 length = geometry.get_length(poly)
                 lengths += length
 
-        Z, hs = swan.evaluate(struct)
-        loss = lengths / max_length + hs
+        _, hs = estimator.estimate(struct)
+        loss = [hs, 2 * lengths / max_length]
 
         return loss
+    
+    estimator = Estimator(estimator=swan,
+                          loss=cost)
 
-**8. Optimization stage**
+**8. Definition of the sampler** 
 
 .. code-block:: python
 
+    sampler = Sampler(sampler=StandardSampler(),
+                      domain=domain)
+
+**9. Definition of the optimizer**
+
+.. code-block:: python
+
+    params = SPEA2.Params(pop_size=10,
+                          crossover_rate=0.6,
+                          mutation_rate=0.6,
+                          mutation_value_rate=[])
+
+    spea2_optimizer = SPEA2(params=params,
+                            evolutionary_operators=default_operators(),
+                            task_setup=task_setup)
+
+.. code-block:: python
+
+    n_steps = 10
+
     start = timeit.default_timer()
-    optimized_structure = optimize(task_setup=task_setup,
-                                objective_function=cost,
-                                pop_size=10,
-                                max_gens=10)
+    optimized_pop = design(n_steps=10,
+                           pop_size=10,
+                           estimator=estimator,
+                           sampler=sampler,
+                           optimizer=spea2_optimizer)
     spend_time = timeit.default_timer() - start
 
 **9. Vizualization of the result**
 
 .. code-block:: python
 
-    viz = StructVizualizer(domain)
-    viz.plot_structure(optimized_structure)
+    with open(f'HistoryFiles/performance_{n_steps-1}.pickle', 'rb') as f:
+    performance = pickle.load(f)
+    
+    with open(f'HistoryFiles/population_{n_steps-1}.pickle', 'rb') as f:
+        population = pickle.load(f)
+        
+    performance_sum = [sum(pair) for pair in performance]
+    idx_of_best = performance_sum.index(min(performance_sum))
+
+    visualiser = StructVizualizer(task_setup.domain)
+    plt.figure(figsize=(7, 7))
+
+    info = {'spend time': spend_time,
+            'fitness': performance[idx_of_best],
+            'type': 'prediction'}
+    visualiser.plot_structure(population[idx_of_best], info)
+
+    plt.show()
+
