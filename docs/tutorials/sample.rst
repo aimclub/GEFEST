@@ -122,15 +122,13 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
 
         return loss
     
-    estimator = Estimator(estimator=swan,
-                          loss=cost)
+    estimator = Estimator(estimator=swan, loss=cost)
 
 **8. Definition of the sampler** 
 
 .. code-block:: python
 
-    sampler = Sampler(sampler=StandardSampler(),
-                      domain=domain)
+    sampler = Sampler(sampler=StandardSampler(), domain=domain)
 
 **9. Definition of the optimizer**
 
@@ -150,9 +148,8 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
 .. code-block:: python
 
     n_steps = 10
-
     start = timeit.default_timer()
-    optimized_pop = design(n_steps=10,
+    optimized_pop = design(n_steps=n_steps,
                            pop_size=10,
                            estimator=estimator,
                            sampler=sampler,
@@ -174,11 +171,9 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
 
     visualiser = StructVizualizer(task_setup.domain)
     plt.figure(figsize=(7, 7))
-
     info = {'spend time': spend_time,
             'fitness': performance[idx_of_best],
             'type': 'prediction'}
     visualiser.plot_structure(population[idx_of_best], info)
-
     plt.show()
 
