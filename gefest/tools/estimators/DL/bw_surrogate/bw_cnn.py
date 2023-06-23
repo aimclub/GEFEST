@@ -1,11 +1,12 @@
-import matplotlib
-import matplotlib.pyplot as plt
-import tensorflow as tf
 import os
 import shutil
-
-from tensorflow import keras
 from typing import Optional
+
+import matplotlib
+import matplotlib.pyplot as plt
+
+import tensorflow as tf
+from tensorflow import keras
 
 from gefest.core.structure.structure import Structure
 from gefest.core.structure.domain import Domain
@@ -31,7 +32,7 @@ class BWCNN:
         self._create_temp_path()
         self.img_name = 'tmp_images/0.png'
         self.img_size = 128
-        self.rate = 6
+        self.rate = 4
 
     def _create_temp_path(self):
         """

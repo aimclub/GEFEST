@@ -1,28 +1,14 @@
-import sys
-sys.path.append('C:/Users/user2/GEFEST')
-
-import matplotlib.pyplot as plt
-from copy import deepcopy
-import pickle
-import time
-import itertools
-
-from gefest.core.structure.structure import Structure
-from gefest.core.structure.point import Point
-from gefest.core.algs.geom.validation import out_of_bound, too_close, intersection
 from gefest.core.opt.gen_design import design
-from cases.breakwaters.configuration_de import bw_domain
-from cases.breakwaters.configuration_surrogate import bw_estimator
 from cases.breakwaters.configuration_de import bw_optimizer, bw_sampler
 from cases.main_conf import opt_params
 from cases.sensitivity_analysis.configuration_sa import sa_domain, sa_surrogate_estimator
 
 opt_params.path_to_sim = False
 opt_params.path_to_sur = False
-opt_params.pop_size = 15
-opt_params.n_steps = 80
+opt_params.pop_size = 20
+opt_params.n_steps = 50
 
-domain, task_setup = bw_domain.configurate_domain(poly_num=opt_params.n_polys,
+domain, task_setup = sa_domain.configurate_domain(poly_num=opt_params.n_polys,
                                                   points_num=opt_params.n_points,
                                                   is_closed=opt_params.is_closed)
 

@@ -1,4 +1,3 @@
-import numpy as np
 from pathlib import Path
 
 from gefest.core.structure.structure import Structure
@@ -8,11 +7,7 @@ from gefest.tools.estimators.estimator import Estimator
 import cases.breakwaters.configuration_de.bw_domain as area
 
 
-def configurate_estimator(domain, path_sim=False, path_sur=False):
-    # ------------
-    # User-defined estimator
-    # it should be created as object with .estimate() method
-    # ------------
+def  configurate_estimator(domain, path_sim=False, path_sur=False):
     if not path_sim:
         root_path = Path(__file__).parent.parent.parent.parent
         path_sim = f'{root_path}/gefest/tools/estimators/simulators/swan/swan_model/'

@@ -1,6 +1,7 @@
 from copy import deepcopy
 import random
 from multiprocessing import Pool
+import traceback
 
 from gefest.core.algs.postproc.resolve_errors import postprocess
 from gefest.core.opt.constraints import check_constraints
@@ -10,6 +11,7 @@ from gefest.core.structure.polygon import Polygon
 from gefest.core.structure.point import Point
 from gefest.core.geometry.geometry_2d import Geometry2D
 from gefest.core.structure.structure import get_structure_from_path
+from gefest.tools.samplers.sens_analysis.sens_sampler import SensitivitySampler
 from cases.main_conf import opt_params
 
 MAX_ITER = 50000
@@ -52,7 +54,7 @@ def sa_mutation(structure: Structure, domain: Domain, rate=0.6) -> Structure:
                 # if the mutation did not return anything,
                 # then it is considered unsuccessful,
                 # in which case a random structure is generated
-                from gefest.tools.samplers.sens_analysis.sens_sampler import SensitivitySampler
+                
                 new_structure = SensitivitySampler(path=opt_params.structure_path).get_pop_worker(domain=domain)
                 is_correct = True
                 break
@@ -100,7 +102,6 @@ def mutate_worker(args):
         return new_structure
     except Exception as ex:
         print(f'Mutation error: {ex}')
-        import traceback
         print(traceback.format_exc())
         return None
 
@@ -114,7 +115,7 @@ def change_position(polygon: Polygon):
     moved_poly = deepcopy(polygon)
     for idx, point in enumerate(moved_poly.points):
         moved_poly.points[idx] = moving_point(chosen_direct, point, moving_step)
-    
+
     return moved_poly
 
 

@@ -68,7 +68,7 @@ class BaseGA:
     def random_selection(self, group_size):
         return [self._pop[randint(0, len(self._pop) - 1)] for _ in range(group_size)]
 
-    def tournament_selection(self, fraction=0.1):
+    def tournament_selection(self, fraction=0.25):
         """The method allows to select the best ones from whole population
         Args:
             fraction: value for separating the best part of population from another. Defaults to 0.1.

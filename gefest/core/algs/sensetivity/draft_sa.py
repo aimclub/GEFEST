@@ -1,16 +1,14 @@
-import sys
-sys.path.append('C:/Users/user2/GEFEST')
-
 import itertools
 import time
 from copy import deepcopy
-import matplotlib.pyplot as plt
 import pickle
+import matplotlib.pyplot as plt
 
-from gefest.core.structure.structure import Structure, get_structure_from_path
+
+from gefest.core.structure.structure import Structure
 from gefest.core.structure.point import Point
 from gefest.core.algs.geom.validation import out_of_bound, too_close, intersection
-from cases.sensitivity_analysis.configuration_sa import sa_domain, sa_surrogate_estimator
+from cases.sensitivity_analysis.configuration_sa import sa_surrogate_estimator
 from cases.breakwaters.configuration_de import bw_domain
 
 from cases.sensitivity_analysis.creator_structures import get_structure
@@ -68,13 +66,14 @@ class SA_methods():
                     end_step_time = time.time()
                     self.sa_time_history.append(end_step_time - self.start_time)
 
-                    
                     if worse_res:
                         fitnes_diff = round(100 * ((worse_res - current_fitnes)/current_fitnes), 1)
-                        polygon_history.append(f'{str(poly.id)}, step={round(moving_step)}, fitnes=+{str(fitnes_diff)}%')
+                        polygon_history.append(f'{str(poly.id)}, step={round(moving_step)},\
+                                                fitnes=+{str(fitnes_diff)}%')
                     else:
                         fitnes_diff = round(100 * ((step_fitnes - current_fitnes)/current_fitnes), 1)
-                        polygon_history.append(f'{str(poly.id)}, step={round(moving_step)}, fitnes={str(fitnes_diff)}%')
+                        polygon_history.append(f'{str(poly.id)}, step={round(moving_step)},\
+                                                fitnes={str(fitnes_diff)}%')
 
                     if step_fitnes >= current_fitnes:
                         max_attempts -= 1
@@ -158,7 +157,8 @@ class SA_methods():
                 fitnes = round(self.cost([tmp_structure])[0], 3)
                 real_fitnes.append(fitnes)
 
-                length_polygons = [self.input_domain.geometry.get_length(polygon=poly) for poly in tmp_structure.polygons]
+                length_polygons = [self.input_domain.geometry.get_length(polygon=poly)
+                                    for poly in tmp_structure.polygons]
                 length_strcuture.append(sum(length_polygons))
 
                 if fitnes < current_fitnes:
@@ -181,7 +181,7 @@ class SA_methods():
 
                 end_step_time = time.time()
                 self.sa_time_history.append(end_step_time - self.start_time)
-        
+
         best_indexes = [i for i,x in enumerate(real_fitnes) if x <= current_fitnes]
         struct_lengths = {idx: length_strcuture[idx] for idx in best_indexes}
         best_index = min(struct_lengths, key=struct_lengths.get)
@@ -227,11 +227,13 @@ class SA_methods():
                             current_fitnes = fitnes
                             structure_history.append(tmp_structure)
                             fitnes_history.append(fitnes)
-                            polygon_history.append(f'{str(polygon.id)}, del={str(exploring_point_coords)}, fitnes={str(fitnes_diff)}%')
+                            polygon_history.append(f'{str(polygon.id)}, del={str(exploring_point_coords)},\
+                                                    fitnes={str(fitnes_diff)}%')
                         else:
                             structure_history.append(tmp_structure)
                             fitnes_history.append(current_fitnes)
-                            polygon_history.append(f'{str(polygon.id)}, del={str(exploring_point_coords)}, fitnes=+{str(fitnes_diff)}%')
+                            polygon_history.append(f'{str(polygon.id)}, del={str(exploring_point_coords)},\
+                                                    fitnes=+{str(fitnes_diff)}%')
                         end_step_time = time.time()
                         self.sa_time_history.append(end_step_time - self.start_time)
 
@@ -251,14 +253,16 @@ class SA_methods():
                             current_fitnes = fitnes
                             structure_history.append(tmp_structure)
                             fitnes_history.append(fitnes)
-                            polygon_history.append(f'{str(polygon.id)}, del={str(exploring_point_coords)}, fitnes={str(fitnes_diff)}%')
+                            polygon_history.append(f'{str(polygon.id)}, del={str(exploring_point_coords)},\
+                                                    fitnes={str(fitnes_diff)}%')
                         else:
                             structure_history.append(tmp_structure)
                             fitnes_history.append(current_fitnes)
-                            polygon_history.append(f'{str(polygon.id)}, del={str(exploring_point_coords)}, fitnes=+{str(fitnes_diff)}%')
+                            polygon_history.append(f'{str(polygon.id)}, del={str(exploring_point_coords)},\
+                                                    fitnes=+{str(fitnes_diff)}%')
                         end_step_time = time.time()
                         self.sa_time_history.append(end_step_time - self.start_time)
-        
+
         best_fitnes = min(fitnes_history)
         best_idx = fitnes_history.index(best_fitnes)
         best_structure = structure_history[best_idx]
@@ -290,19 +294,19 @@ class SA_methods():
             tmp_str_history = []
 
             angles = [angle for angle in range(45, 360, 45)]
-            
+
             if poly.id != 'fixed':
                 for angle in angles:
                     tmp_structure = deepcopy(structure)
                     rotated_poly = deepcopy(poly)
-                    
+
                     rotated_poly = rotate_func(rotated_poly, angle=angle)
                     tmp_structure.polygons[poly_num] = rotated_poly
 
                     fitnes = round(self.cost([tmp_structure])[0], 3)
                     tmp_fit_history.append([fitnes, angle])
                     tmp_str_history.append(tmp_structure)
-                
+
                 best_poly_fit = min(tmp_fit_history)
                 idx_best = tmp_fit_history.index(best_poly_fit)
                 fitnes_diff = round(100 * ((best_poly_fit[0] - curent_fitnes)/curent_fitnes), 1)
@@ -318,10 +322,9 @@ class SA_methods():
                     fitnes_history.append(curent_fitnes)
                     structure_history.append(tmp_str_history[idx_best])
                     polygon_history.append(f'{str(poly.id)}, best_angle={best_poly_fit[1]}, fitness=+{fitnes_diff}%')
-                
                 end_step_time = time.time()
                 self.sa_time_history.append(end_step_time - self.start_time)
-        
+
         best_fitnes = min(fitnes_history)
         best_idx = fitnes_history.index(best_fitnes)
         best_structure = structure_history[best_idx]
@@ -341,7 +344,7 @@ class SA(SA_methods):
 
     def __init__(self):
         super().__init__()
-        
+
     def analysis(self):
 
         mov_fitnes, mov_structure, mov_poly = self.moving_position()
@@ -352,7 +355,7 @@ class SA(SA_methods):
         fitnes_history = mov_fitnes + rotated_fitnes + del_fitnes + rm_points_fitnes
         structure_history = mov_structure + rotated_structure + del_structure + rm_points_structure
         poly_history = mov_poly + rotated_poly + del_poly + rm_points_poly
-        
+
         return fitnes_history, structure_history, poly_history
 
 
@@ -367,7 +370,7 @@ if __name__ == "__main__":
         step_for_start_sa = [round(evo_steps*percent_step)-1 for percent_step in step_for_start_sa]
         # root = project_root()
         best_evo_structure = get_structure(n_steps=evo_steps, pop_size=pop_size)
-        
+
         with open(f'HistoryFiles/time_history.pickle', 'rb') as f:
             evo_time_history = pickle.load(f)
             f.close()
@@ -405,38 +408,37 @@ if __name__ == "__main__":
                 pickle.dump(full_archive, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
+        plt.plot(evo_time_history, evo_fitnes_history, '.b-', label='GEFEST alg')
+        plt.plot(sa_time_history, fitnes,'.r-', label='GEFEST+SA alg')
+        plt.title(f'Comparing algorithms, SA started from {step_start} generation')
+        plt.xlabel(f'spent time, sec (number of generations-{evo_steps}')
+        plt.ylabel('value of loss function')
+        plt.legend()
+        plt.savefig(f'comparing_methods_startfrom{step_start}.png')
 
+        fitnes_difference = round(100 * (fitnes[0] - fitnes[-1])/fitnes[0], 1)
+        descriptions = poly
+        x= list(range(len(poly)))
+        y= fitnes
 
-        # plt.plot(evo_time_history, evo_fitnes_history, '.b-', label='GEFEST alg')
-        # plt.plot(sa_time_history, fitnes,'.r-', label='GEFEST+SA alg')
-        # plt.title(f'Comparing algorithms, SA started from {step_start} generation')
-        # plt.xlabel(f'spent time, sec (number of generations-{evo_steps}')
-        # plt.ylabel('value of loss function')
-        # plt.legend()
-        # plt.savefig(f'comparing_methods_startfrom{step_start}.png')
+        fig, axd = plt.subplot_mosaic([['upper', 'upper'],
+                                    ['lower left', 'lower right']],
+                                    figsize=(18, 18), height_ratios=[1, 2])
 
-        # fitnes_difference = round(100 * (fitnes[0] - fitnes[-1])/fitnes[0], 1)
-        # descriptions = poly
-        # x= list(range(len(poly)))
-        # y= fitnes
+        fig.suptitle(f'Sensitivity analysis started from {step_start} gen, spent={sa_time_history[-1]}sec,\
+                      fitnes decreased by {fitnes_difference}%')
 
-        # fig, axd = plt.subplot_mosaic([['upper', 'upper'],
-        #                             ['lower left', 'lower right']],
-        #                             figsize=(18, 18), height_ratios=[1, 2])
+        structure[0].plot(color = 'r', ax=axd['lower left'], legend=True)
+        axd['lower left'].set_title(f'Initial structure, fitnes={round(fitnes[0], 3)}')
+        structure[-1].plot(ax=axd['lower right'], legend=True)
+        axd['lower right'].set_title(f'Processed structure, fitnes={round(fitnes[-1], 3)}')
 
-        # fig.suptitle(f'Sensitivity analysis started from {step_start} gen, spent={sa_time_history[-1]}sec, fitnes decreased by {fitnes_difference}%')
+        axd['upper'].plot(fitnes, c='c')
+        axd['upper'].scatter(x,y, marker='o', c='c')
+        for idx,text in enumerate(descriptions):
+            axd['upper'].annotate(text, (x[idx]+0.01, y[idx]+0.01), rotation=45.0)
+        axd['upper'].set_xlabel('iteration of senitivity analysis')
+        axd['upper'].set_ylabel('loss - height of waves')
 
-        # structure[0].plot(color = 'r', ax=axd['lower left'], legend=True)
-        # axd['lower left'].set_title(f'Initial structure, fitnes={round(fitnes[0], 3)}')
-        # structure[-1].plot(ax=axd['lower right'], legend=True)
-        # axd['lower right'].set_title(f'Processed structure, fitnes={round(fitnes[-1], 3)}')
-
-        # axd['upper'].plot(fitnes, c='c')
-        # axd['upper'].scatter(x,y, marker='o', c='c')
-        # for idx,text in enumerate(descriptions):
-        #     axd['upper'].annotate(text, (x[idx]+0.01, y[idx]+0.01), rotation=45.0)
-        # axd['upper'].set_xlabel('iteration of senitivity analysis')
-        # axd['upper'].set_ylabel('loss - height of waves')
-
-        # fig.tight_layout()
-        # fig.savefig(f'sa_fullway_from{step_start}.png')
+        fig.tight_layout()
+        fig.savefig(f'sa_fullway_from{step_start}.png')
