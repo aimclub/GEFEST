@@ -19,8 +19,8 @@ NUM_PROC = 1
 
 geometry = Geometry2D()
 
-def sa_mutation(structure: Structure, domain: Domain, rate=0.6) -> Structure:
 
+def sa_mutation(structure: Structure, domain: Domain, rate=0.6) -> Structure:
     random_val = random.random()
 
     if random_val > rate:
@@ -39,11 +39,15 @@ def sa_mutation(structure: Structure, domain: Domain, rate=0.6) -> Structure:
 
         if NUM_PROC > 1:
             with Pool(NUM_PROC) as p:
-                new_items = \
-                    p.map(mutate_worker,
-                          [[new_structure, changes_num, domain] for _ in range(NUM_PROC)])
+                new_items = p.map(
+                    mutate_worker,
+                    [[new_structure, changes_num, domain] for _ in range(NUM_PROC)],
+                )
         else:
-            new_items = [mutate_worker([new_structure, changes_num, domain]) for _ in range(NUM_PROC)]
+            new_items = [
+                mutate_worker([new_structure, changes_num, domain])
+                for _ in range(NUM_PROC)
+            ]
 
         for structure in new_items:
             if structure is not None:
@@ -54,8 +58,10 @@ def sa_mutation(structure: Structure, domain: Domain, rate=0.6) -> Structure:
                 # if the mutation did not return anything,
                 # then it is considered unsuccessful,
                 # in which case a random structure is generated
-                
-                new_structure = SensitivitySampler(path=opt_params.structure_path).get_pop_worker(domain=domain)
+
+                new_structure = SensitivitySampler(
+                    path=opt_params.structure_path
+                ).get_pop_worker(domain=domain)
                 is_correct = True
                 break
     return new_structure
@@ -101,14 +107,14 @@ def mutate_worker(args):
 
         return new_structure
     except Exception as ex:
-        print(f'Mutation error: {ex}')
+        print(f"Mutation error: {ex}")
         print(traceback.format_exc())
         return None
 
 
 def change_position(polygon: Polygon):
-    moving_step = geometry.get_length(polygon=polygon)*0.05
-    directions = ['north', 'south', 'east', 'west', 'n-w', 's-w', 'n-e', 's-e']
+    moving_step = geometry.get_length(polygon=polygon) * 0.05
+    directions = ["north", "south", "east", "west", "n-w", "s-w", "n-e", "s-e"]
 
     chosen_direct = random.choice(directions)
 
@@ -120,14 +126,16 @@ def change_position(polygon: Polygon):
 
 
 def moving_point(direction: str, point: Point, moving_step) -> Point:
-    directions = {'north': Point(point.x + moving_step, point.y),
-                  'south': Point(point.x - moving_step, point.y),
-                  'east': Point(point.x, point.y + moving_step),
-                  'west': Point(point.x, point.y - moving_step),
-                  'n-w': Point(point.x + moving_step, point.y - moving_step),
-                  's-w': Point(point.x - moving_step, point.y + moving_step),
-                  'n-e': Point(point.x + moving_step, point.y + moving_step),
-                  's-e': Point(point.x - moving_step, point.y - moving_step)}
+    directions = {
+        "north": Point(point.x + moving_step, point.y),
+        "south": Point(point.x - moving_step, point.y),
+        "east": Point(point.x, point.y + moving_step),
+        "west": Point(point.x, point.y - moving_step),
+        "n-w": Point(point.x + moving_step, point.y - moving_step),
+        "s-w": Point(point.x - moving_step, point.y + moving_step),
+        "n-e": Point(point.x + moving_step, point.y + moving_step),
+        "s-e": Point(point.x - moving_step, point.y - moving_step),
+    }
     return directions[direction]
 
 
@@ -135,7 +143,7 @@ def removing_point(polygon: Polygon):
     if len(polygon.points) > 2:
         polygon = deepcopy(polygon)
         points = polygon.points
-        rand_idx = random.randint(0, len(points)-1)
+        rand_idx = random.randint(0, len(points) - 1)
         points.pop(rand_idx)
         polygon.points = points
 
@@ -148,7 +156,7 @@ def get_structure_for_analysis(path: str):
     structure = get_structure_from_path(path=path)
     if random.random() < 0.2 and len(structure.polygons) > 1:
         polygons = structure.polygons
-        rand_idx = random.randint(0, len(polygons)-1)
+        rand_idx = random.randint(0, len(polygons) - 1)
         polygons.pop(rand_idx)
         structure.polygons = polygons
 
@@ -162,9 +170,8 @@ def get_structure_for_analysis(path: str):
 
 
 def rotate_poly(polygon: Polygon):
-    angle = random.randint(1,360)
+    angle = random.randint(1, 360)
     poly = deepcopy(polygon)
     rotated_poly = geometry.rotate_poly(poly=poly, angle=angle)
 
     return rotated_poly
-    

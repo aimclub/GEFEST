@@ -11,8 +11,6 @@ MAX_ITER = 50000
 NUM_PROC = 1
 
 
-
-
 class SensitivitySampler:
     def __init__(self, path: str):
         self.path = path

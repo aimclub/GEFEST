@@ -11,17 +11,37 @@ poly_width = 10
 poly_length = 20
 
 # creating a testing polygons via corner points
-rectangle_points = [(-1, 40), (-1, poly_length + 40), (-poly_width - 10, poly_length + 40), (-poly_width - 10, 40)]
-out_bounds_rectangle_poly = Polygon('rectangle', points=[Point(*coords) for coords in rectangle_points])
+rectangle_points = [
+    (-1, 40),
+    (-1, poly_length + 40),
+    (-poly_width - 10, poly_length + 40),
+    (-poly_width - 10, 40),
+]
+out_bounds_rectangle_poly = Polygon(
+    "rectangle", points=[Point(*coords) for coords in rectangle_points]
+)
 
 triangle_points = [(1, 1), (poly_width, poly_length), (1, poly_length)]
-unclosed_triangle_poly = Polygon('triangle', points=[Point(*coords) for coords in triangle_points])
+unclosed_triangle_poly = Polygon(
+    "triangle", points=[Point(*coords) for coords in triangle_points]
+)
 
 incorrect_points = [(5, 5), (5, poly_length), (8, poly_length), (5, 5), (5, 30)]
-incorrect_poly = Polygon('incorrect_poly', points=[Point(*coords) for coords in incorrect_points])
+incorrect_poly = Polygon(
+    "incorrect_poly", points=[Point(*coords) for coords in incorrect_points]
+)
 
-intersected_points = [(0, 0), (0, poly_length), (poly_width, poly_length), (poly_width-5, poly_length-5), (poly_width, poly_length+10), (0,0)]
-intersected_poly = Polygon('incorrect_poly', points=[Point(*coords) for coords in intersected_points])
+intersected_points = [
+    (0, 0),
+    (0, poly_length),
+    (poly_width, poly_length),
+    (poly_width - 5, poly_length - 5),
+    (poly_width, poly_length + 10),
+    (0, 0),
+]
+intersected_poly = Polygon(
+    "incorrect_poly", points=[Point(*coords) for coords in intersected_points]
+)
 
 domain = Domain()
 
@@ -69,7 +89,7 @@ def test_fixed_polys():
 
 def test_too_close():
     same_poly = deepcopy(unclosed_triangle_poly)
-    same_poly.id = 'same_triangle'
+    same_poly.id = "same_triangle"
     input_structure = Structure([unclosed_triangle_poly, same_poly])
     observed_structure = postprocess(input_structure, domain)
 

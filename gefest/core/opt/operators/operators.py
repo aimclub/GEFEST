@@ -12,5 +12,6 @@ class EvoOperators:
 def default_operators():
     return EvoOperators(crossover=crossover, mutation=mutation)
 
+
 def sensitivity_operators():
     return EvoOperators(crossover=crossover, mutation=sa_mutation)
