@@ -94,7 +94,8 @@ class Structure:
             title: the name of drawing, by default ``None``
             legend: show legend (id of polygons), by default ``False``
             color: set special color for all polygons, see variants of colors in `matplotlib documentation`_
-            ax: set name of axes where drown structure has to be part of complicated matplotlib figure, by default `None`
+            ax: set name of axes where drown structure has to be part of complicated matplotlib figure,
+             by default `None`
             show_coords: print coords for every apex of polygon(s) if `True`, by default `False`
 
         Examples:
@@ -112,7 +113,7 @@ class Structure:
             try:
                 poly_id = poly.id
                 poly_id = poly_id.split("-")[-1]
-            except:
+            except IndexError:
                 poly_id = poly.id
 
             if ax:
