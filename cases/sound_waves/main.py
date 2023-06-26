@@ -11,11 +11,13 @@ from cases.sound_waves.configuration import (
     sound_sampler,
 )
 
-
 # If the value is False, pretrained models will be selected
 # otherwise put path to your model
 opt_params.is_closed = True
-
+opt_params.pop_size = 15
+opt_params.n_steps = 20
+opt_params.n_polys = 1
+opt_params.n_points = 30
 
 # ------------
 # GEFEST tools configuration

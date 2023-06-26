@@ -63,7 +63,7 @@ def generate_random_map(map_size, random_seed):
     # # (1) the image with the generated shapes
     # # (2) a list of label tuples with the kind of shape
     # (e.g. circle, rectangle) and ((r0, r1), (c0, c1)) coordinates.
-    obstacle_map, labels = result
+    obstacle_map, _ = result
     # Force free media in a square of 20x20 at the center of the map
     width_center = map_size[0] // 2
     length_center = map_size[1] // 2
