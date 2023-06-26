@@ -8,6 +8,8 @@ Output file (wave height at each point of the water are) located is in the 'r' f
 
 **1. Install last stable version of the GEFEST**
 
+Tested on python 3.7
+
 .. code-block:: python
 
     pip install https://github.com/ITMO-NSS-team/GEFEST/archive/master.zip
