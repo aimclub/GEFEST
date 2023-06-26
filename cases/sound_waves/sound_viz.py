@@ -11,6 +11,7 @@ def upload_file(path: str):
         f.close()
     return file
 
+
 init_path = "best_structure.pickle"
 optimized_path = "optimized_structure.pickle"
 
