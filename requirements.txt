@@ -13,5 +13,5 @@ shapely==1.7.1
 pytest>=6.2.*
 autodocsumm
 tqdm
-skimage
 thegolem
+skimage
