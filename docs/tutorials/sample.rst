@@ -97,10 +97,10 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
 .. code-block:: python
 
     path = str(Path(sm.__file__).parent) +'\\'
-    swan = Swan(path=path,
-            targets=targets,
-            grid=grid,
-            domain=domain)
+    swan = Swan(swan_root=path,
+                targets=targets,
+                grid=grid,
+                domain=domain)
     max_length = np.linalg.norm(np.array([max(coord_X) - min(coord_X), max(coord_Y) - min(coord_Y)]))
 
 **7. Definition of the cost function and estimator**
