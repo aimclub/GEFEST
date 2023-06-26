@@ -21,7 +21,11 @@ Loss function for finding a polygon that seems like circle showed below.
  from types import SimpleNamespace
  import numpy as np 
  from gefest.tools.estimators.estimator import Estimator
+ from gefest.core.geometry.geometry_2d import Geometry2D
  
+ geometry = Geometry2D()
+
+
  def circle_loss(structure):
      #calculating area and length of designed polygon via GEFEST.gefest methods
  
@@ -52,7 +56,6 @@ Put the *Domain* to *Setup()* class for creating a task variable.
 
 .. code:: python
     
- from gefest.core.geometry.geometry_2d import Geometry2D
  from gefest.core.structure.domain import Domain
  from gefest.core.opt.setup import Setup
 
@@ -65,7 +68,7 @@ Put the *Domain* to *Setup()* class for creating a task variable.
                 ],
 
                 # specify processing way
-                geometry=Geometry2D(),
+                geometry=geometry,
 
                 # every designed polygon locates into Structure(),
                 # these parameters determine number of polygons per Structure()
