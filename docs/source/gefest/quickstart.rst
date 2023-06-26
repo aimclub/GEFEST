@@ -3,8 +3,12 @@ Quickstart
 
 GEFEST Framework quick start guide
 
+
 How to install
 --------------
+
+Tested on python 3.7
+
 .. code::
 
  pip install https://github.com/ITMO-NSS-team/GEFEST/archive/master.zip
