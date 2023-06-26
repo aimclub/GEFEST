@@ -7,12 +7,12 @@ from gefest.core.structure.structure import Structure
 
 class Swan:
 
-    def __init__(self, swan_root, targets, grid, domain,
+    def __init__(self, path, targets, grid, domain,
                  input_file_path="bw_example_cfg",
                  hs_file_path="r/hs47dd8b1c0d4447478fec6f956c7e32d9.d"):
-        self.path_to_model = swan_root
-        self.path_to_input = swan_root + input_file_path
-        self.path_to_hs = swan_root + hs_file_path
+        self.path_to_model = path
+        self.path_to_input = path + input_file_path
+        self.path_to_hs = path + hs_file_path
         self.targets = targets
         self.grid = grid
         self.domain = domain

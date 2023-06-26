@@ -97,7 +97,7 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
 .. code-block:: python
 
     path = str(Path(sm.__file__).parent) +'\\'
-    swan = Swan(swan_root=path,
+    swan = Swan(path=path,
                 targets=targets,
                 grid=grid,
                 domain=domain)
