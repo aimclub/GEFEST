@@ -2,12 +2,14 @@ import numpy as np
 import pickle
 
 from gefest.core.structure.structure import Structure, get_random_structure
-from gefest.tools.estimators.simulators.sound_wave.sound_interface import SoundSimulator, generate_map
+from gefest.tools.estimators.simulators.sound_wave.sound_interface import (
+    SoundSimulator,
+    generate_map,
+)
 from gefest.tools.estimators.estimator import Estimator
 
 
-
-def configurate_estimator(domain: 'Domain', path_best_struct=None):
+def configurate_estimator(domain: "Domain", path_best_struct=None):
     # ------------
     # User-defined estimator
     # it should be created as object with .estimate() method
@@ -23,15 +25,14 @@ def configurate_estimator(domain: 'Domain', path_best_struct=None):
         with open(path_best_struct, "rb") as f:
             best_structure = pickle.load(f)
         best_spl = sound.estimate(best_structure)
-        best_spl = np.nan_to_num(best_spl)
+        best_spl = np.nan_to_num(best_spl, nan=0, neginf=0, posinf=0)
 
     # Loss for minimizing, it is optional function
     def loss(struct: Structure, estimator):
-
         spl = estimator.estimate(struct)
-        spl = np.nan_to_num(spl)
+        current_spl = np.nan_to_num(spl, nan=0, neginf=0, posinf=0)
 
-        l_f = np.sum(np.abs(best_spl - spl))
+        l_f = np.sum(np.abs(best_spl - current_spl))
 
         return l_f
 
@@ -40,7 +41,6 @@ def configurate_estimator(domain: 'Domain', path_best_struct=None):
     # ------------
 
     # Here loss is an optional argument, otherwise estimator will be considered as loss for minimizing
-    estimator = Estimator(estimator=sound,
-                          loss=loss)
+    estimator = Estimator(estimator=sound, loss=loss)
 
     return estimator
