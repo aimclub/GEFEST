@@ -135,7 +135,7 @@ class SPEA2(BaseGA):
 
         # Second case, deleting using truncation procedure
         elif len(self.archive) > self.arch_size:
-            arch_obj = sorted([(ind.objectives[0], ind) for ind in self._pop])[:self.arch_size]
+            arch_obj = sorted([(ind.objectives[0], ind) for ind in self._pop], key=lambda x: x[0])[:self.arch_size]
             self.archive = [ind[1] for ind in arch_obj]
 
     def _save_archive(self, n):
