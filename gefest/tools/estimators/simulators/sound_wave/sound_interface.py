@@ -66,9 +66,7 @@ def generate_random_map(map_size, random_seed):
     # Force free media in a square of 20x20 at the center of the map
     width_center = map_size[0] // 2
     length_center = map_size[1] // 2
-    obstacle_map[
-        width_center - 20 : width_center + 21, length_center - 20 : length_center + 21
-    ] = 255
+    obstacle_map[width_center - 20:width_center + 21, length_center - 20:length_center + 21] = 255
     free_media = obstacle_map == 255
     # Obstacles = 1, free media = 0
     obstacles = obstacle_map == 0

@@ -30,4 +30,4 @@ sound = SoundSimulator(domain)
 def test_sumulator():
     current_spl = sound.estimate(standart_structure)
 
-    assert (np.isclose(current_spl,standart_spl)).all()
+    assert (np.isclose(current_spl, standart_spl)).all()
