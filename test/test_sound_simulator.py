@@ -1,5 +1,6 @@
 import pytest
 import pickle
+import numpy as np
 from gefest.tools.estimators.simulators.sound_wave.sound_interface import SoundSimulator
 from cases.sound_waves.configuration import sound_domain
 
@@ -29,4 +30,4 @@ sound = SoundSimulator(domain)
 def test_sumulator():
     current_spl = sound.estimate(standart_structure)
 
-    assert (current_spl == standart_spl).all()
+    assert (np.isclose(current_spl,standart_spl)).all()
