@@ -14,13 +14,13 @@ min_presure = -initial_P / 2
 
 
 def generate_map(domain, structure):
-    """Randomly generate an array of zeros (free media) and ones (obstacles).
-    The obstacles have basic geometric shapes.
+    """Generates obstacke map according to polygons in structure inside of domain borders
+
     Parameters:
-        map_size(tuple): shape of the map to generate
-        random_seed (int): random seed for random generation of obstacles
+        domain(Domain): shape of the map to generate
+        structure (Structure): structure for shaping obstacles
     Returns:
-        random_map (np.array): array shaped as map_size, containing random
+        obstacle_map (np.array): array shaped as domain area, containing polygons as
                             obstacles.
     """
     map_size = (round(1.2 * domain.max_y), round(1.2 * domain.max_x))
@@ -90,7 +90,6 @@ class SoundSimulator:
             shape is different from map_size, ignore the parameters and
             generate a map with no obstacles.
         duration (int): duration (in seconds) of the simulation.
-        iteration (int): current iteration of the simulation.
         size_x (int): number of cols in the grid.
         size_y (int): number of cols in the grid.
         pressure (np.array): pressure field at current iteration.
