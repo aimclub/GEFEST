@@ -45,8 +45,7 @@ def generate_random_map(map_size, random_seed):
         map_size(tuple): shape of the map to generate
         random_seed (int): random seed for random generation of obstacles
     Returns:
-        random_map (np.array): array shaped as map_size, containing random
-                               obstacles.
+        random_map (np.array): array shaped as map_size, containing random obstacles
     """
     result = random_shapes(
         map_size,
