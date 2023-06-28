@@ -106,7 +106,10 @@ Put the *Domain* to *Setup()* class for creating a task variable.
  from gefest.core.opt.operators.operators import default_operators
  from gefest.tools.samplers.standard.standard import StandardSampler
 
- params = GA.Params(pop_size=50,
+ n_steps = 25
+ pop_size = 25
+
+ params = GA.Params(pop_size=pop_size,
                     crossover_rate=0.6, 
                     mutation_rate=0.6,
                     mutation_value_rate=[])
@@ -122,9 +125,8 @@ Put the *Domain* to *Setup()* class for creating a task variable.
 
  from gefest.core.opt.gen_design import design
 
- n_steps = 50
  optimized_population = design(n_steps=n_steps,
-                               pop_size=25,
+                               pop_size=pop_size,
                                estimator=estimator,
                                sampler=sampler,
                                optimizer=optimizer)
