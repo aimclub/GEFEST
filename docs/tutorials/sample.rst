@@ -81,7 +81,7 @@ and coordinates of your target (or targets) for which you want to optimize heigh
                                 (max(coord_X), max(coord_Y)),
                                 (max(coord_X), min(coord_Y))],
                     geometry=geometry,
-                    max_poly_num=1,
+                    max_poly_num=3,
                     min_poly_num=1,
                     max_points_num=10,
                     min_points_num=2,
@@ -135,8 +135,11 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
 **9. Definition of the optimizer**
 
 .. code-block:: python
+    
+    pop_size = 10
+    n_steps = 10
 
-    params = SPEA2.Params(pop_size=10,
+    params = SPEA2.Params(pop_size=pop_size,
                           crossover_rate=0.6,
                           mutation_rate=0.6,
                           mutation_value_rate=[])
@@ -149,10 +152,9 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
 
 .. code-block:: python
 
-    n_steps = 10
     start = timeit.default_timer()
     optimized_pop = design(n_steps=n_steps,
-                           pop_size=10,
+                           pop_size=pop_size,
                            estimator=estimator,
                            sampler=sampler,
                            optimizer=spea2_optimizer)
@@ -163,8 +165,7 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
 .. code-block:: python
 
     with open(f'HistoryFiles/performance_{n_steps-1}.pickle', 'rb') as f:
-    performance = pickle.load(f)
-
+        performance = pickle.load(f)
     with open(f'HistoryFiles/population_{n_steps-1}.pickle', 'rb') as f:
         population = pickle.load(f)
         
@@ -173,8 +174,10 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
 
     visualiser = StructVizualizer(task_setup.domain)
     plt.figure(figsize=(7, 7))
-    info = {'spend time': spend_time,
-            'fitness': performance[idx_of_best],
+    
+    best = performance[idx_of_best]
+    info = {'spend time': f'{spend_time:.2f}',
+            'fitness': f'[{best[0]:.3f}, {best[1]:.3f}]',
             'type': 'prediction'}
     visualiser.plot_structure(population[idx_of_best], info)
     plt.show()

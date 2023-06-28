@@ -146,7 +146,7 @@ Put the *Domain* to *Setup()* class for creating a task variable.
  idx_of_best = performance.index(min(performance))
  visualiser = StructVizualizer(task_setup.domain)
  plt.figure(figsize=(7, 7))
- info = {'fitness': performance[idx_of_best],
+ info = {'fitness': f'{performance[idx_of_best]:.2f}',
          'type': 'prediction'}
  visualiser.plot_structure(population[idx_of_best], info)
  plt.show()
