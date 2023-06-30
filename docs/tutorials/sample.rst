@@ -20,7 +20,6 @@ Tested on python 3.7
 
     import timeit
     import pickle
-    from pathlib import Path
     from types import SimpleNamespace
 
     import matplotlib.pyplot as plt
@@ -40,7 +39,8 @@ Tested on python 3.7
     from gefest.tools.optimizers.SPEA2.SPEA2 import SPEA2
     from gefest.core.opt.operators.operators import default_operators
     from gefest.core.opt.gen_design import design
-    import gefest.tools.estimators.simulators.swan.swan_model as sm
+    from gefest.tools.estimators.simulators.swan import swan_model
+    from gefest.core.structure.prohibited import create_prohibited
 
 **3. Settings for domain to be researched**
 
@@ -72,6 +72,31 @@ and coordinates of your target (or targets) for which you want to optimize heigh
 
 .. code-block:: python
 
+    fixed_area = [
+    [[471, 5], [1335, 2], [1323, 214], [1361, 277], [1395, 327], [1459, 405], [1485, 490], [1449, 521], [1419, 558],
+     [1375, 564], [1321, 469], [1248, 318], [1068, 272], [921, 225], [804, 231], [732, 266], [634, 331], [548, 405],
+     [485, 482], [424, 569], [381, 625], [310, 662], [271, 684], [244, 706], [203, 708], [182, 647], [214, 638],
+     [234, 632], [275, 588], [346, 475], [427, 366], [504, 240], [574, 166], [471, 5]],
+    [[652, 1451], [580, 1335], [544, 1253], [468, 1190], [439, 1170], [395, 1150], [378, 1115], [438, 1070],
+     [481, 1059], [508, 1076], [539, 1133], [554, 1183], [571, 1244], [594, 1305], [631, 1366], [657, 1414],
+     [671, 1449], [652, 1451]]
+    ]
+    fixed_targets = [[coord_X[26], coord_Y[49]], [coord_X[37], coord_Y[11]], [coord_X[60], coord_Y[5]]]
+    fixed_poly = [
+        [[878, 1433], [829, 1303], [739, 1116], [619, 995], [447, 962], [306, 1004], [254, 1092], [241, 1184],
+        [269, 1244],
+        [291, 1338], [370, 1450]],
+        [[878, 1433], [829, 1303], [739, 1116], [619, 995], [447, 962], [274, 868], [180, 813], [126, 717], [146, 580],
+        [203, 480], [249, 469], [347, 471]]
+    ]
+
+    # Creation of prohibited structure consist of targets, lines, areas
+    prohibited_structure = create_prohibited(
+                                targets=fixed_targets, 
+                                fixed_area=fixed_area,
+                                fixed_points=fixed_poly
+    )
+
     fixed_points = [[[1000, 50], [700, 600], [800, 800]], 
                     [[1900, 540], [1750, 1000]]]
     is_closed = False
@@ -85,6 +110,7 @@ and coordinates of your target (or targets) for which you want to optimize heigh
                     min_poly_num=1,
                     max_points_num=10,
                     min_points_num=2,
+                    prohibited_area=prohibited_structure,
                     fixed_points=fixed_points,
                     is_closed=is_closed)
     task_setup = Setup(domain=domain)
@@ -96,7 +122,7 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
 
 .. code-block:: python
 
-    path = str(Path(sm.__file__).parent) +'\\'
+    path = swan_model.__file__[:-11]
     swan = Swan(path=path,
                 targets=targets,
                 grid=grid,
@@ -168,17 +194,21 @@ Our SWAN interface uses this path, domain grid, GEFEST domain and coordinates of
         performance = pickle.load(f)
     with open(f'HistoryFiles/population_{n_steps-1}.pickle', 'rb') as f:
         population = pickle.load(f)
-        
+            
     performance_sum = [sum(pair) for pair in performance]
     idx_of_best = performance_sum.index(min(performance_sum))
 
     visualiser = StructVizualizer(task_setup.domain)
     plt.figure(figsize=(7, 7))
-    
+        
     best = performance[idx_of_best]
-    info = {'spend time': f'{spend_time:.2f}',
-            'fitness': f'[{best[0]:.3f}, {best[1]:.3f}]',
-            'type': 'prediction'}
-    visualiser.plot_structure(population[idx_of_best], info)
-    plt.show()
+    info_optimized = {
+        'spend time': f'{spend_time:.2f}',
+        'fitness': f'[{best[0]:.3f}, {best[1]:.3f}]',
+        'type': 'prediction'}
+    visualiser.plot_structure(
+        [domain.prohibited_area, population[idx_of_best]], 
+        ['prohibited structures', info_optimized], 
+        [':', '-'])
+
 

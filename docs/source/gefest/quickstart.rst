@@ -150,6 +150,8 @@ Put the *Domain* to *Setup()* class for creating a task variable.
  plt.figure(figsize=(7, 7))
  info = {'fitness': f'{performance[idx_of_best]:.2f}',
          'type': 'prediction'}
- visualiser.plot_structure(population[idx_of_best], info)
+ visualiser.plot_structure([population[idx_of_best]], 
+                           [info],
+                           ['-'])
  plt.show()
  
