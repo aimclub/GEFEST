@@ -1,6 +1,7 @@
 import numpy as np
 import pickle
 
+from test.test_sound_simulator import load_file_from_path
 from gefest.core.structure.structure import Structure, get_random_structure
 from gefest.tools.estimators.simulators.sound_wave.sound_interface import (
     SoundSimulator,
@@ -22,8 +23,7 @@ def configurate_estimator(domain: "Domain", path_best_struct=None):
         rnd_structure = get_random_structure(domain)
         best_spl = generate_map(domain, rnd_structure)
     else:
-        with open(path_best_struct, "rb") as f:
-            best_structure = pickle.load(f)
+        best_structure = load_file_from_path(path_best_struct)
         best_spl = sound.estimate(best_structure)
         best_spl = np.nan_to_num(best_spl, nan=0, neginf=0, posinf=0)
 

@@ -1,19 +1,13 @@
-import pickle
 import matplotlib.pyplot as plt
+
 from cases.main_conf import opt_params
 from cases.sound_waves.configuration import sound_domain
 from gefest.tools.estimators.simulators.sound_wave.sound_interface import SoundSimulator
-
-
-def upload_file(path: str):
-    with open(path, "rb") as f:
-        file = pickle.load(f)
-        f.close()
-    return file
-
+from test.test_sound_simulator import load_file_from_path
 
 init_path = "best_structure.pickle"
 optimized_path = "optimized_structure.pickle"
+
 
 if __name__ == "__main__":
     domain, _ = sound_domain.configurate_domain(
@@ -22,8 +16,8 @@ if __name__ == "__main__":
         is_closed=opt_params.is_closed,
     )
 
-    init_structure = upload_file(init_path)
-    optimized_archive = upload_file(optimized_path)
+    init_structure = load_file_from_path(init_path)
+    optimized_archive = load_file_from_path(optimized_path)
     optimized_structure = optimized_archive[0]
 
     sound = SoundSimulator(domain)

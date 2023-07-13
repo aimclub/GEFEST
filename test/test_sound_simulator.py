@@ -5,7 +5,7 @@ from gefest.tools.estimators.simulators.sound_wave.sound_interface import SoundS
 from cases.sound_waves.configuration import sound_domain
 
 
-def upload_file(path: str):
+def load_file_from_path(path: str):
     with open(path, "rb") as f:
         file = pickle.load(f)
         f.close()
@@ -21,8 +21,8 @@ domain, _ = sound_domain.configurate_domain(
 structure_path = "test/files/standart_structure.pickle"
 spl_path = "test/files/standart_spl.pickle"
 
-standart_spl = upload_file(spl_path)
-standart_structure = upload_file(structure_path)
+standart_spl = load_file_from_path(spl_path)
+standart_structure = load_file_from_path(structure_path)
 
 sound = SoundSimulator(domain)
 
