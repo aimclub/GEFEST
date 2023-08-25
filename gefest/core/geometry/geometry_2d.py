@@ -3,15 +3,15 @@ from uuid import uuid4
 
 import numpy as np
 from shapely import affinity
-from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon, LineString, MultiLineString
+from shapely.geometry import LineString, MultiLineString
+from shapely.geometry import Point as GeomPoint
+from shapely.geometry import Polygon as GeomPolygon
 from shapely.ops import nearest_points
 
-from gefest.core.geometry.geometry import Geometry
-from gefest.core.structure.point import Point
-from gefest.core.structure.polygon import Polygon
+from gefest.core.geometry import Point, Polygon, Structure
 
 
-class Geometry2D(Geometry):
+class Geometry2D:
     """Overriding the geometry base class for 2D structures.
     The input receives information about the closeness of the polygon
     Args:
@@ -19,9 +19,19 @@ class Geometry2D(Geometry):
             (first Point is equal to the last one), otherwise ``False``. Default value is ``True``
     """
 
-    def __init__(self,
-                 is_closed=True):
+    def __init__(
+        self,
+        is_closed=True,
+    ):
         self.is_closed = is_closed
+
+    def get_length(self, polygon: Polygon):
+        if len(polygon.points) < 1:
+            return 0
+
+        geom_polygon = LineString([GeomPoint(pt.x, pt.y) for pt in polygon.points])
+
+        return geom_polygon.length
 
     def get_coords(self, poly) -> List[Point]:
         """The function for getting points
@@ -36,14 +46,22 @@ class Geometry2D(Geometry):
             # Converting  shapely.Polygon to shapely.LineString translation for correct conversion
             poly = LineString(poly.exterior.coords)
         if self.is_closed or len(poly.coords.xy[0]) < 3:
-            points = [Point(x, y) for x, y in
-                      zip(list(poly.coords.xy[0]),
-                          list(poly.coords.xy[1]))]
+            points = [
+                Point(x, y)
+                for x, y in zip(
+                    list(poly.coords.xy[0]),
+                    list(poly.coords.xy[1]),
+                )
+            ]
         else:
             # For open polygons, the last point is ignored
-            points = [Point(x, y) for x, y in
-                      zip(list(poly.coords.xy[0][:-1]),
-                          list(poly.coords.xy[1][:-1]))]
+            points = [
+                Point(x, y)
+                for x, y in zip(
+                    list(poly.coords.xy[0][:-1]),
+                    list(poly.coords.xy[1][:-1]),
+                )
+            ]
 
         return points
 
@@ -59,13 +77,18 @@ class Geometry2D(Geometry):
         """
         geom_polygon = self._poly_to_geom(poly)  # Transformation to shapely structure
 
-        rescaled_geom_polygon = affinity.scale(geom_polygon,
-                                               x_scale, y_scale)  # Scaling along each axis
+        rescaled_geom_polygon = affinity.scale(
+            geom_polygon,
+            x_scale,
+            y_scale,
+        )  # Scaling along each axis
 
         rescaled_points = self.get_coords(rescaled_geom_polygon)
 
-        rescaled_poly = Polygon(polygon_id=poly.id,
-                                points=rescaled_points)  # Back transformation to GEFEST polygon
+        rescaled_poly = Polygon(
+            polygon_id=poly._id,
+            points=rescaled_points,
+        )  # Back transformation to GEFEST polygon
 
         return rescaled_poly
 
@@ -80,15 +103,19 @@ class Geometry2D(Geometry):
 
         geom_polygon = self._poly_to_geom(poly)  # Transformation to shapely structure
 
-        rotated_geom_polygon = affinity.rotate(geom_polygon, angle, 'center')  # Rotating the entire polygon
+        rotated_geom_polygon = affinity.rotate(
+            geom_polygon, angle, "center"
+        )  # Rotating the entire polygon
 
         rotated_points = self.get_coords(rotated_geom_polygon)
-        rotated_poly = Polygon(polygon_id=poly.id,
-                               points=rotated_points)  # Back transformation to GEFEST polygon
+        rotated_poly = Polygon(
+            polygon_id=poly._id,
+            points=rotated_points,
+        )  # Back transformation to GEFEST polygon
 
         return rotated_poly
 
-    def get_square(self, polygon: 'Polygon') -> float:
+    def get_square(self, polygon: "Polygon") -> float:
         """Recieving value of the area
         Args:
             polygon: :obj:`Polygon` for processing
@@ -104,7 +131,7 @@ class Geometry2D(Geometry):
 
         return geom_polygon.area
 
-    def is_contain_point(self, poly: 'Polygon', point: Point) -> bool:
+    def is_contain_point(self, poly: "Polygon", point: Point) -> bool:
         """Checking if a point is inside a polygon
         Args:
             poly: :obj:`Polygon` that explore
@@ -141,10 +168,12 @@ class Geometry2D(Geometry):
         geom_poly_1 = self._poly_to_geom(poly_1)
         geom_poly_2 = self._poly_to_geom(poly_2)
 
-        _, nearest_correct_position = nearest_points(geom_poly_1, geom_poly_2)  # Set of points as output
+        _, nearest_correct_position = nearest_points(
+            geom_poly_1, geom_poly_2
+        )  # Set of points as output
         return nearest_correct_position
 
-    def get_convex(self, poly: 'Polygon') -> Polygon:
+    def get_convex(self, poly: "Polygon") -> Polygon:
         """Obtaining a convex polygon to avoid intersections
         Args:
             poly: :obj:`Polygon` for processing
@@ -155,11 +184,11 @@ class Geometry2D(Geometry):
             return poly
         geom_poly = self._poly_to_geom(poly).convex_hull
         points = self.get_coords(geom_poly)
-        polygon = Polygon(polygon_id='tmp', points=points)
+        polygon = Polygon(polygon_id="tmp", points=points)
 
         return polygon
 
-    def get_centroid(self, poly: 'Polygon') -> Point:
+    def get_centroid(self, poly: "Polygon") -> Point:
         """Getting a point that is the center of mass of the polygon
         Args:
             poly: the :obj:`Polygon` that explore
@@ -174,7 +203,7 @@ class Geometry2D(Geometry):
         point = Point(geom_point.x, geom_point.y)
         return point
 
-    def intersects(self, structure: 'Structure') -> bool:
+    def intersects(self, structure: "Structure") -> bool:
         """Function to check for any intersection in structure of polygons
         Whole structure appears like shapely MultiLineString for which uses method is simple
         Args:
@@ -187,14 +216,14 @@ class Geometry2D(Geometry):
         multi_geom = MultiLineString([self._poly_to_geom(poly) for poly in polygons])
         return multi_geom.is_simple
 
-    def contains(self, poly1: 'Polygon', poly2: 'Polygon') -> bool:
+    def contains(self, poly1: "Polygon", poly2: "Polygon") -> bool:
         geom_polygon1 = self._poly_to_geom(poly1)
         geom_polygon2 = GeomPolygon([self._pt_to_geom(pt) for pt in poly2.points])
 
         is_contain = geom_polygon2.contains(geom_polygon1)
         return is_contain
 
-    def intersects_poly(self, poly_1: 'Polygon', poly_2: 'Polygon') -> bool:
+    def intersects_poly(self, poly_1: "Polygon", poly_2: "Polygon") -> bool:
         """Intersection between two polygons
         Args:
             poly_1: the first :obj:`Polygon` that explore
@@ -235,7 +264,7 @@ class Geometry2D(Geometry):
 
         return distance
 
-    def centroid_distance(self, point: 'Point', poly: 'Polygon') -> Point:
+    def centroid_distance(self, point: "Point", poly: "Polygon") -> Point:
         # Distance from point to polygon
         geom_point = self._pt_to_geom(point)
         geom_poly = self._poly_to_geom(poly)
@@ -245,7 +274,7 @@ class Geometry2D(Geometry):
 
 
 # Function to create a circle, needed for one of the synthetic examples
-def create_circle(struct: 'Structure') -> 'Structure':
+def create_circle(struct: "Structure") -> "Structure":
     geom = Geometry2D(is_closed=False)
     poly = struct.polygons[0]
 
@@ -262,7 +291,9 @@ def create_circle(struct: 'Structure') -> 'Structure':
     a = radius * np.cos(theta) + center_x + 2.2 * radius
     b = radius * np.sin(theta) + center_y
 
-    struct = Polygon(polygon_id=str(uuid4()),
-                     points=[(Point(x, y)) for x, y in zip(a, b)])
+    struct = Polygon(
+        polygon_id=str(uuid4()),
+        points=[(Point(x, y)) for x, y in zip(a, b)],
+    )
 
     return struct

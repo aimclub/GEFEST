@@ -1,10 +1,10 @@
 from abc import abstractmethod
-from shapely.geometry import Point as GeomPoint, LineString
-
 from typing import List
 
-from gefest.core.structure.point import Point
-from gefest.core.structure.polygon import Polygon
+from shapely.geometry import LineString
+from shapely.geometry import Point as GeomPoint
+
+from gefest.core.geometry import Point, Polygon
 
 
 class Geometry:
@@ -39,7 +39,7 @@ class Geometry:
         pass
 
     @abstractmethod
-    def is_contain_point(self, poly: Polygon, point: 'Point'):
+    def is_contain_point(self, poly: Polygon, point: "Point"):
         pass
 
     @abstractmethod
@@ -51,7 +51,7 @@ class Geometry:
         pass
 
     @abstractmethod
-    def min_distance(self, pt_1: 'Point', pt_2: 'Point') -> float:
+    def min_distance(self, pt_1: "Point", pt_2: "Point") -> float:
         pass
 
     @abstractmethod

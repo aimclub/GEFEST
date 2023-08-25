@@ -1,13 +1,13 @@
-from copy import deepcopy
-from uuid import uuid4
+from uuid import UUID, uuid4
+
+from pydantic import Field
+from pydantic.dataclasses import dataclass
+
+from gefest.core.geometry import Structure
 
 
+@dataclass
 class Individual:
-    def __init__(self, genotype):
-        self.objectives = ()
-        self.analytics_objectives = []
-        self.fitness = None
-        self.genotype = deepcopy(genotype)
-        self.graph = self.genotype
-        self.population_number = 0
-        self.uid = str(uuid4())
+    genotype: Structure
+    fitness: list[float] = Field(default_factory=list)
+    _id: UUID = Field(default_factory=uuid4)

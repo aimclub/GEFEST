@@ -60,12 +60,12 @@ class Point:
         self._z = value
 
     def coords(self):
-        '''Returns the :obj:`list` included spatial coordinates of the :obj:`Point`
+        """Returns the :obj:`list` included spatial coordinates of the :obj:`Point`
 
         Returns:
           :obj:`List`: ``[x,y,z]``
 
-        '''
+        """
         return [self.x, self.y, self.z]
 
 

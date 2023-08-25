@@ -1,56 +1,35 @@
-from copy import deepcopy
-from multiprocessing import Pool
+from functools import partial
+from typing import Callable
 
-from gefest.core.algs.postproc.resolve_errors import postprocess
-from gefest.core.opt.constraints import check_constraints
-from gefest.core.structure.domain import Domain
-from gefest.core.structure.structure import get_random_structure
+import numpy as np
+from numpy import ndarray
 
-MAX_ITER = 50000
-NUM_PROC = 1
+from gefest.core.geometry import Structure
+from gefest.core.geometry.utils import get_random_structure
+from gefest.core.opt.abstract.strategy import Strategy
+from gefest.core.opt.domain import Domain
+from gefest.core.utils.mp_manager import WorkerData
 
 
-class StandardSampler:
+class StandardSampler(Strategy):
+    def __init__(self, postprocessor: Callable, domain: Domain) -> None:
+        super().__init__()
+        self.postprocessor: Callable = postprocessor
+        self.domain: Domain = domain
 
-    def sample(self, n_samples: int, domain: Domain, initial_state=None):
-        # Method for initialization of population
+    def __call__(self, n_samples: int) -> list[Structure]:
+        return self.sample(n_samples=n_samples)
 
-        population_new = []
+    def sample(self, n_samples: int) -> list[Structure]:
+        data = [
+            (
+                (partial(get_random_structure, domain=self.domain), self.postprocessor),
+                idx,
+            )
+            for _, idx in enumerate(range(n_samples))
+        ]
 
-        if initial_state is None:
-            while len(population_new) < n_samples:
-                if NUM_PROC > 1:
-                    with Pool(NUM_PROC) as p:
-                        new_items = p.map(self.get_pop_worker, [domain] * n_samples)
-                else:
-                    new_items = []
-                    for i in range(n_samples):
-                        new_items.append(self.get_pop_worker(domain))
+        parallel_generators = [WorkerData(funcs, idx) for funcs, idx in data]
 
-                for structure in new_items:
-                    population_new.append(structure)
-                    if len(population_new) == n_samples:
-                        return population_new
-        else:
-            for _ in range(n_samples):
-                population_new.append(deepcopy(initial_state))
-        return population_new
-
-    def get_pop_worker(self, domain):
-        # Create a random structure and postprocess it
-        structure = get_random_structure(domain=domain)
-        structure = postprocess(structure, domain)
-        constraints = check_constraints(structure=structure, domain=domain)
-        max_attempts = 3  # Number of postprocessing attempts
-        while not constraints:
-            structure = postprocess(structure, domain)
-            constraints = check_constraints(structure=structure, domain=domain)
-            max_attempts -= 1
-            if max_attempts < 0:
-                # If the number of attempts is over,
-                # a new structure is created on which postprocessing is performed
-                structure = get_random_structure(domain=domain)
-                structure = postprocess(structure, domain)
-                constraints = check_constraints(structure=structure, domain=domain)
-
-        return structure
+        random_pop, _ = self._mp.multiprocess(parallel_generators)
+        return random_pop

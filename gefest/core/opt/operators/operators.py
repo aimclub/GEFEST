@@ -1,5 +1,5 @@
-from gefest.core.opt.operators.mutation import mutation
 from gefest.core.opt.operators.crossover import crossover
+from gefest.core.opt.operators.mutation import mutation
 
 
 class EvoOperators:

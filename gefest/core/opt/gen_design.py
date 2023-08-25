@@ -1,16 +1,12 @@
 import os
-import shutil
 import pickle
-from tqdm import tqdm
+import shutil
 from pathlib import Path
 
+from tqdm import tqdm
 
-def design(n_steps: int,
-           pop_size: int,
-           estimator,
-           sampler,
-           optimizer,
-           extra=False):
+
+def design(n_steps: int, pop_size: int, estimator, sampler, optimizer, extra=False):
     """
     Generative design procedure
     :param n_steps: (Int) number of generative design steps
@@ -29,10 +25,10 @@ def design(n_steps: int,
         :param samples: (List), samples to save
         :return: None
         """
-        with open(Path(path, f'performance_{i}.pickle'), 'wb') as handle:
+        with open(Path(path, f"performance_{i}.pickle"), "wb") as handle:
             pickle.dump(performance, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-        with open(Path(path, f'population_{i}.pickle'), 'wb') as handle:
+        with open(Path(path, f"population_{i}.pickle"), "wb") as handle:
             pickle.dump(samples, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         return
@@ -55,7 +51,7 @@ def design(n_steps: int,
 
         return performance, samples
 
-    path = 'HistoryFiles'
+    path = "HistoryFiles"
 
     if os.path.exists(path):
         shutil.rmtree(path)
@@ -68,7 +64,7 @@ def design(n_steps: int,
 
         # Choose best and save the results
         performance, samples = _remain_best(performance, samples)
-        print(f'\nBest performance is {performance[0]}')
+        print(f"\nBest performance is {performance[0]}")
 
         _save_res(performance, samples)
 

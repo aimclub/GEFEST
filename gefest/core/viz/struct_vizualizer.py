@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
-
-from gefest.core.structure.domain import Domain
-from gefest.core.structure.structure import Structure
 from matplotlib.lines import Line2D
+
+from gefest.core.geometry import Structure
+from gefest.core.opt.domain import Domain
 
 
 class StructVizualizer:
@@ -17,7 +17,7 @@ class StructVizualizer:
     def __init__(self, domain: Domain):
         self.domain = domain
 
-    def plot_structure(self, structs: list[Structure], infos, linestyles):
+    def plot_structure(self, structs: list[Structure], infos, linestyles="-"):
         """The method displays the given list[obj:`Structure`]
         Args:
             structs: the list[obj:`Structure`] for displaying
@@ -46,8 +46,9 @@ class StructVizualizer:
 
             plt.plot(x, y)
 
-        lines = [Line2D([0], [0], color='black', linewidth=3, linestyle=style)
-                 for style in linestyles]
+        lines = [
+            Line2D([0], [0], color="black", linewidth=3, linestyle=style) for style in linestyles
+        ]
         plt.legend(lines, infos, loc=2)
 
     def plot_poly(self, poly, linestyle):
