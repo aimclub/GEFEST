@@ -1,6 +1,6 @@
 """
 Here are defined general constraints on polygons by validation rules.
-Validation is a checking on valid and unvalid objects for further processing.
+Validation is a checking on valid and invalid objects for further processing.
 """
 
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon

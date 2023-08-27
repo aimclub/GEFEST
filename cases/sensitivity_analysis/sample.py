@@ -1,4 +1,4 @@
-from gefest.core.algs.sensetivity.sa_core import SA, report_viz
+from gefest.core.algs.sensitivity.sa_core import SA, report_viz
 from gefest.core.opt.gen_design import design
 from cases.breakwaters.configuration_de import bw_optimizer, bw_sampler
 from cases.main_conf import opt_params

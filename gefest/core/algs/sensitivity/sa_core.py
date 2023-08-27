@@ -8,7 +8,7 @@ from gefest.core.structure.point import Point
 from gefest.core.algs.geom.validation import out_of_bound, too_close, intersection
 
 
-class SA_methods:
+class SensitivityAnalysisMethods:
     """Base class consists transformation methods for sensitivity-based optimization"""
 
     def __init__(self, optimized_pop, estimator, domain, *args, **kwargs):
@@ -29,64 +29,64 @@ class SA_methods:
         print(structure)
         for poly_num, poly in enumerate(structure.polygons):
             poly.id = "poly_" + str(poly_num)
-        init_fitnes = round(
+        init_fitness = round(
             self.cost([structure])[0], 3
         )  # only high of wave in multicreterial loss
 
-        fitnes_history = []
+        fitness_history = []
         structure_history = []
         polygon_history = []
-        fitnes_history.append(init_fitnes)
+        fitness_history.append(init_fitness)
         structure_history.append(structure)
-        polygon_history.append(f"init_moving, fitnes={init_fitnes}")
-        current_fitnes = init_fitnes
+        polygon_history.append(f"init_moving, fitness={init_fitness}")
+        current_fitness = init_fitness
 
         for poly_num, poly in enumerate(structure.polygons):
-            step_fitnes = 0
+            step_fitness = 0
             max_attempts = 3
 
             if poly.id != "fixed":
                 moving_step = self.input_domain.geometry.get_length(polygon=poly) * 0.2
 
-                while step_fitnes <= current_fitnes and max_attempts > 0:
-                    step_structure, step_fitnes, worse_res = self._moving_for_one_step(
+                while step_fitness <= current_fitness and max_attempts > 0:
+                    step_structure, step_fitness, worse_res = self._moving_for_one_step(
                         structure=structure,
                         poly_number=poly_num,
                         moving_step=moving_step,
-                        init_fitnes=current_fitnes,
+                        init_fitness=current_fitness,
                     )
                     structure_history.append(step_structure)
-                    fitnes_history.append(step_fitnes)
+                    fitness_history.append(step_fitness)
                     end_step_time = time.time()
                     self.sa_time_history.append(end_step_time - self.start_time)
 
                     if worse_res:
-                        fitnes_diff = round(
-                            100 * ((worse_res - current_fitnes) / current_fitnes), 1
+                        fitness_diff = round(
+                            100 * ((worse_res - current_fitness) / current_fitness), 1
                         )
                         polygon_history.append(
                             f"{str(poly.id)}, step={round(moving_step)},\
-                                                fitnes=+{str(fitnes_diff)}%"
+                                                fitness=+{str(fitness_diff)}%"
                         )
                     else:
-                        fitnes_diff = round(
-                            100 * ((step_fitnes - current_fitnes) / current_fitnes), 1
+                        fitness_diff = round(
+                            100 * ((step_fitness - current_fitness) / current_fitness), 1
                         )
                         polygon_history.append(
-                            f"{str(poly.id)}, step={round(moving_step)}, fitnes={str(fitnes_diff)}%"
+                            f"{str(poly.id)}, step={round(moving_step)}, fitness={str(fitness_diff)}%"
                         )
 
-                    if step_fitnes >= current_fitnes:
+                    if step_fitness >= current_fitness:
                         max_attempts -= 1
                         moving_step = moving_step / 2
                     else:
-                        current_fitnes = step_fitnes
+                        current_fitness = step_fitness
                         structure = deepcopy(step_structure)
 
-        return fitnes_history, structure_history, polygon_history
+        return fitness_history, structure_history, polygon_history
 
     def _moving_for_one_step(
-        self, structure: Structure, poly_number: int, moving_step, init_fitnes
+        self, structure: Structure, poly_number: int, moving_step, init_fitness
     ):
         moved_init_poly = structure.polygons[poly_number]
         directions = ["north", "south", "east", "west", "n-w", "s-w", "n-e", "s-e"]
@@ -100,28 +100,28 @@ class SA_methods:
 
             tmp_structure = deepcopy(structure)
             tmp_structure.polygons[poly_number] = moved_poly
-            fitnes = round(self.cost([tmp_structure])[0], 3)
-            non_unvalid = not any(
+            fitness = round(self.cost([tmp_structure])[0], 3)
+            non_invalid = not any(
                 [
                     out_of_bound(tmp_structure, self.input_domain),
                     too_close(tmp_structure, self.input_domain),
                     intersection(tmp_structure, self.input_domain),
                 ]
             )
-            if fitnes < init_fitnes and non_unvalid:
-                results[fitnes] = tmp_structure
-            elif fitnes >= init_fitnes and non_unvalid:
-                worse_results[fitnes] = tmp_structure
+            if fitness < init_fitness and non_invalid:
+                results[fitness] = tmp_structure
+            elif fitness >= init_fitness and non_invalid:
+                worse_results[fitness] = tmp_structure
             else:
-                worse_results[init_fitnes] = tmp_structure
+                worse_results[init_fitness] = tmp_structure
 
         if results:
             best_structure = results[min(results)]
-            best_fitnes = min(results)
-            return best_structure, best_fitnes, 0
+            best_fitness = min(results)
+            return best_structure, best_fitness, 0
         else:
-            best_worse_fitnes = min(worse_results)
-            return structure, init_fitnes, best_worse_fitnes
+            best_worse_fitness = min(worse_results)
+            return structure, init_fitness, best_worse_fitness
 
     def _moving_point(self, direction: str, point: Point, moving_step) -> Point:
         directions = {
@@ -136,20 +136,20 @@ class SA_methods:
         }
         return directions[direction]
 
-    def exploring_combinations(self, structure: Structure, init_fitnes):
+    def exploring_combinations(self, structure: Structure, init_fitness):
         """Analysis of polygons necessity, looking for the best combination of polys"""
 
-        best_fitnes = []
+        best_fitness = []
         best_structures = []
         best_description = []
 
-        fitnes_history = []
+        fitness_history = []
         structure_history = []
         polygon_history = []
 
-        fitnes_history.append(init_fitnes)
+        fitness_history.append(init_fitness)
         structure_history.append(structure)
-        polygon_history.append(f"init_combinations, fitnes={init_fitnes}")
+        polygon_history.append(f"init_combinations, fitness={init_fitness}")
         end_step_time = time.time()
         self.sa_time_history.append(end_step_time - self.start_time)
 
@@ -157,60 +157,60 @@ class SA_methods:
             for unique_comb in itertools.combinations(structure.polygons, length):
                 tmp_structure = deepcopy(structure)
                 tmp_structure.polygons = list(unique_comb)
-                fitnes = round(self.cost([tmp_structure])[0], 3)
+                fitness = round(self.cost([tmp_structure])[0], 3)
 
                 structure_history.append(tmp_structure)
-                fitnes_history.append(init_fitnes)
-                fitnes_diff = round(100 * ((fitnes - init_fitnes) / init_fitnes), 1)
+                fitness_history.append(init_fitness)
+                fitness_diff = round(100 * ((fitness - init_fitness) / init_fitness), 1)
 
-                if fitnes <= init_fitnes * 1.01:
-                    best_fitnes.append(fitnes)
+                if fitness <= init_fitness * 1.01:
+                    best_fitness.append(fitness)
                     best_structures.append(tmp_structure)
 
                     ids = []
                     for polygon in tmp_structure.polygons:
                         ids.append(polygon.id)
-                    polygon_history.append(f"{str(ids)}, fitnes={str(fitnes_diff)}%")
-                    best_description.append(f"{str(ids)}, fitnes={str(fitnes_diff)}%")
+                    polygon_history.append(f"{str(ids)}, fitness={str(fitness_diff)}%")
+                    best_description.append(f"{str(ids)}, fitness={str(fitness_diff)}%")
                 else:
                     ids = []
                     for polygon in tmp_structure.polygons:
                         ids.append(polygon.id)
-                    polygon_history.append(f"{str(ids)}, fitnes=+{str(fitnes_diff)}%")
+                    polygon_history.append(f"{str(ids)}, fitness=+{str(fitness_diff)}%")
 
                 end_step_time = time.time()
                 self.sa_time_history.append(end_step_time - self.start_time)
 
-        if min(best_fitnes) < init_fitnes:
-            best_samples = list(zip(best_fitnes, best_structures, best_description))
+        if min(best_fitness) < init_fitness:
+            best_samples = list(zip(best_fitness, best_structures, best_description))
             best_samples.sort(key=lambda x: x[0])
             finish_sample = best_samples[0]
         else:
             length = [len(struct.polygons) for struct in best_structures]
             best_samples = list(
-                zip(best_fitnes, best_structures, best_description, length)
+                zip(best_fitness, best_structures, best_description, length)
             )
             best_samples.sort(key=lambda x: x[3])
             finish_sample = best_samples[0][:-1]
 
-        fitnes_history.append(finish_sample[0])
+        fitness_history.append(finish_sample[0])
         structure_history.append(finish_sample[1])
         polygon_history.append(finish_sample[2])
 
-        return fitnes_history, structure_history, polygon_history
+        return fitness_history, structure_history, polygon_history
 
-    def removing_points(self, structure: Structure, init_fitnes):
-        fitnes_history = []
+    def removing_points(self, structure: Structure, init_fitness):
+        fitness_history = []
         structure_history = []
         polygon_history = []
 
-        fitnes_history.append(init_fitnes)
+        fitness_history.append(init_fitness)
         structure_history.append(structure)
-        polygon_history.append(f"init_removing_points, fitnes={init_fitnes}")
+        polygon_history.append(f"init_removing_points, fitness={init_fitness}")
         end_step_time = time.time()
         self.sa_time_history.append(end_step_time - self.start_time)
 
-        current_fitnes = init_fitnes
+        current_fitness = init_fitness
 
         new_structure = deepcopy(structure)
 
@@ -231,26 +231,26 @@ class SA_methods:
 
                         tmp_structure.polygons[poly_number] = tmp_polygon
 
-                        fitnes = round(self.cost([tmp_structure])[0], 3)
-                        fitnes_diff = round(
-                            100 * ((fitnes - current_fitnes) / current_fitnes), 1
+                        fitness = round(self.cost([tmp_structure])[0], 3)
+                        fitness_diff = round(
+                            100 * ((fitness - current_fitness) / current_fitness), 1
                         )
 
                         structure_history.append(tmp_structure)
 
-                        if fitnes <= current_fitnes * 1.01:
-                            current_fitnes = fitnes
+                        if fitness <= current_fitness * 1.01:
+                            current_fitness = fitness
                             new_polygon = tmp_polygon
-                            fitnes_history.append(fitnes)
+                            fitness_history.append(fitness)
                             polygon_history.append(
                                 f"{str(polygon.id)}, del={str(point.coords())},\
-                                                    fitnes={str(fitnes_diff)}%"
+                                                    fitness={str(fitness_diff)}%"
                             )
                         else:
-                            fitnes_history.append(current_fitnes)
+                            fitness_history.append(current_fitness)
                             polygon_history.append(
                                 f"{str(polygon.id)}, del={str(point.coords())},\
-                                                    fitnes=+{str(fitnes_diff)}%"
+                                                    fitness=+{str(fitness_diff)}%"
                             )
 
                         end_step_time = time.time()
@@ -266,48 +266,48 @@ class SA_methods:
 
                         tmp_structure.polygons[poly_number] = tmp_polygon
 
-                        fitnes = round(self.cost([tmp_structure])[0], 3)
-                        fitnes_diff = round(
-                            100 * ((fitnes - current_fitnes) / current_fitnes), 1
+                        fitness = round(self.cost([tmp_structure])[0], 3)
+                        fitness_diff = round(
+                            100 * ((fitness - current_fitness) / current_fitness), 1
                         )
 
                         structure_history.append(tmp_structure)
 
-                        if fitnes <= current_fitnes * 1.01:
-                            current_fitnes = fitnes
+                        if fitness <= current_fitness * 1.01:
+                            current_fitness = fitness
                             new_polygon = tmp_polygon
-                            fitnes_history.append(fitnes)
+                            fitness_history.append(fitness)
                             polygon_history.append(
                                 f"{str(polygon.id)}, del={str(point.coords())},\
-                                                    fitnes={str(fitnes_diff)}%"
+                                                    fitness={str(fitness_diff)}%"
                             )
                         else:
-                            fitnes_history.append(current_fitnes)
+                            fitness_history.append(current_fitness)
                             polygon_history.append(
                                 f"{str(polygon.id)}, del={str(point.coords())},\
-                                                    fitnes=+{str(fitnes_diff)}%"
+                                                    fitness=+{str(fitness_diff)}%"
                             )
 
                         end_step_time = time.time()
                         self.sa_time_history.append(end_step_time - self.start_time)
                     new_structure = tmp_structure
 
-        return fitnes_history, structure_history, polygon_history
+        return fitness_history, structure_history, polygon_history
 
-    def rotate_objects(self, structure: Structure, init_fitnes: int):
+    def rotate_objects(self, structure: Structure, init_fitness: int):
         """Analysis of rotating polygons"""
         rotate_func = self.input_domain.geometry.rotate_poly
-        fitnes_history = []
+        fitness_history = []
         structure_history = []
         polygon_history = []
 
-        fitnes_history.append(init_fitnes)
+        fitness_history.append(init_fitness)
         structure_history.append(structure)
-        polygon_history.append(f"init_rotates, fitnes={init_fitnes}")
+        polygon_history.append(f"init_rotates, fitness={init_fitness}")
         end_step_time = time.time()
         self.sa_time_history.append(end_step_time - self.start_time)
 
-        curent_fitnes = init_fitnes
+        curent_fitness = init_fitness
 
         for poly_num, poly in enumerate(structure.polygons):
             tmp_fit_history = []
@@ -323,50 +323,50 @@ class SA_methods:
                     rotated_poly = rotate_func(rotated_poly, angle=angle)
                     tmp_structure.polygons[poly_num] = rotated_poly
 
-                    fitnes = round(self.cost([tmp_structure])[0], 3)
-                    tmp_fit_history.append([fitnes, angle])
+                    fitness = round(self.cost([tmp_structure])[0], 3)
+                    tmp_fit_history.append([fitness, angle])
                     tmp_str_history.append(tmp_structure)
 
                 best_poly_fit = min(tmp_fit_history)
                 idx_best = tmp_fit_history.index(best_poly_fit)
-                fitnes_diff = round(
-                    100 * ((best_poly_fit[0] - curent_fitnes) / curent_fitnes), 1
+                fitness_diff = round(
+                    100 * ((best_poly_fit[0] - curent_fitness) / curent_fitness), 1
                 )
 
-                if best_poly_fit[0] < curent_fitnes:
-                    curent_fitnes = best_poly_fit[0]
+                if best_poly_fit[0] < curent_fitness:
+                    curent_fitness = best_poly_fit[0]
                     best_tmp_structure = tmp_str_history[idx_best]
                     structure.polygons[poly_num] = best_tmp_structure.polygons[poly_num]
-                    fitnes_history.append(best_poly_fit[0])
+                    fitness_history.append(best_poly_fit[0])
                     structure_history.append(best_tmp_structure)
                     polygon_history.append(
-                        f"{str(poly.id)}, best_angle={best_poly_fit[1]}, fitness={fitnes_diff}%"
+                        f"{str(poly.id)}, best_angle={best_poly_fit[1]}, fitnesss={fitness_diff}%"
                     )
                 else:
-                    fitnes_history.append(curent_fitnes)
+                    fitness_history.append(curent_fitness)
                     structure_history.append(tmp_str_history[idx_best])
                     polygon_history.append(
-                        f"{str(poly.id)}, best_angle={best_poly_fit[1]}, fitness=+{fitnes_diff}%"
+                        f"{str(poly.id)}, best_angle={best_poly_fit[1]}, fitnesss=+{fitness_diff}%"
                     )
 
                 end_step_time = time.time()
                 self.sa_time_history.append(end_step_time - self.start_time)
 
-        best_fitnes = min(fitnes_history)
-        best_idx = fitnes_history.index(best_fitnes)
+        best_fitness = min(fitness_history)
+        best_idx = fitness_history.index(best_fitness)
         best_structure = structure_history[best_idx]
 
-        fitnes_history.append(best_fitnes)
+        fitness_history.append(best_fitness)
         structure_history.append(best_structure)
         polygon_history.append("best_structure after rotating polygons")
 
         end_step_time = time.time()
         self.sa_time_history.append(end_step_time - self.start_time)
 
-        return fitnes_history, structure_history, polygon_history
+        return fitness_history, structure_history, polygon_history
 
 
-class SA(SA_methods):
+class SA(SensitivityAnalysisMethods):
     """The class for doing sensitivity-based optimization for structures
 
     Parameters:
@@ -383,22 +383,22 @@ class SA(SA_methods):
         """Method for sensitivity-based optimization
 
         Returns:
-            List: fitnes history, structure history, description for an each step of analysis,
+            List: fitness history, structure history, description for an each step of analysis,
               time history
         """
 
-        mov_fitnes, mov_structure, mov_poly = self.moving_position()
-        rotated_fitnes, rotated_structure, rotated_poly = self.rotate_objects(
-            mov_structure[-1], mov_fitnes[-1]
+        mov_fitness, mov_structure, mov_poly = self.moving_position()
+        rotated_fitness, rotated_structure, rotated_poly = self.rotate_objects(
+            mov_structure[-1], mov_fitness[-1]
         )
-        del_fitnes, del_structure, del_poly = self.exploring_combinations(
-            rotated_structure[-1], rotated_fitnes[-1]
+        del_fitness, del_structure, del_poly = self.exploring_combinations(
+            rotated_structure[-1], rotated_fitness[-1]
         )
-        rm_points_fitnes, rm_points_structure, rm_points_poly = self.removing_points(
-            del_structure[-1], del_fitnes[-1]
+        rm_points_fitness, rm_points_structure, rm_points_poly = self.removing_points(
+            del_structure[-1], del_fitness[-1]
         )
 
-        fitnes_history = mov_fitnes + rotated_fitnes + del_fitnes + rm_points_fitnes
+        fitness_history = mov_fitness + rotated_fitness + del_fitness + rm_points_fitness
         structure_history = (
             mov_structure + rotated_structure + del_structure + rm_points_structure
         )
@@ -406,7 +406,7 @@ class SA(SA_methods):
 
         time_history = self.get_time_history
 
-        return fitnes_history, structure_history, poly_history, time_history
+        return fitness_history, structure_history, poly_history, time_history
 
     @property
     def get_improved_structure(self):
@@ -428,7 +428,7 @@ def report_viz(analysis_result):
         analysis_result (List): results of sensitivity analysis of structure (from ''SA.analysis()'')
     """
 
-    fitnes_history = analysis_result[0]
+    fitness_history = analysis_result[0]
     structure_history = analysis_result[1]
     descriptions = analysis_result[2]
     time_history = analysis_result[3]
@@ -437,13 +437,13 @@ def report_viz(analysis_result):
     optimized_structure = structure_history[-1]
 
     x = list(range(len(descriptions)))
-    y = fitnes_history
+    y = fitness_history
 
     spend_time = round(time_history[-1] - time_history[0])
 
-    start_fit = fitnes_history[0]
-    end_fit = fitnes_history[-1]
-    fitnes_difference = round(100 * (start_fit - end_fit) / start_fit, 1)
+    start_fit = fitness_history[0]
+    end_fit = fitness_history[-1]
+    fitness_difference = round(100 * (start_fit - end_fit) / start_fit, 1)
 
     fig, axd = plt.subplot_mosaic(
         [["upper", "upper"], ["lower left", "lower right"]],
@@ -453,19 +453,19 @@ def report_viz(analysis_result):
 
     fig.suptitle(
         f"Sensitivity-based optimization report, spend={spend_time}sec,\
-                  fitnes improved on {fitnes_difference}%"
+                  fitness improved on {fitness_difference}%"
     )
 
     initial_strucutre.plot(color="r", ax=axd["lower left"], legend=True)
     axd["lower left"].set_title(
-        f"Initial structure, fitnes={round(fitnes_history[0], 3)}"
+        f"Initial structure, fitness={round(fitness_history[0], 3)}"
     )
     optimized_structure.plot(ax=axd["lower right"], legend=True)
     axd["lower right"].set_title(
-        f"Processed structure, fitnes={round(fitnes_history[-1], 3)}"
+        f"Processed structure, fitness={round(fitness_history[-1], 3)}"
     )
 
-    axd["upper"].plot(fitnes_history, c="c")
+    axd["upper"].plot(fitness_history, c="c")
     axd["upper"].scatter(x, y, marker="o", c="c")
     for idx, text in enumerate(descriptions):
         axd["upper"].annotate(text, (x[idx] + 0.01, y[idx] + 0.01), rotation=45.0)
