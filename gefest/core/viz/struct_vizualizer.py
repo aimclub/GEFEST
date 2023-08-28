@@ -1,3 +1,5 @@
+from typing import List
+
 import matplotlib.pyplot as plt
 
 from gefest.core.structure.domain import Domain
@@ -17,7 +19,7 @@ class StructVizualizer:
     def __init__(self, domain: Domain):
         self.domain = domain
 
-    def plot_structure(self, structs: list[Structure], infos, linestyles):
+    def plot_structure(self, structs: List[Structure], infos, linestyles):
         """The method displays the given list[obj:`Structure`]
         Args:
             structs: the list[obj:`Structure`] for displaying
