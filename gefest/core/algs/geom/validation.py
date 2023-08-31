@@ -14,7 +14,6 @@ from gefest.core.geometry import Polygon, Structure
 from gefest.core.opt.domain import Domain
 
 # from gefest.core.structure.polygon import Polygon
-4
 
 min_dist_from_boundary = 1
 
@@ -104,7 +103,7 @@ def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain):
     return domain.geometry.min_distance(poly_1, poly_2)
 
 
-def self_intersection(structure: Structure) -> bool:
+def self_intersection(structure: Structure, *args) -> bool:
     """The method indicates that any :obj:`Polygon` in the :obj:`Structure`
     is self-intersected
     Args:
@@ -142,7 +141,7 @@ def distance_between_points(structure: Structure, domain: Domain) -> bool:
         for ind, pnt in enumerate(i[1:]):
             check.append(norm(np.array(pnt) - np.array(i[ind]), ord=1) < lenght)
     if any(check):
-        print("Намутировал плохой полигон!, distance_between_points")
+        print('Намутировал плохой полигон!, distance_between_points')
     return any(check)
 
 
@@ -160,7 +159,7 @@ def distance_between_points_in_poly(poly: Polygon, domain: Domain) -> bool:
         for ind, pnt in enumerate(i[1:]):
             check.append(norm(np.array(pnt) - np.array(i[ind]), ord=1) < lenght)
     if any(check):
-        print("Намутировал плохой полигон!, distance_between_points_in_poly")
+        print('Намутировал плохой полигон!, distance_between_points_in_poly')
     return any(check)
 
 
@@ -176,7 +175,7 @@ def unclosed_poly(structure: Structure, domain: Domain) -> bool:
         otherwise - ``False``
     """
 
-    if domain.is_closed:
+    if domain.geometry.is_closed:
         return any([poly.points[0] != poly.points[-1] for poly in structure.polygons])
     else:
         return False
@@ -187,7 +186,7 @@ def is_contain(structure: Structure, domain: Domain) -> bool:
 
     try:
         for poly_area in domain.prohibited_area.polygons:
-            if poly_area.id == "prohibited_area":
+            if poly_area.id == 'prohibited_area':
                 for poly in structure.polygons:
                     is_contains.append(domain.geometry.contains(poly, poly_area))
 
@@ -198,4 +197,4 @@ def is_contain(structure: Structure, domain: Domain) -> bool:
 
 
 def _forbidden_validity(validity):
-    return validity != "Valid Geometry" and "Ring Self-intersection" not in validity
+    return validity != 'Valid Geometry' and 'Ring Self-intersection' not in validity

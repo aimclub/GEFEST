@@ -1,4 +1,6 @@
-from gefest.core.structure.domain import Domain
+from typing import Any
+
+from gefest.core.opt.domain import Domain
 
 
 class Sampler:
@@ -6,7 +8,8 @@ class Sampler:
     ::TODO::
     make abstract class for all samplers
     """
-    def __init__(self, sampler, domain: 'Domain'):
+
+    def __init__(self, sampler, domain: "Domain"):
         """
         Base sampler class
         :param sampler: (Object) object with method sample
@@ -24,3 +27,6 @@ class Sampler:
         samples = self.sampler.sample(n_samples=n_samples, domain=self.domain)
 
         return samples
+
+    def __call__(self, *args: Any, **kwds: Any) -> Any:
+        return self.sample(args)

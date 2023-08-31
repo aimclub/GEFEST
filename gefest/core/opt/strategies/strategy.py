@@ -1,5 +1,5 @@
-from abc import ABCMeta, abstractclassmethod
-from typing import Any, Iterable
+from abc import ABCMeta, abstractmethod
+from typing import Any
 
 from gefest.core.geometry import Structure
 from gefest.core.utils import WorkersManager
@@ -13,7 +13,7 @@ class Strategy(metaclass=ABCMeta):
     def __init__(self):
         self._mp = WorkersManager()
 
-    @abstractclassmethod
-    def __call__(self, pop: Iterable[Structure], *args: Any, **kwds: Any) -> Iterable[Structure]:
+    @abstractmethod
+    def __call__(self, pop: list[Structure], *args: Any, **kwds: Any,) -> list[Structure]:
         """Code"""
         ...

@@ -4,7 +4,7 @@ from typing import Callable
 import numpy as np
 
 from gefest.core.geometry import Structure
-from gefest.core.opt.abstract.strategy import Strategy
+from .strategy import Strategy
 from gefest.core.utils import WorkerData, where
 
 

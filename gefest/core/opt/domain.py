@@ -5,7 +5,7 @@ from pydantic.dataclasses import dataclass
 from typing_extensions import Annotated
 
 from gefest.core import Geometry2D
-from gefest.core.geometry import Point, Polygon
+from gefest.core.geometry import Point, Polygon, Structure
 
 
 @dataclass
@@ -16,10 +16,9 @@ class Domain:
     max_poly_num: int = 4
     min_points_num: int = 20
     max_points_num: int = 50
-    prohibited_area: Optional[Union[Polygon, list[list[float]]]] = None
-    fixed_points: Optional[Union[Polygon, list[list[float]]]] = None
-    is_closed: bool = True
-    geometry: Optional[object] = Geometry2D(is_closed)
+    prohibited_area: Optional[Structure] = None
+    fixed_points: Optional[Polygon] = Field(default_factory=list)
+    geometry: Optional[object] = Geometry2D(is_closed=True)
 
     def __contains__(self, point: Point):
         """Checking :obj:`Domain` contains :obj:`point`
@@ -37,10 +36,6 @@ class Domain:
             raise ValueError("Invalid points number interval.")
         if self.min_points_num > self.max_points_num:
             raise ValueError("Invalid points number interval.")
-
-    @field_validator("prohibited_area")
-    def parse_points(cls, data):
-        return Polygon([Point(*coords) for coords in data])
 
     @field_validator("allowed_area")
     def parse_allowed_area(cls, data: Union[Polygon, list[list[float]]]):

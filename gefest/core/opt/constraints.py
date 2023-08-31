@@ -191,7 +191,7 @@ class Constraints:
             otherwise - ``False``
         """
 
-        if domain.is_closed:
+        if domain.geometry.is_closed:
             return any([poly.points[0] != poly.points[-1] for poly in structure.polygons])
         else:
             return False

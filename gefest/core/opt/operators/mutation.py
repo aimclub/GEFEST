@@ -1,5 +1,3 @@
-import copy
-import random
 from copy import deepcopy
 from multiprocessing import Pool
 
@@ -26,9 +24,10 @@ def drop_poly(
     domain: Domain,
 ) -> Structure:
     if len(new_structure.polygons) > (domain.min_poly_num + 1):
-        polygon_to_mutate_idx = int(np.random.randint(0, len(new_structure.polygons)))
+        polygon_to_mutate_idx = int(np.random.randint(0, len(new_structure)))
         polygon_to_remove = new_structure.polygons[polygon_to_mutate_idx]
-        new_structure.polygons.remove(polygon_to_remove)
+        if any([p in polygon_to_remove for p in domain.fixed_points]):
+            new_structure.polygons.remove(polygon_to_remove)
     return new_structure
 
 

@@ -9,7 +9,6 @@ from pydantic.dataclasses import dataclass
 from gefest.core.utils import chain
 from gefest.core.utils.singleton import Singleton
 
-
 @dataclass
 class WorkerData:
     funcs: list[Callable]
@@ -34,7 +33,10 @@ class WorkersManager(metaclass=Singleton):
             for _ in range(self.num_workers)
         ]
 
-    def __del__(self) -> None:
+    def __enter__(self):
+        pass
+
+    def __exit__(self, *args):
         self.pool.close()
         self.pool.terminate()
 
@@ -53,7 +55,8 @@ class WorkersManager(metaclass=Singleton):
     @staticmethod
     @logger.catch
     def worker(
-        processing_queue: multiprocessing.Queue, result_queue: multiprocessing.Queue
+        processing_queue: multiprocessing.Queue,
+        result_queue: multiprocessing.Queue,
     ) -> None:
         """Executes given func with it params.
         Args:
@@ -83,13 +86,6 @@ class WorkersManager(metaclass=Singleton):
         Returns:
             results: [list, list], contains provided functions outputs and indices they sorted by
         """
-        # if ids is None:
-        #     ids = list(range(len(funcs)))
-        # if args is None:
-        #     operands = list(zip(funcs, ids))
-        # else:
-        #     operands = list(zip(funcs, ids, args))
-
         res_ids_pairs = []
 
         for idx, operand in enumerate(workers_data):

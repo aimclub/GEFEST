@@ -1,5 +1,4 @@
 import copy
-import random
 from multiprocessing import Pool
 
 import numpy as np
@@ -15,15 +14,18 @@ def panmixis(pop: list[Structure]) -> list[tuple[Structure, Structure]]:
 
 
 # best indivisual selection
-def structure_level_crossover(operands: tuple[Structure, Structure], domain: Domain):
-
+def structure_level_crossover(
+    operands: tuple[Structure, Structure],
+    domain: Domain,
+    **kwargs,
+):
     s1, s2 = operands
     new_structure = copy.deepcopy(s1)
 
     crossover_point = np.random.randint(
         1,
         len(new_structure.polygons) + 1,
-    )  # Choosing crossover point randomly
+    )
 
     # Crossover conversion
     part_1 = s1.polygons[0:crossover_point]

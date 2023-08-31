@@ -17,33 +17,32 @@ def postprocess(
     if structure is None:
         return None
     if any(
-        [
-            (poly is None or len(poly.points) == 0 or any([pt is None for pt in poly.points]))
-            for poly in structure.polygons
-        ],
+        [(not poly or len(poly) == 0 or any([not pt for pt in poly])) for poly in structure],
     ):
-        print("Wrong structure - problems with points")
+        print('Wrong structure - problems with points')
         return None
 
     corrected_structure = deepcopy(structure)
     for i, poly in enumerate(corrected_structure.polygons):
         local_structure = Structure([poly])
         for rule, fix in rule_fix_pairs.values():
-            if not rule(local_structure):
-                corrected_structure.polygons[i] = fix(poly)
+            if not rule(local_structure, domain):
+                corrected_structure.polygons[i] = fix(poly, domain)
 
-    cts = [rule(structure) for rule, _ in rule_fix_pairs.values()]
+    cts = [rule(structure, domain) for rule, _ in rule_fix_pairs.values()]
     if not any(cts):
         return corrected_structure
     return None
 
 
-def correct_unclosed_poly(poly: Polygon) -> Polygon:
+def correct_unclosed_poly(poly: Polygon, domain: Domain) -> Polygon:
     # Simple fix for open polygons by adding first point to end
-    point_to_add = poly.points[0]
-    poly.points.append(point_to_add)
-    correct_poly = poly
-    return correct_poly
+    if domain.geometry.is_closed:
+        point_to_add = poly.points[0]
+        poly.points.append(point_to_add)
+        correct_poly = poly
+        return correct_poly
+    return poly
 
 
 def correct_wrong_point(poly: Polygon, domain: Domain) -> Polygon:
@@ -101,7 +100,7 @@ def correct_self_intersection(poly: Polygon, domain: Domain) -> Polygon:
 #     try:
 #         for i, poly in enumerate(corrected_structure.polygons):
 #             local_structure = Structure([poly])
-#             if unclosed_poly(local_structure, domain) and domain.is_closed:
+#             if unclosed_poly(local_structure, domain) and domain.geometry.is_closed:
 #                 corrected_structure.polygons[i] = _correct_unclosed_poly(poly)
 #             if self_intersection(local_structure):
 #                 corrected_structure.polygons[i] = _correct_self_intersection(poly, domain)
