@@ -24,7 +24,7 @@ def test_mutation_poly():
 
         if len(mutated_structure.polygons) < 2:
             count_del_poly += 1
-        elif 'tmp' in mutated_ids:
+        elif len(mutated_structure.polygons) > 2:
             count_add_poly += 1
 
         count_initial_points = [len(p.points) for p in structure.polygons]

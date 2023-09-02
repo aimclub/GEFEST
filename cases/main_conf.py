@@ -1,4 +1,7 @@
 import argparse
+from gefest.core.utils import project_root
+root = project_root()
+file = 'optimized.pkl'
 
 """
 General configurations for all cases.
