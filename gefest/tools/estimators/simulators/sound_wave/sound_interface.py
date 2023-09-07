@@ -1,9 +1,15 @@
 import itertools
-import numpy as np
-from numpy.core.umath import pi
-from tqdm import tqdm
 from copy import deepcopy
-from skimage.draw import random_shapes, polygon as skipolygon
+
+import numpy as np
+from numpy import ndarray
+from numpy.core.umath import pi
+from skimage.draw import polygon as skipolygon
+from skimage.draw import random_shapes
+from tqdm import tqdm
+
+from gefest.core.geometry import Structure
+from gefest.tools import Estimator
 
 # initial values
 damping = 1 - 0.001
@@ -66,7 +72,9 @@ def generate_random_map(map_size, random_seed):
     # Force free media in a square of 20x20 at the center of the map
     width_center = map_size[0] // 2
     length_center = map_size[1] // 2
-    obstacle_map[width_center - 20:width_center + 21, length_center - 20:length_center + 21] = 255
+    obstacle_map[
+        width_center - 20 : width_center + 21, length_center - 20 : length_center + 21,
+    ] = 255
     free_media = obstacle_map == 255
     # Obstacles = 1, free media = 0
     obstacles = obstacle_map == 0
@@ -75,7 +83,7 @@ def generate_random_map(map_size, random_seed):
     return obstacle_map
 
 
-class SoundSimulator:
+class SoundSimulator(Estimator):
     """Class for the configuration and simulation of sound propagation in a map
     with obstacles.
     Adapted from https://github.com/Alexander3/wave-propagation
@@ -127,25 +135,12 @@ class SoundSimulator:
         P = self.pressure
         for i, j in itertools.product(range(self.size_y), range(self.size_x)):
             if self.obstacle_map[i, j] == 1:
-                V[i, j, 0] = V[i, j, 1] = V[i, j, 2] = V[i, j, 3] = 0.0
+                V[i, j, 0:4] = 0.0
                 continue
-            cell_pressure = P[i, j]
-            V[i, j, 0] = (
-                V[i, j, 0] + cell_pressure - P[i - 1, j] if i > 0 else cell_pressure
-            )
-            V[i, j, 1] = (
-                V[i, j, 1] + cell_pressure - P[i, j + 1]
-                if j < self.size_x - 1
-                else cell_pressure
-            )
-            V[i, j, 2] = (
-                V[i, j, 2] + cell_pressure - P[i + 1, j]
-                if i < self.size_y - 1
-                else cell_pressure
-            )
-            V[i, j, 3] = (
-                V[i, j, 3] + cell_pressure - P[i, j - 1] if j > 0 else cell_pressure
-            )
+            V[i, j, 0] = V[i, j, 0] + P[i, j] - P[i - 1, j] if i > 0 else P[i, j]
+            V[i, j, 1] = V[i, j, 1] + P[i, j] - P[i, j + 1] if j < self.size_x - 1 else P[i, j]
+            V[i, j, 2] = V[i, j, 2] + P[i, j] - P[i + 1, j] if i < self.size_y - 1 else P[i, j]
+            V[i, j, 3] = V[i, j, 3] + P[i, j] - P[i, j - 1] if j > 0 else P[i, j]
 
     def updateP(self):
         """Update the pressure field based on Komatsuzaki's transition rules."""
@@ -153,9 +148,7 @@ class SoundSimulator:
 
     def step(self):
         """Perform a simulation step, upadting the wind an pressure fields."""
-        self.pressure[self.s_y, self.s_x] = initial_P * np.sin(
-            self.omega * self.iteration
-        )
+        self.pressure[self.s_y, self.s_x] = initial_P * np.sin(self.omega * self.iteration)
         self.updateV()
         self.updateP()
         self.iteration += 1
@@ -173,9 +166,7 @@ class SoundSimulator:
         p0 = 20 * 10e-6  # Pa
         if integration_interval > self.pressure_hist.shape[0]:
             integration_interval = self.pressure_hist.shape[0]
-        rms_p = np.sqrt(
-            np.mean(np.square(self.pressure_hist[-integration_interval:-1]), axis=0)
-        )
+        rms_p = np.sqrt(np.mean(np.square(self.pressure_hist[-integration_interval:-1]), axis=0))
 
         matrix_db = 20 * np.log10(rms_p / p0)
         return matrix_db
@@ -185,7 +176,15 @@ class SoundSimulator:
             self.pressure_hist[iteration] = deepcopy(self.pressure)
             self.step()
 
-    def estimate(self, structure):
+    def estimate(self, structure: Structure) -> ndarray:
+        """Estimates sound pressule level for provided structure.
+
+        Args:
+            structure (Structure): optimized structure
+
+        Returns:
+            ndarray: map of sound pressure level (dB)
+        """
         self.obstacle_map = generate_map(self.domain, structure)
         self.run()
         spl = self.spl()

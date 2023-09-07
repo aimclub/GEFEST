@@ -1,10 +1,8 @@
-from typing import List
-
 import matplotlib.pyplot as plt
-
-from gefest.core.structure.domain import Domain
-from gefest.core.structure.structure import Structure
 from matplotlib.lines import Line2D
+
+from gefest.core.geometry import Structure
+from gefest.core.geometry.domain import Domain
 
 
 class StructVizualizer:
@@ -19,7 +17,7 @@ class StructVizualizer:
     def __init__(self, domain: Domain):
         self.domain = domain
 
-    def plot_structure(self, structs: List[Structure], infos, linestyles):
+    def plot_structure(self, structs: list[Structure], infos, linestyles="-"):
         """The method displays the given list[obj:`Structure`]
         Args:
             structs: the list[obj:`Structure`] for displaying
@@ -48,8 +46,9 @@ class StructVizualizer:
 
             plt.plot(x, y)
 
-        lines = [Line2D([0], [0], color='black', linewidth=3, linestyle=style)
-                 for style in linestyles]
+        lines = [
+            Line2D([0], [0], color="black", linewidth=3, linestyle=style) for style in linestyles
+        ]
         plt.legend(lines, infos, loc=2)
 
     def plot_poly(self, poly, linestyle):
@@ -65,7 +64,9 @@ class StructVizualizer:
         Returns:
             .. |viz_poly| image:: https://ibb.co/s31cj3c
         """
-        x = [pt.x for pt in poly.points]
-        y = [pt.y for pt in poly.points]
-
-        plt.plot(x, y, linestyle=linestyle)
+        x_ = [pt.x for pt in poly.points]
+        y_ = [pt.y for pt in poly.points]
+        for i, p in enumerate(zip(x_, y_)):
+            plt.plot(p[0], p[1], marker='${}$'.format(i), color='black')
+        
+        plt.plot(x_, y_,linestyle=linestyle)

@@ -1,22 +1,19 @@
-from abc import abstractmethod
-from shapely.geometry import Point as GeomPoint, LineString
-
+from abc import ABC, abstractmethod
 from typing import List
 
-from gefest.core.structure.point import Point
-from gefest.core.structure.polygon import Polygon
+from pydantic import BaseModel
+from shapely.geometry import LineString
+from shapely.geometry import Point as GeomPoint
+
+from gefest.core.geometry import Point, Polygon
 
 
-class Geometry:
+class Geometry(BaseModel, ABC):
     """
     Abstract geometry class.
     Сlass contains basic transformations of geometries, geometry properties.
     Each of the methods is overridden for a particular dimension of the geometry.
     """
-
-    @abstractmethod
-    def __init__(self):
-        pass
 
     @abstractmethod
     def resize_poly(self, poly: Polygon, x_scale: float, y_scale: float):
@@ -26,20 +23,16 @@ class Geometry:
     def rotate_poly(self, poly: Polygon, angle: float):
         pass
 
+    @abstractmethod
     def get_length(self, polygon: Polygon):
-        if len(polygon.points) < 1:
-            return 0
-
-        geom_polygon = LineString([GeomPoint(pt.x, pt.y) for pt in polygon.points])
-
-        return geom_polygon.length
+        pass
 
     @abstractmethod
     def get_square(self, polygon: Polygon):
         pass
 
     @abstractmethod
-    def is_contain_point(self, poly: Polygon, point: 'Point'):
+    def is_contain_point(self, poly: Polygon, point: "Point"):
         pass
 
     @abstractmethod
@@ -51,7 +44,7 @@ class Geometry:
         pass
 
     @abstractmethod
-    def min_distance(self, pt_1: 'Point', pt_2: 'Point') -> float:
+    def min_distance(self, pt_1: Point, pt_2: Point) -> float:
         pass
 
     @abstractmethod

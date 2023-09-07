@@ -11,8 +11,11 @@ def calculate_objectives(population: List[Individual], model_func):
         ind.objectives = [objective]
         ind.analytics_objectives = [objective]
         idx = ind_id
-        EvoAnalytics.save_cantidate(ind.population_number,
-                                    ind.objectives,
-                                    ind.analytics_objectives,
-                                    ind.genotype,
-                                    'common_dataset', idx)
+        EvoAnalytics.save_cantidate(
+            ind.population_number,
+            ind.objectives,
+            ind.analytics_objectives,
+            ind.genotype,
+            "common_dataset",
+            idx,
+        )

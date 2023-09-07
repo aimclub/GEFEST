@@ -3,33 +3,32 @@ from inspect import isclass, isfunction, ismethod, signature
 from json import JSONDecoder, JSONEncoder
 from typing import Any, Callable, Dict, Type, TypeVar, Union
 
-MODULE_X_NAME_DELIMITER = '/'
-INSTANCE_OR_CALLABLE = TypeVar('INSTANCE_OR_CALLABLE', object, Callable)
-CLASS_PATH_KEY = '_class_path'
+MODULE_X_NAME_DELIMITER = "/"
+INSTANCE_OR_CALLABLE = TypeVar("INSTANCE_OR_CALLABLE", object, Callable)
+CLASS_PATH_KEY = "_class_path"
 
 
 class Serializer(JSONEncoder, JSONDecoder):
-    _to_json = 'to_json'
-    _from_json = 'from_json'
+    _to_json = "to_json"
+    _from_json = "from_json"
 
     CODERS_BY_TYPE = {}
 
     def __init__(self, *args, **kwargs):
-        for base_class, coder_name in [(JSONEncoder, 'default'), (JSONDecoder, 'object_hook')]:
-            base_kwargs = {k: kwargs[k] for k in kwargs.keys() & signature(base_class.__init__).parameters}
+        for base_class, coder_name in [(JSONEncoder, "default"), (JSONDecoder, "object_hook")]:
+            base_kwargs = {
+                k: kwargs[k] for k in kwargs.keys() & signature(base_class.__init__).parameters
+            }
             base_kwargs[coder_name] = getattr(self, coder_name)
             base_class.__init__(self, **base_kwargs)
 
         if not Serializer.CODERS_BY_TYPE:
             from gefest.core.opt.result import Result
-            from gefest.core.structure.structure import Structure
             from gefest.core.structure.point import Point
             from gefest.core.structure.polygon import Polygon
+            from gefest.core.structure.structure import Structure
 
-            from .any import (
-                any_from_json,
-                any_to_json,
-            )
+            from .any import any_from_json, any_to_json
 
             _to_json = Serializer._to_json
             _from_json = Serializer._from_json
@@ -38,12 +37,13 @@ class Serializer(JSONEncoder, JSONDecoder):
                 Result: basic_serialization,
                 Structure: basic_serialization,
                 Polygon: basic_serialization,
-                Point: basic_serialization
-
+                Point: basic_serialization,
             }
 
     @staticmethod
-    def _get_field_checker(obj: Union[INSTANCE_OR_CALLABLE, Type[INSTANCE_OR_CALLABLE]]) -> Callable[..., bool]:
+    def _get_field_checker(
+        obj: Union[INSTANCE_OR_CALLABLE, Type[INSTANCE_OR_CALLABLE]],
+    ) -> Callable[..., bool]:
         if isclass(obj):
             return issubclass
         return isinstance
@@ -76,13 +76,11 @@ class Serializer(JSONEncoder, JSONDecoder):
         else:
             obj_name = obj.__class__.__qualname__
 
-        if getattr(obj, '__module__', None) is not None:
+        if getattr(obj, "__module__", None) is not None:
             obj_module = obj.__module__
         else:
             obj_module = obj.__class__.__module__
-        return {
-            CLASS_PATH_KEY: f'{obj_module}{MODULE_X_NAME_DELIMITER}{obj_name}'
-        }
+        return {CLASS_PATH_KEY: f"{obj_module}{MODULE_X_NAME_DELIMITER}{obj_name}"}
 
     def default(self, obj: INSTANCE_OR_CALLABLE) -> Dict[str, Any]:
         """Tries to encode objects that are not simply json-encodable to JSON-object
@@ -114,7 +112,7 @@ class Serializer(JSONEncoder, JSONDecoder):
 
         module_name, class_name = class_path.split(MODULE_X_NAME_DELIMITER)
         obj_cls = import_module(module_name)
-        for sub in class_name.split('.'):
+        for sub in class_name.split("."):
             obj_cls = getattr(obj_cls, sub)
         return obj_cls
 
@@ -134,8 +132,10 @@ class Serializer(JSONEncoder, JSONDecoder):
             del json_obj[CLASS_PATH_KEY]
             base_type = Serializer._get_base_type(obj_cls)
             if isclass(obj_cls) and base_type is not None:
-                return Serializer._get_coder_by_type(base_type, Serializer._from_json)(obj_cls, json_obj)
+                return Serializer._get_coder_by_type(base_type, Serializer._from_json)(
+                    obj_cls, json_obj,
+                )
             elif isfunction(obj_cls) or ismethod(obj_cls):
                 return obj_cls
-            raise TypeError(f'Parsed obj_cls={obj_cls} is not serializable, but should be')
+            raise TypeError(f"Parsed obj_cls={obj_cls} is not serializable, but should be")
         return json_obj
