@@ -1,6 +1,6 @@
-from uuid import UUID, uuid4
 from enum import Enum
 from typing import Optional, Union
+from uuid import UUID, uuid4
 
 from pydantic import Field
 from pydantic.dataclasses import dataclass

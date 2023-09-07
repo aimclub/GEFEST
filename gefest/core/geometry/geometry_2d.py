@@ -2,6 +2,8 @@ from typing import List
 from uuid import uuid4
 
 import numpy as np
+from pydantic import BaseModel
+from pydantic.dataclasses import dataclass
 from shapely import affinity
 from shapely.geometry import LineString, MultiLineString
 from shapely.geometry import Point as GeomPoint
@@ -10,8 +12,10 @@ from shapely.ops import nearest_points
 
 from gefest.core.geometry import Point, Polygon, Structure
 
+from .geometry import Geometry
 
-class Geometry2D:
+
+class Geometry2D(Geometry):
     """Overriding the geometry base class for 2D structures.
     The input receives information about the closeness of the polygon
     Args:
@@ -19,12 +23,7 @@ class Geometry2D:
             (first Point is equal to the last one), otherwise ``False``.
             Default value is ``True``
     """
-
-    def __init__(
-        self,
-        is_closed=True,
-    ):
-        self.is_closed = is_closed
+    is_closed: bool = True
 
     def get_length(self, polygon: Polygon):
         if len(polygon.points) < 1:

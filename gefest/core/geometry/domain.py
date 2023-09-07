@@ -1,11 +1,13 @@
-from typing import Iterable, Optional, Union
+from pathlib import Path
+from typing import Optional, Union
 
+import yaml
 from pydantic import Field, computed_field, field_validator, model_validator
 from pydantic.dataclasses import dataclass
-from typing_extensions import Annotated
+from pydantic_yaml import parse_yaml_raw_as
 
-from gefest.core import Geometry2D
 from gefest.core.geometry import Point, Polygon, Structure
+from gefest.core.geometry.geometry_2d import Geometry2D
 
 
 @dataclass
@@ -17,8 +19,18 @@ class Domain:
     min_points_num: int = 20
     max_points_num: int = 50
     prohibited_area: Optional[Structure] = None
-    fixed_points: Optional[Polygon] = Field(default_factory=list)
-    geometry: Optional[object] = Geometry2D(is_closed=True)
+    fixed_points: Optional[Union[Polygon, list[list[float]]]] = Field(default_factory=list)
+    geometry: Optional[Geometry2D] = Geometry2D()
+
+    def parse_raw(self, cfg_file: Path):
+
+        with open(cfg_file) as f:
+            cfg = yaml.safe_load(f)
+
+        if "domain" not in cfg:
+            raise AttributeError("No 'domain' section {cfg_file} config file.")
+
+        return parse_yaml_raw_as(Domain, yaml.dump(cfg['domain']))
 
     def __contains__(self, point: Point):
         """Checking :obj:`Domain` contains :obj:`point`
@@ -30,12 +42,17 @@ class Domain:
         """
         return self.geometry.is_contain_point(self.allowed_area, point)
 
-    @model_validator(mode="after")
-    def min_max_bounds(self):
+    def __post_init__(self):
         if self.min_poly_num > self.max_poly_num:
             raise ValueError("Invalid points number interval.")
         if self.min_points_num > self.max_points_num:
             raise ValueError("Invalid points number interval.")
+
+    @field_validator("fixed_points")
+    def parse_allowed_area(cls, data: Union[Polygon, list[list[float]]]):
+        if isinstance(data, Polygon):
+            return data
+        return Polygon([Point(*coords) for coords in data])
 
     @field_validator("allowed_area")
     def parse_allowed_area(cls, data: Union[Polygon, list[list[float]]]):
@@ -70,6 +87,3 @@ class Domain:
     @computed_field
     def bound_poly(self) -> Polygon:
         return self.allowed_area
-
-        bnd_points = [Point(*pt_coords) for pt_coords in self.allowed_area]
-        return Polygon(polygon_id=f"bnd_{self.name}", points=bnd_points)

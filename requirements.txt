@@ -15,12 +15,10 @@ autodocsumm
 tqdm
 thegolem
 
-pre-commit==3.2.2
-
 flake8==6.0.0
 brunette==0.2.8
 isort==5.12.0
-add-trailing-comma==2.4.0
+add-trailing-comma==3.0.1
 
 pep8-naming==0.13.3
 flake8-isort==6.0.0 

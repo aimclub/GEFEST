@@ -3,7 +3,7 @@ from typing import Optional
 from shapely.geometry.point import Point
 
 from gefest.core.geometry import Point as G_Point
-from gefest.core.geometry import Polygon, Structure, PolyID
+from gefest.core.geometry import Polygon, PolyID, Structure
 
 
 def create_prohibited(

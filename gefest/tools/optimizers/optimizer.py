@@ -13,7 +13,7 @@ class Optimizer(metaclass=ABCMeta):
         self.logger = logger
 
     @abstractmethod
-    def solution(
+    def optimize(
         self,
         n_steps: int,
         **kwargs,

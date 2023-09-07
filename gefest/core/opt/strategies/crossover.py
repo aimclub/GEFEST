@@ -4,13 +4,14 @@ from typing import Callable
 import numpy as np
 
 from gefest.core.geometry import Structure
-from .strategy import Strategy
 from gefest.core.utils import WorkerData, where
+
+from .strategy import Strategy
 
 
 class CrossoverStrategy(Strategy):
     def __init__(self, opt_params):
-        super().__init__()
+        super().__init__(opt_params.workers_manager)
 
         self.prob = opt_params.crossover_prob
         self.crossovers = opt_params.crossovers
@@ -41,7 +42,7 @@ class CrossoverStrategy(Strategy):
                     range(len(pairs_to_crossover)),
                     pairs_to_crossover,
                 )
-            ]
+            ],
         )
 
         succes_crossover_ids = where(children, lambda ind: ind != None)
@@ -59,7 +60,7 @@ class CrossoverStrategy(Strategy):
                             failed_idx,
                             [pairs_to_crossover[idx] for idx in failed_idx],
                         )
-                    ]
+                    ],
                 )
                 succes_crossover_ids = where(children, lambda ind: ind != None)
                 for idx in succes_crossover_ids:

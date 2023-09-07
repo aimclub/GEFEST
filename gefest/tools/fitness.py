@@ -1,8 +1,8 @@
 from abc import ABCMeta, abstractmethod
-from typing import Optional, Any
+from typing import Any, Optional
 
-from gefest.tools import Estimator
 from gefest.core.geometry import Structure
+from gefest.tools import Estimator
 
 
 class Fitness(metaclass=ABCMeta):

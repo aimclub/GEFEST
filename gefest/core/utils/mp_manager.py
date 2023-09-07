@@ -1,13 +1,11 @@
 import multiprocessing
 from typing import Any, Callable, Optional
 
-import numpy as np
 from loguru import logger
-from pydantic import Field, field_validator
 from pydantic.dataclasses import dataclass
 
 from gefest.core.utils import chain
-from gefest.core.utils.singleton import Singleton
+
 
 @dataclass
 class WorkerData:
@@ -16,9 +14,11 @@ class WorkerData:
     initial_args: Optional[Any] = None
 
 
-class WorkersManager(metaclass=Singleton):
+class WorkersManager:
     def __init__(
-        self, num_workers: Optional[int] = None, worker_func: Optional[Callable] = None
+        self,
+        num_workers: Optional[int] = None,
+        worker_func: Optional[Callable] = None,
     ) -> None:
         self.worker_func = worker_func if worker_func else WorkersManager.worker
         self.num_workers = num_workers if num_workers else multiprocessing.cpu_count()
@@ -29,14 +29,14 @@ class WorkersManager(metaclass=Singleton):
         self.result_queue = self.mpm.Queue()
         self.__out__queue_expected_size = 0
         self.workers = [
-            self.pool.apply_async(self.worker_func, (self.processing_queue, self.result_queue))
+            self.pool.apply_async(
+                self.worker_func,
+                (self.processing_queue, self.result_queue),
+            )
             for _ in range(self.num_workers)
         ]
 
-    def __enter__(self):
-        pass
-
-    def __exit__(self, *args):
+    def __del__(self, *args):
         self.pool.close()
         self.pool.terminate()
 
@@ -101,7 +101,7 @@ class WorkersManager(metaclass=Singleton):
             res_ids_pairs.append(self._queue_get())
 
         if len(res_ids_pairs) == 0:
-            print("err")
+            print('err')
         res_ids_pairs = sorted(res_ids_pairs, key=lambda x: x[1])
         res, ids = list(zip(*res_ids_pairs))
 

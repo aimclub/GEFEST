@@ -1,13 +1,29 @@
 from copy import deepcopy
+from itertools import combinations
+
+import numpy as np
 
 from gefest.core.geometry import Polygon, Structure
-from gefest.core.opt.domain import Domain
+from gefest.core.geometry.domain import Domain
 
-"""
-Defines methods to correct wrong structures (not satisfying the constraints)
-Function postprocess makes structures that satisfy the constraints given in validation
-"""
 
+def distance_between_points(structure: 'Structure', domain: 'Domain') -> bool:
+    """The method indicates that any :obj:`Point` in each :obj:`Polygon` of :obj:`Structure`
+    is placed in correct distance by previous point
+    Args:
+        structure: the :obj:`Structure` that explore
+    Returns:
+        ``True`` if any side of poly have incorrect lenght, otherwise - ``False``
+    """
+    lenght = domain.dist_between_points
+    p1 = structure
+    check = []
+    for i in [[p.coords()[:2] for p in poly.points] for poly in p1.polygons]:
+        for ind, pnt in enumerate(i[1:]):
+            check.append(np.norm(np.array(pnt) - np.array(i[ind]), ord=1) < lenght)
+    if any(check):
+        print('Намутировал плохой полигон!, distance_between_points')
+    return any(check)
 
 def postprocess(
     structure: Structure,
@@ -36,7 +52,6 @@ def postprocess(
 
 
 def correct_unclosed_poly(poly: Polygon, domain: Domain) -> Polygon:
-    # Simple fix for open polygons by adding first point to end
     if domain.geometry.is_closed:
         point_to_add = poly.points[0]
         poly.points.append(point_to_add)
@@ -48,7 +63,6 @@ def correct_unclosed_poly(poly: Polygon, domain: Domain) -> Polygon:
 def correct_wrong_point(poly: Polygon, domain: Domain) -> Polygon:
     point_moved = False
     for p_id, point in enumerate(poly.points):
-        # Correcting each point out of bounds
         if domain.fixed_points:
             if point in domain.fixed_points:
                 continue
@@ -57,7 +71,6 @@ def correct_wrong_point(poly: Polygon, domain: Domain) -> Polygon:
         point.x = min(point.x, domain.max_x + domain.len_x * 0.05)
         point.y = min(point.y, domain.max_y + domain.len_y * 0.05)
         if point not in domain:
-            # if the point is not in the domain, we look for the nearest one inside
             new_point = domain.geometry.nearest_point(point, domain.bound_poly)
             poly.points[p_id] = new_point
             point_moved = True
@@ -74,123 +87,37 @@ def correct_self_intersection(poly: Polygon, domain: Domain) -> Polygon:
     return convex_poly
 
 
-# def postprocess(structure: Structure, domain: Domain) -> Structure:
-#     """The method process given :obj:`Structure` step by step while
-#     it is not correct.
-#     Args:
-#         structure: the :obj:`Structure` that need correcting
-#         domain: the :obj:`Domain` that determinates the main
-#             parameters, it needs there for checking equality between given
-#             :obj:`Structure` and set parameters in the :obj:`Domain`
-#     Stages of processing:
-#     Methods:
-#         fixed poly: If ``fixed_points`` in the :obj:`Domain` set, they will be added to the structure
-#         too close: Fixing proximity between polygons, for polygons that are closer than the
-#             specified threshold, one of them will be removed (exclude fixed polygons)
-#         self-intersection: Change self-intersected poly to convex
-#         out of allowed area: Cut :obj:`Polygon` that is out of borders by borders, than rescale it
-#             down to 80%
-#         unclosed polygon: Fix for open polygons by adding first :obj:`Point` to end
-#     Returns:
-#         checked by rules on stages before and corrected :obj:`Structure`
-#     """
-#     corrected_structure = deepcopy(structure)
+def too_close(structure: Structure, domain: Domain) -> bool:
+    """Checks for too close location between every :obj:`Polygon` in the
+        given :obj:`Structure`
+    Args:
+        structure: the :obj:`Structure` that explore
+        domain: the :obj:`Domain` that determinates the main
+            parameters, this method requires ``min_dist`` from :obj:`Domain`
+    Returns:
+        ``True`` if at least one distance between any polygons is less than value of minimal
+        distance set by :obj:`Domain`, otherwise - ``False``
+    """
 
-#     # Fixing each polygon in structure
-#     try:
-#         for i, poly in enumerate(corrected_structure.polygons):
-#             local_structure = Structure([poly])
-#             if unclosed_poly(local_structure, domain) and domain.geometry.is_closed:
-#                 corrected_structure.polygons[i] = _correct_unclosed_poly(poly)
-#             if self_intersection(local_structure):
-#                 corrected_structure.polygons[i] = _correct_self_intersection(poly, domain)
-#             if out_of_bound(local_structure, domain):
-#                 corrected_structure.polygons[i] = _correct_wrong_point(poly, domain)
-#     except AttributeError:
-#         return structure
+    pairs = tuple(combinations(structure.polygons, 2))
+    is_too_close = [False] * len(pairs)
 
-#     #  Fixing proximity between polygons
-#     if too_close(structure, domain):
-#         corrected_structure = _correct_closeness(corrected_structure, domain)
+    for idx, poly_1, poly_2 in enumerate(pairs):
+        is_too_close[idx] = _pairwise_dist(poly_1, poly_2, domain) < domain.min_dist
 
-#     # If you set fixed polygons in the domain, here they are added to the structure
-#     if len(corrected_structure.polygons) > 0:
-#         for fixed in domain.fixed_points:
-#             if not (fixed.points == [p.points for p in corrected_structure.polygons]):
-#                 corrected_structure.polygons.append(deepcopy(fixed))
-
-#     return corrected_structure
+    return any(is_too_close)
 
 
-# def _correct_low_points(poly: 'Polygon',
-#                         domain: 'Domain') -> Polygon:
-#     new_point = Point(np.random.uniform(domain.min_x, domain.max_x),
-#                       np.random.uniform(domain.min_y, domain.max_y))
-#     poly.points.append(new_point)
+def _pairwise_dist(
+    poly_1: Polygon,
+    poly_2: Polygon,
+    domain: Domain,
+) -> float:
+    """
+    ::TODO:: find the answer for the question: why return 0 gives infinite computation
+    """
+    if poly_1 is poly_2 or len(poly_1) == 0 or len(poly_2) == 0:
+        return float('inf')
 
-#     return poly
-
-
-# def _correct_unclosed_poly(poly: Polygon) -> Polygon:
-#     # Simple fix for open polygons by adding first point to end
-#     point_to_add = poly.points[0]
-#     poly.points.append(point_to_add)
-#     correct_poly = poly
-#     return correct_poly
-
-
-# def _correct_wrong_point(poly: Polygon, domain: Domain) -> Polygon:
-#     point_moved = False
-#     for p_id, point in enumerate(poly.points):
-#         # Correcting each point out of bounds
-#         if domain.fixed_points:
-#             if point in domain.fixed_points:
-#                 continue
-#         point.x = max(point.x, domain.min_x + domain.len_x * 0.05)
-#         point.y = max(point.y, domain.min_y + domain.len_y * 0.05)
-#         point.x = min(point.x, domain.max_x + domain.len_x * 0.05)
-#         point.y = min(point.y, domain.max_y + domain.len_y * 0.05)
-#         if not domain.contains(point):
-#             # if the point is not in the domain, we look for the nearest one inside
-#             new_point = domain.geometry.nearest_point(point, domain.bound_poly)
-#             poly.points[p_id] = new_point
-#             point_moved = True
-
-#     if point_moved:
-#         poly = domain.geometry.resize_poly(poly=poly, x_scale=0.8, y_scale=0.8)
-
-#     return poly
-
-
-# def _correct_self_intersection(poly: Polygon, domain: Domain) -> Polygon:
-#     # Change self-intersected poly to convex
-#     convex_poly = domain.geometry.get_convex(poly)
-#     return convex_poly
-
-
-# def _correct_closeness(structure: Structure, domain: Domain) -> Structure:
-#     """
-#     For polygons that are closer than the specified threshold,
-#     one of them will be removed
-#     """
-#     polygons = structure.polygons
-#     num_poly = len(polygons)
-#     to_delete = []
-
-#     for i in range(num_poly - 1):
-#         for j in range(i + 1, num_poly):
-#             distance = _pairwise_dist(polygons[i], polygons[j], domain)
-#             if distance < domain.min_dist:
-#                 if polygons[i].id != 'fixed' or 'prohibited':
-#                     to_delete.append(i)  # Collecting polygon indices for deletion
-
-#     to_delete_poly = [structure.polygons[i] for i in np.unique(to_delete)]
-#     corrected_structure = Structure(polygons=[poly for poly in structure.polygons if poly not in to_delete_poly])
-#     return corrected_structure
-
-
-# def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain) -> float:
-#     if poly_1 is poly_2 or len(poly_1.points) == 0 or len(poly_2.points) == 0:
-#         return 9999
-
-#     return domain.geometry.min_distance(poly_1, poly_2)
+    # nearest_pts = domain.geometry.nearest_points(poly_1, poly_2) ??? why return only 1 point
+    return domain.geometry.min_distance(poly_1, poly_2)

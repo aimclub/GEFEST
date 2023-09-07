@@ -1,10 +1,11 @@
-from uuid import UUID, uuid4
 from typing import Union
+from uuid import UUID, uuid4
+
 from pydantic import Field
 from pydantic.dataclasses import dataclass
 
-from .polygon import Polygon
 from .point import Point
+from .polygon import Polygon
 
 
 @dataclass

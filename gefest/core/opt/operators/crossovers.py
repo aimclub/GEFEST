@@ -4,7 +4,7 @@ from multiprocessing import Pool
 import numpy as np
 
 from gefest.core.geometry import Structure
-from gefest.core.opt.domain import Domain
+from gefest.core.geometry.domain import Domain
 
 
 # pairs for crossover selection

@@ -10,10 +10,15 @@ class Strategy(metaclass=ABCMeta):
     Provides shared multiprocessing pool.
     """
 
-    def __init__(self):
-        self._mp = WorkersManager()
+    def __init__(self, wm: WorkersManager):
+        self._mp: WorkersManager = wm
 
     @abstractmethod
-    def __call__(self, pop: list[Structure], *args: Any, **kwds: Any,) -> list[Structure]:
+    def __call__(
+        self,
+        pop: list[Structure],
+        *args: Any,
+        **kwds: Any,
+    ) -> list[Structure]:
         """Code"""
         ...

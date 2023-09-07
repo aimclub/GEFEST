@@ -7,7 +7,8 @@ import numpy as np
 
 from gefest.core.geometry import Point, Polygon, Structure
 from gefest.core.geometry.geometry_2d import Geometry2D
-from gefest.core.opt.domain import Domain
+
+from .domain import Domain
 
 
 def get_random_structure(domain: Domain) -> Structure:
@@ -23,6 +24,9 @@ def get_random_structure(domain: Domain) -> Structure:
             structure.polygons.append(polygon)
         else:
             continue
+
+    for poly in structure:
+        print(poly[0], poly[-1])
 
     return structure
 
@@ -80,7 +84,7 @@ def create_poly(centroid: Point, sigma: int, domain: Domain, geometry: Geometry2
     # sigma defines neighborhood
 
     num_points = randint(
-        domain.min_points_num, domain.max_points_num
+        domain.min_points_num, domain.max_points_num,
     )  # Number of points in a polygon
     points = []
     for _ in range(num_points):
@@ -88,7 +92,7 @@ def create_poly(centroid: Point, sigma: int, domain: Domain, geometry: Geometry2
         while not in_bound(point, domain):  # checking if a point is in domain
             point = create_polygon_point(centroid, sigma)
         points.append(point)
-    if domain.is_closed:
+    if domain.geometry.is_closed:
         points.append(points[0])
 
     poly = geometry.get_convex(Polygon(points=points))  # avoid self intersection in polygon
@@ -113,7 +117,7 @@ def create_area(domain: Domain, structure: Structure, geometry: Geometry2D) -> (
         """
         centroid = create_random_point(domain)
         min_dist = distance(
-            centroid, structure, geometry
+            centroid, structure, geometry,
         )  # Distance to the nearest polygon in the structure
         max_attempts = 20
         while min_dist < 2.5 * sigma:
@@ -145,7 +149,7 @@ def create_random_point(domain: Domain) -> Point:
 def create_polygon_point(centroid: Point, sigma: int) -> Point:
     # Creating polygon point inside the neighborhood defined by the centroid
     point = Point(
-        np.random.normal(centroid.x, sigma, 1)[0], np.random.normal(centroid.y, sigma, 1)[0]
+        np.random.normal(centroid.x, sigma, 1)[0], np.random.normal(centroid.y, sigma, 1)[0],
     )
 
     return point

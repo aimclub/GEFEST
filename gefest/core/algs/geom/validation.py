@@ -1,7 +1,3 @@
-"""
-Here are defined general constraints on polygons by validation rules.
-Validation is a checking on valid and unvalid objects for further processing.
-"""
 from itertools import permutations
 
 import numpy as np
@@ -11,9 +7,7 @@ from shapely.geometry import Polygon as GeomPolygon
 from shapely.validation import explain_validity
 
 from gefest.core.geometry import Polygon, Structure
-from gefest.core.opt.domain import Domain
-
-# from gefest.core.structure.polygon import Polygon
+from gefest.core.geometry.domain import Domain
 
 min_dist_from_boundary = 1
 

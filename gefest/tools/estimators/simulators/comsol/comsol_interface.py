@@ -96,10 +96,10 @@ class Comsol(Estimator):
                 target = 0
 
             mean_diff = float(
-                np.mean([abs(float(o) / np.mean(outs[0:4]) - 1) * 100 for o in outs[0:4]])
+                np.mean([abs(float(o) / np.mean(outs[0:4]) - 1) * 100 for o in outs[0:4]]),
             )
             if USE_AVG_CONST and any(
-                [abs(float(o) / np.mean(outs[0:4]) - 1) * 100 > 5.0 for o in outs[0:4]]
+                [abs(float(o) / np.mean(outs[0:4]) - 1) * 100 > 5.0 for o in outs[0:4]],
             ):
                 print(
                     "Speed equality violated",
@@ -131,10 +131,10 @@ class Comsol(Estimator):
             except Exception:
                 pass
             model.java.component("comp1").geom("geom1").feature("pol" + str(n + 1)).set(
-                "x", poly[0]
+                "x", poly[0],
             )
             model.java.component("comp1").geom("geom1").feature("pol" + str(n + 1)).set(
-                "y", poly[1]
+                "y", poly[1],
             )
         return model
 
