@@ -9,13 +9,13 @@ from .point import Point
 
 
 class PolyID(Enum):
-    TEMP = "tmp"
-    CONSTR = "constraint"
-    FIXED_AREA = "fixed_area"
-    FIXED_POLY = "fixed_poly"
-    PROH_AREA = "prohibited_area"
-    PROH_TARG = "prohibited_target"
-    PROH_POLY = "prohibited_poly"
+    TEMP = 'tmp'
+    CONSTR = 'constraint'
+    FIXED_AREA = 'fixed_area'
+    FIXED_POLY = 'fixed_poly'
+    PROH_AREA = 'prohibited_area'
+    PROH_TARG = 'prohibited_target'
+    PROH_POLY = 'prohibited_poly'
 
 
 @dataclass

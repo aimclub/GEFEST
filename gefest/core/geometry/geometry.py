@@ -32,7 +32,7 @@ class Geometry(BaseModel, ABC):
         pass
 
     @abstractmethod
-    def is_contain_point(self, poly: Polygon, point: "Point"):
+    def is_contain_point(self, poly: Polygon, point: Point):
         pass
 
     @abstractmethod

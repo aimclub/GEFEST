@@ -36,7 +36,7 @@ def tournament_selection(
     pop_size: int,
     fraction: float = 0.1,
 ) -> list[Structure]:
-    """ Selects the best ones from provided population.
+    """Selects the best ones from provided population.
 
     Args:
         pop (list[Structure]): population

@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
+import moviepy.editor as mp
 from matplotlib.lines import Line2D
+from moviepy.video.io.bindings import mplfig_to_npimage
 
 from gefest.core.geometry import Structure
 from gefest.core.geometry.domain import Domain
@@ -17,7 +19,7 @@ class StructVizualizer:
     def __init__(self, domain: Domain):
         self.domain = domain
 
-    def plot_structure(self, structs: list[Structure], infos, linestyles="-"):
+    def plot_structure(self, structs: list[Structure], infos=None, linestyles='-'):
         """The method displays the given list[obj:`Structure`]
         Args:
             structs: the list[obj:`Structure`] for displaying
@@ -35,21 +37,25 @@ class StructVizualizer:
             |viz_struct|
         .. |viz_struct| image::https://ibb.co/fN7XCXh
         """
-
+        if not isinstance(structs, list):
+            structs = [structs]
+        if not isinstance(infos, list):
+            infos = [infos]
+        fig = plt.figure()
         for struct, linestyle in zip(structs, linestyles):
-            for poly in struct.polygons:
-                self.plot_poly(poly, linestyle)
-
             boundary = self.domain.bound_poly
             x = [pt.x for pt in boundary.points]
             y = [pt.y for pt in boundary.points]
+            plt.plot(x, y, 'k')
 
-            plt.plot(x, y)
+            for poly in struct.polygons:
+                self.plot_poly(poly, linestyle)
 
         lines = [
-            Line2D([0], [0], color="black", linewidth=3, linestyle=style) for style in linestyles
+            Line2D([0], [0], color='black', linewidth=3, linestyle=style) for style in linestyles
         ]
         plt.legend(lines, infos, loc=2)
+        return fig
 
     def plot_poly(self, poly, linestyle):
         """The method displays the given :obj:`Polygon`
@@ -66,7 +72,30 @@ class StructVizualizer:
         """
         x_ = [pt.x for pt in poly.points]
         y_ = [pt.y for pt in poly.points]
+
+        plt.plot(x_, y_, linestyle=linestyle)
         for i, p in enumerate(zip(x_, y_)):
             plt.plot(p[0], p[1], marker='${}$'.format(i), color='black')
-        
-        plt.plot(x_, y_,linestyle=linestyle)
+
+
+class GIFMaker(StructVizualizer):
+    def __init__(self, domain) -> None:
+        super().__init__(domain=domain)
+        self.frames = []
+        self.counter = 0
+
+    def create_frame(self, structure, infos):
+        fig = self.plot_structure(structure, infos)
+        numpy_fig = mplfig_to_npimage(fig)
+        self.frames.append(numpy_fig)
+        plt.close()
+
+    def make_gif(self, gifname, duration=1500, loop=-1):
+
+        # imgs = [Image.fromarray(img) for img in self.frames]
+        # imgs[0].save(f"./{gifname}.fig", save_all=True, append_images=imgs[1:], duration=duration, loop=0)
+        # clip = mp.VideoFileClip("mygif.gif")
+        clip = mp.ImageSequenceClip(self.frames, durations=[1500] * len(self.frames), fps=0.66)
+        clip.write_videofile(f'./{gifname}.mp4')
+        self.frames = []
+        self.counter = 0

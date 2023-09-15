@@ -16,11 +16,11 @@ class StructureAdapter(BaseOptimizationAdapter):
     def _point_to_node(self, point):
         # Prepare content for nodes
         if isinstance(point, OptNode):
-            self._log.warn("Unexpected: OptNode found in adapter instead" "Point.")
+            self._log.warn('Unexpected: OptNode found in adapter instead' 'Point.')
         else:
-            content = {"name": f"pt_{point.x}_{point.y}", "params": {}}
+            content = {'name': f'pt_{point.x}_{point.y}', 'params': {}}
             node = OptNode(content=content)
-            node.content["params"] = {"x": point.x, "y": point.y}
+            node.content['params'] = {'x': point.x, 'y': point.y}
             return node
 
     def _adapt(self, adaptee: Structure):
@@ -39,7 +39,9 @@ class StructureAdapter(BaseOptimizationAdapter):
         return graph
 
     def _restore(
-        self, opt_graph: OptGraph, metadata: Optional[Dict[str, Any]] = None,
+        self,
+        opt_graph: OptGraph,
+        metadata: Optional[Dict[str, Any]] = None,
     ) -> Structure:
         """Convert OptGraph class into Structure class"""
         structure = []

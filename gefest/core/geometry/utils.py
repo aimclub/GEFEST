@@ -4,6 +4,7 @@ from random import randint
 from typing import Optional
 
 import numpy as np
+from loguru import logger
 
 from gefest.core.geometry import Point, Polygon, Structure
 from gefest.core.geometry.geometry_2d import Geometry2D
@@ -11,7 +12,7 @@ from gefest.core.geometry.geometry_2d import Geometry2D
 from .domain import Domain
 
 
-def get_random_structure(domain: Domain) -> Structure:
+def get_random_structure(domain: Domain, **kwargs) -> Structure:
     # Creating structure with random number of polygons
 
     structure = Structure(polygons=[])
@@ -24,10 +25,6 @@ def get_random_structure(domain: Domain) -> Structure:
             structure.polygons.append(polygon)
         else:
             continue
-
-    for poly in structure:
-        print(poly[0], poly[-1])
-
     return structure
 
 
@@ -82,21 +79,45 @@ def get_random_point(polygon: Polygon, structure: Structure, domain: Domain) -> 
 def create_poly(centroid: Point, sigma: int, domain: Domain, geometry: Geometry2D) -> Polygon:
     # Creating polygon in the neighborhood of the centroid
     # sigma defines neighborhood
-
     num_points = randint(
-        domain.min_points_num, domain.max_points_num,
+        domain.min_points_num,
+        domain.max_points_num,
     )  # Number of points in a polygon
     points = []
-    for _ in range(num_points):
-        point = create_polygon_point(centroid, sigma)  # point in polygon
-        while not in_bound(point, domain):  # checking if a point is in domain
+    cntr = 0
+    while len(points) < num_points:
+        cntr += 1
+
+        point = create_polygon_point(centroid, sigma)
+        while not in_bound(point, domain):
             point = create_polygon_point(centroid, sigma)
         points.append(point)
-    if domain.geometry.is_closed:
-        points.append(points[0])
+        ind = len(points) - 1
+        if ind > 0:
+            if (
+                np.linalg.norm(
+                    np.array(points[ind].coords[:2]) - np.array(points[ind - 1].coords[:2]), ord=1
+                )
+                < domain.dist_between_points
+            ):
+                del points[ind]
+        if len(points) == num_points:
+            if (
+                np.linalg.norm(
+                    np.array(points[-1].coords[:2]) - np.array(points[0].coords[:2]), ord=1
+                )
+                < domain.dist_between_points
+            ):
+                del points[-1]
+        if len(points) == num_points:
+            if domain.geometry.is_closed:
+                points.append(points[0])
+            poly = geometry.get_convex(Polygon(points=points))
+            points = poly.points
+            if cntr > 100 and len(points) > 4:
+                break
 
-    poly = geometry.get_convex(Polygon(points=points))  # avoid self intersection in polygon
-
+    # logger.info(f'Create poly finish, {cntr} iterations.')
     return poly
 
 
@@ -117,7 +138,9 @@ def create_area(domain: Domain, structure: Structure, geometry: Geometry2D) -> (
         """
         centroid = create_random_point(domain)
         min_dist = distance(
-            centroid, structure, geometry,
+            centroid,
+            structure,
+            geometry,
         )  # Distance to the nearest polygon in the structure
         max_attempts = 20
         while min_dist < 2.5 * sigma:
@@ -149,7 +172,8 @@ def create_random_point(domain: Domain) -> Point:
 def create_polygon_point(centroid: Point, sigma: int) -> Point:
     # Creating polygon point inside the neighborhood defined by the centroid
     point = Point(
-        np.random.normal(centroid.x, sigma, 1)[0], np.random.normal(centroid.y, sigma, 1)[0],
+        np.random.normal(centroid.x, sigma, 1)[0],
+        np.random.normal(centroid.y, sigma, 1)[0],
     )
 
     return point

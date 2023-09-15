@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 
 import numpy as np
 from loguru import logger
@@ -7,20 +7,17 @@ from matplotlib import pyplot as plt
 from pydantic.dataclasses import dataclass
 from tqdm import tqdm
 
-from gefest.core.algs.geom.validation import *
-from gefest.core.algs.postproc.resolve_errors import *
+from gefest.core.algs.postproc.resolve_errors import Rules, PolygonRule, StructureRule
 from gefest.core.geometry import Structure
 from gefest.core.geometry.domain import Domain
 from gefest.core.geometry.utils import *
-from gefest.core.opt.operators.crossovers import panmixis, structure_level_crossover
+from gefest.core.opt.operators.crossovers import panmixis, structure_level_crossover, polygon_level_crossover
 from gefest.core.opt.operators.mutations import *
-from gefest.core.opt.operators.selections import tournament_selection
+from gefest.core.opt.operators.selections import tournament_selection, roulette_selection
 from gefest.core.opt.strategies.crossover import CrossoverStrategy
 from gefest.core.opt.strategies.mutation import MutationStrategy
 from gefest.core.opt.strategies.strategy import Strategy
 from gefest.core.structure.prohibited import create_prohibited
-from gefest.core.utils.mp_manager import WorkersManager
-from gefest.core.viz.struct_vizualizer import StructVizualizer
 from gefest.tools.optimizers.optimizer import Optimizer
 from gefest.tools.samplers.standard.standard import StandardSampler
 
@@ -40,12 +37,12 @@ class OptimizationParams:
     sampler: Callable
     estimator: Callable
     postprocessor: Callable
-    postprocess_rules: dict[str, list[Callable, Callable]]
+    postprocess_rules: list[Union[PolygonRule, StructureRule]]
     mutation_prob: float = 0.6
     crossover_prob: float = 0.6
     mutation_each_prob: Optional[list[float]] = None
     crossover_each_prob: Optional[list[float]] = None
-    workers_manager: Optional[object] = None
+    n_jobs: Optional[int] = -1
 
     def __post_init__(self):
         self.crossovers = [
@@ -55,52 +52,53 @@ class OptimizationParams:
         self.postprocessor = partial(
             self.postprocessor,
             domain=self.domain,
-            rule_fix_pairs=self.postprocess_rules,
+            rules=self.postprocess_rules,
         )
         self.sampler = self.sampler(opt_params=self)
 
 
-@logger.catch
-def main(opt_params):
+# def main(opt_params):
 
-    optimizer = BaseGA(opt_params)
+#     optimizer = BaseGA(opt_params)
 
-    optimizer.optimize(1)
+#     optimizer.optimize(15)
 
-    from gefest.core.viz.struct_vizualizer import StructVizualizer
+#     from gefest.core.viz.struct_vizualizer import StructVizualizer
 
-    plt.figure(figsize=(7, 7))
-    visualiser = StructVizualizer(domain)
+#     plt.figure(figsize=(7, 7))
+#     visualiser = StructVizualizer(domain)
 
-    info = {
-        'spend_time': 1,
-        'fitness': optimizer._pop[0].fitness,
-        'type': 'prediction',
-    }
-    visualiser.plot_structure(
-        [optimizer._pop[0]], [info], ['-'],
-    )
+#     info = {
+#         'spend_time': 1,
+#         'fitness': optimizer._pop[0].fitness,
+#         'type': 'prediction',
+#     }
+#     visualiser.plot_structure(
+#         [optimizer._pop[0]], [info], ['-'],
+#     )
 
-    plt.show(block=True)
+#     plt.show(block=True)
 
-from contextlib import contextmanager
+# from contextlib import contextmanager
 
 
-@contextmanager
-def configuration(subprocess_holder):
-    try:
-        # load config from yaml
-        yield subprocess_holder
-    except Exception:
-        raise
-    finally:
-        # add simulators safe exit
-        subprocess_holder.workers_manager.pool.close()
-        subprocess_holder.workers_manager.pool.terminate()
+# @contextmanager
+# def configuration(subprocess_holder):
+#     try:
+#         # load config from yaml
+#         yield subprocess_holder
+#     except Exception:
+#         raise
+#     finally:
+#         # add simulators safe exit
+#         subprocess_holder.parallel_manager.pool.close()
+#         subprocess_holder.parallel_manager.pool.terminate()
 
 
 if __name__ == '__main__':
-    logger.add('somefile.log', enqueue=True)
+    # logger.add('somefile.log', enqueue=True)
+    
+    logger.disable('__main__')
     class BaseGA(Optimizer):
         def __init__(
             self,
@@ -114,16 +112,18 @@ if __name__ == '__main__':
             self.estimator: Callable[[list[Structure]], list[Structure]] = opt_params.estimator
             self.selector: Callable = opt_params.selector
             self.pop_size = opt_params.pop_size
-            self._pop: list[Structure] = self.sampler(self.opt_params.pop_size)
             self.domain = self.opt_params.domain
+            self._pop: list[Structure] = self.sampler(self.opt_params.pop_size)
+            self._pop = self.estimator(self._pop)
 
         def optimize(self, n_steps: int) -> list[Structure]:
             for _ in tqdm(range(n_steps)):
-                self._pop = self.estimator(pop=self._pop)
                 self._pop = self.selector(self._pop, self.opt_params.pop_size)
                 self._pop = self.crossover(self._pop)
                 self._pop = self.mutation(self._pop)
+                self._pop = self.estimator(self._pop)
 
+            [print(x.fitness) for x in self._pop]
             self._pop = sorted(self._pop, key=lambda x: x.fitness)
             return self._pop
 
@@ -178,11 +178,16 @@ if __name__ == '__main__':
         min_points_num=6,
         is_closed=True,
     )
+    print(domain.dist_between_points)
+    print(domain.dist_between_polygons)
+    print(domain.min_dist_from_boundary)
     from pathlib import Path
 
     from gefest.core.geometry import PolyID
     from gefest.tools import Estimator
     from gefest.tools.estimators.simulators.swan.swan_interface import Swan
+
+
 
     # root_path = Path(__file__).parent.parent.parent.parent
     # path_sim = (
@@ -223,7 +228,9 @@ if __name__ == '__main__':
     # estimator = ComsolFitness(simulator=comsol, domain=domain)
 
     opt_params = OptimizationParams(
-        crossovers=[partial(structure_level_crossover, domain=domain)],
+        crossovers=[
+            partial(polygon_level_crossover, domain=domain),
+            partial(structure_level_crossover, domain=domain)],
         mutations=[
             rotate_poly,
             resize_poly,
@@ -237,50 +244,50 @@ if __name__ == '__main__':
         crossover_strategy=CrossoverStrategy,
         mutation_prob=0.6,
         crossover_prob=0.6,
-        crossover_each_prob=[1],
-        mutation_each_prob=[0.125, 0.125, 0.35, 0.05, 0.1, 0.05, 0.2],
+        crossover_each_prob=[0.0, 1.0],
+        mutation_each_prob=[0.125, 0.125, 0.35, 0.05, 0.01, 0.01, 0.33],
         n_steps=5,
-        pop_size=50,
+        pop_size=25,
         selector=tournament_selection,
         pair_selector=panmixis,
-        postprocess_attempts=3,
+        postprocess_attempts=5,
         domain=domain,
         postprocessor=postprocess,
-        postprocess_rules={
-            'unclosed': [
-                unclosed_poly,
-                correct_unclosed_poly,
-            ],
-            'self_intersect': [
-                self_intersection,
-                correct_self_intersection,
-            ],
-            'wrong_points': [
-                out_of_bound,
-                correct_wrong_point,
-            ],
-        },
+        postprocess_rules=[
+
+            Rules.not_closed_polygon.value,
+            Rules.not_self_intersects.value,
+            Rules.not_out_of_bounds.value,
+            Rules.not_too_close_points.value,
+            Rules.not_too_close_polygons.value,
+        ],
         sampler=StandardSampler,
         estimator=partial(area_length_ratio, domain=domain),
-        workers_manager=WorkersManager(),
+        n_jobs=-1,
     )
 
-    with configuration(opt_params):
-        optimizer = BaseGA(opt_params)
+    # with configuration(opt_params):
+    optimizer = BaseGA(opt_params)
+    logger.disable('Standard')
+    import cProfile
+    optimizer.optimize(25)
 
-        optimizer.optimize(100)
+    from gefest.core.viz.struct_vizualizer import GIFMaker
+    gm = GIFMaker(domain=domain)
+    for s in optimizer._pop:
+        gm.create_frame(s, {'Fitness': s.fitness})
+    gm.make_gif('test', 500, )
+    # from gefest.core.viz.struct_vizualizer import StructVizualizer
+    # plt.figure(figsize=(7, 7))
+    # visualiser = StructVizualizer(domain)
 
-        from gefest.core.viz.struct_vizualizer import StructVizualizer
-        plt.figure(figsize=(7, 7))
-        visualiser = StructVizualizer(domain)
+    # info = {
+    #         'spend_time': 1,
+    #         'fitness': optimizer._pop[0].fitness,
+    #         'type': 'prediction',
+    #     }
+    # visualiser.plot_structure(
+    #         [optimizer._pop[0]], [info], ['-'],
+    #     )
 
-        info = {
-            'spend_time': 1,
-            'fitness': optimizer._pop[0].fitness,
-            'type': 'prediction',
-        }
-        visualiser.plot_structure(
-            [optimizer._pop[0]], [info], ['-'],
-        )
-
-        plt.show(block=True)
+    # plt.show(block=True)

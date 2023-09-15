@@ -4,11 +4,13 @@ from uuid import uuid4
 import numpy as np
 from pydantic import BaseModel
 from pydantic.dataclasses import dataclass
-from shapely import affinity
+from shapely import affinity, get_parts
+from shapely.affinity import scale
 from shapely.geometry import LineString, MultiLineString
 from shapely.geometry import Point as GeomPoint
 from shapely.geometry import Polygon as GeomPolygon
-from shapely.ops import nearest_points
+from shapely.geometry import mapping
+from shapely.ops import nearest_points, split
 
 from gefest.core.geometry import Point, Polygon, Structure
 
@@ -23,6 +25,7 @@ class Geometry2D(Geometry):
             (first Point is equal to the last one), otherwise ``False``.
             Default value is ``True``
     """
+
     is_closed: bool = True
 
     def get_length(self, polygon: Polygon):
@@ -93,6 +96,19 @@ class Geometry2D(Geometry):
         )
 
         return rescaled_poly
+
+    def rotate_point(
+        self,
+        point: Point,
+        origin: Point,
+        angle: float,
+    ) -> Polygon:
+        rotated = affinity.rotate(
+            GeomPoint(point.x, point.y),
+            angle,
+            GeomPoint(origin.x, origin.y),
+        )
+        return Point(rotated.x, rotated.y)
 
     def rotate_poly(
         self,
@@ -263,6 +279,23 @@ class Geometry2D(Geometry):
             GeomPoint
         """
         return GeomPoint(pt.x, pt.y)
+
+    def split_polygon(self, poly, line: tuple[Point, Point], scale_factor=1000):
+        poly = GeomPolygon([(p.x, p.y) for p in poly])
+        line = LineString(
+            [
+                (line[0].x, line[0].y),
+                (line[1].x, line[1].y),
+            ],
+        )
+        line = scale(
+            line,
+            scale_factor,
+            scale_factor,
+        )
+        parts = get_parts(split(poly, line)).tolist()
+        parts = list(map(lambda p: list(mapping(p)['coordinates'][0][:-1]), parts))
+        return parts
 
     def min_distance(self, obj_1, obj_2) -> float:
         """Smallest distance between two objects

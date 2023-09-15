@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 import yaml
-from pydantic import Field, computed_field, field_validator, model_validator
+from pydantic import Field, computed_field, field_validator
 from pydantic.dataclasses import dataclass
 from pydantic_yaml import parse_yaml_raw_as
 
@@ -13,12 +13,14 @@ from gefest.core.geometry.geometry_2d import Geometry2D
 @dataclass
 class Domain:
     allowed_area: Union[Polygon, list[list[float]]]
-    name: str = "main"
+    name: str = 'main'
     min_poly_num: int = 2
     max_poly_num: int = 4
     min_points_num: int = 20
     max_points_num: int = 50
-    prohibited_area: Optional[Structure] = None
+    polygon_side: int = 0.05
+    min_dist_from_boundary: float = 1.0
+    prohibited_area: Optional[Structure] = Field(default=Structure([]))
     fixed_points: Optional[Union[Polygon, list[list[float]]]] = Field(default_factory=list)
     geometry: Optional[Geometry2D] = Geometry2D()
 
@@ -27,7 +29,7 @@ class Domain:
         with open(cfg_file) as f:
             cfg = yaml.safe_load(f)
 
-        if "domain" not in cfg:
+        if 'domain' not in cfg:
             raise AttributeError("No 'domain' section {cfg_file} config file.")
 
         return parse_yaml_raw_as(Domain, yaml.dump(cfg['domain']))
@@ -44,21 +46,29 @@ class Domain:
 
     def __post_init__(self):
         if self.min_poly_num > self.max_poly_num:
-            raise ValueError("Invalid points number interval.")
+            raise ValueError('Invalid points number interval.')
         if self.min_points_num > self.max_points_num:
-            raise ValueError("Invalid points number interval.")
+            raise ValueError('Invalid points number interval.')
 
-    @field_validator("fixed_points")
+    @field_validator('fixed_points')
     def parse_allowed_area(cls, data: Union[Polygon, list[list[float]]]):
         if isinstance(data, Polygon):
             return data
         return Polygon([Point(*coords) for coords in data])
 
-    @field_validator("allowed_area")
+    @field_validator('allowed_area')
     def parse_allowed_area(cls, data: Union[Polygon, list[list[float]]]):
         if data is None or len(data) <= 2:
-            raise ValueError("Not enough points for allowed_area.")
+            raise ValueError('Not enough points for allowed_area.')
         return Polygon([Point(*coords) for coords in data])
+
+    @computed_field
+    def dist_between_polygons(self) -> float:
+        return max(self.max_x - self.min_x, self.max_y - self.min_y) / 35
+
+    @computed_field
+    def dist_between_points(self) -> float:
+        return self.dist_between_polygons * 15 * self.polygon_side
 
     @computed_field
     def min_x(self) -> int:
