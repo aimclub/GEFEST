@@ -27,6 +27,9 @@ class Polygon:
         return len(self.points)
 
     def __getitem__(self, key) -> Point:
+        if isinstance(key, slice):
+            indices = range(*key.indices(len(self.points)))
+            return Polygon([self.points[i] for i in indices])
         return self.points[key]
 
     def __setitem__(self, key: int, value: Point):

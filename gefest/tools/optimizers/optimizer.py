@@ -4,7 +4,6 @@ from gefest.core.geometry import Structure
 
 
 class Optimizer(metaclass=ABCMeta):
-
     def __init__(
         self,
         logger=None,

@@ -5,7 +5,7 @@ from typing import Callable
 import numpy as np
 
 from gefest.core.geometry import Structure
-from gefest.core.utils import chain, where
+from gefest.core.utils import chained_call, where
 from gefest.core.utils.parallel_manager import BaseParallelDispatcher
 
 from .strategy import Strategy
@@ -36,7 +36,7 @@ class CrossoverStrategy(Strategy):
         pairs = copy.deepcopy(self.parent_pairs_selector(pop))
 
         new_generation = self._pm.exec_parallel(
-            func=chain(chosen_crossover, partial(self.postprocess, attempts=3)),
+            func=chained_call(chosen_crossover, partial(self.postprocess, attempts=3)),
             arguments=pairs,
             use=True,
         )

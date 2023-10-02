@@ -19,7 +19,7 @@ class StructVizualizer:
     def __init__(self, domain: Domain):
         self.domain = domain
 
-    def plot_structure(self, structs: list[Structure], infos=None, linestyles='-'):
+    def plot_structure(self, structs: list[Structure], domain=None, infos=None, linestyles='-'):
         """The method displays the given list[obj:`Structure`]
         Args:
             structs: the list[obj:`Structure`] for displaying
@@ -43,10 +43,14 @@ class StructVizualizer:
             infos = [infos]
         fig = plt.figure()
         for struct, linestyle in zip(structs, linestyles):
-            boundary = self.domain.bound_poly
-            x = [pt.x for pt in boundary.points]
-            y = [pt.y for pt in boundary.points]
-            plt.plot(x, y, 'k')
+            if self.domain:
+                boundary = self.domain.bound_poly
+                x = [pt.x for pt in boundary.points]
+                y = [pt.y for pt in boundary.points]
+                plt.plot(x, y, 'k')
+                if domain.prohibited_area:
+                    for poly in domain.prohibited_area:
+                        self.plot_poly(poly, '-', color='m')
 
             for poly in struct.polygons:
                 self.plot_poly(poly, linestyle)
@@ -57,7 +61,7 @@ class StructVizualizer:
         plt.legend(lines, infos, loc=2)
         return fig
 
-    def plot_poly(self, poly, linestyle):
+    def plot_poly(self, poly, linestyle, **kwargs):
         """The method displays the given :obj:`Polygon`
         Args:
             poly: the :obj:`Polygon` for displaying
@@ -70,12 +74,12 @@ class StructVizualizer:
         Returns:
             .. |viz_poly| image:: https://ibb.co/s31cj3c
         """
-        x_ = [pt.x for pt in poly.points]
-        y_ = [pt.y for pt in poly.points]
+        x_ = [pt.x for pt in poly]
+        y_ = [pt.y for pt in poly]
 
-        plt.plot(x_, y_, linestyle=linestyle)
-        for i, p in enumerate(zip(x_, y_)):
-            plt.plot(p[0], p[1], marker='${}$'.format(i), color='black')
+        plt.plot(x_, y_, linestyle=linestyle, **kwargs)
+        # for i, p in enumerate(zip(x_, y_)):
+        #     plt.plot(p[0], p[1], marker='${}$'.format(i), color='black')
 
 
 class GIFMaker(StructVizualizer):
@@ -84,8 +88,8 @@ class GIFMaker(StructVizualizer):
         self.frames = []
         self.counter = 0
 
-    def create_frame(self, structure, infos):
-        fig = self.plot_structure(structure, infos)
+    def create_frame(self, structure, infos, domain=None):
+        fig = self.plot_structure(structure, domain, infos)
         numpy_fig = mplfig_to_npimage(fig)
         self.frames.append(numpy_fig)
         plt.close()

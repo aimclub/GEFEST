@@ -35,8 +35,8 @@ class SimpleGefestOptNodeFactory(OptNodeFactory):
             px = (r * cos(theta) * self._generation_radius) + kwargs['node'].content['params']['x']
             py = (r * sin(theta) * self._generation_radius) + kwargs['node'].content['params']['y']
         else:
-            px = int(random()*self._generation_radius)
-            py = int(random()*self._generation_radius)
+            px = int(random() * self._generation_radius)
+            py = int(random() * self._generation_radius)
 
         return OptNode(
             content={

@@ -24,19 +24,17 @@ def create_prohibited(
     if targets is not None:
         target_polygons = [list(Point(target).buffer(20).exterior.coords) for target in targets]
         target_points = [[G_Point(p[0], p[1]) for p in target] for target in target_polygons]
-        poly_targets = [
-            Polygon(polygon_id=PolyID.PROH_TARG, points=points) for points in target_points
-        ]
+        poly_targets = [Polygon(id_=PolyID.PROH_TARG, points=points) for points in target_points]
         prohibited_area += poly_targets
 
     if fixed_points is not None:
         fix_points = [[G_Point(p[0], p[1]) for p in fixed] for fixed in fixed_points]
-        poly_fixed = [Polygon(polygon_id=PolyID.PROH_POLY, points=points) for points in fix_points]
+        poly_fixed = [Polygon(id_=PolyID.PROH_POLY, points=points) for points in fix_points]
         prohibited_area += poly_fixed
 
     if fixed_area is not None:
         fix_area = [[G_Point(p[0], p[1]) for p in fixed] for fixed in fixed_area]
-        poly_area = [Polygon(polygon_id=PolyID.PROH_AREA, points=points) for points in fix_area]
+        poly_area = [Polygon(id_=PolyID.PROH_AREA, points=points) for points in fix_area]
         prohibited_area += poly_area
 
     struct = Structure(prohibited_area)

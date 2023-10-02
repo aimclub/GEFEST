@@ -9,11 +9,11 @@ import numpy as np
 from loguru import logger
 from shapely.geometry import Point as ShapelyPoint
 from shapely.geometry import Polygon as ShapelyPolygon
+from shapely.ops import cascaded_union
 from shapely.validation import explain_validity
 
-from gefest.core.geometry import Polygon, Structure, get_random_poly
+from gefest.core.geometry import Point, Polygon, Structure, get_random_poly
 from gefest.core.geometry.domain import Domain
-from gefest.core.viz.struct_vizualizer import GIFMaker
 
 
 class PolygonRule(metaclass=ABCMeta):
@@ -169,15 +169,20 @@ class PointsNotTooClose(PolygonRule):
         Returns:
             ``True`` if any side of poly have incorrect lenght, otherwise - ``False``
         """
+        poly = structure[idx_poly_with_error]
+        if poly[0] != poly[-1] and domain.geometry.is_closed:
+            poly[:-1] = poly[0]
         lenght = domain.dist_between_points
-        check = []
-        norms = []
-        for pair in zip(structure[idx_poly_with_error][:-1], structure[idx_poly_with_error][1:]):
-            norm = np.linalg.norm(np.array(pair[1].coords) - np.array(pair[0].coords), ord=1)
-            norms.append(norm)
-            check.append(norm > lenght)
-
-        # logger.info(f'{norms}, {lenght}, {all(check)}')
+        check, norms = [[None] * (len(poly) - 1)] * 2
+        for idx, pair in enumerate(
+            zip(
+                poly[:-1],
+                poly[1:],
+            ),
+        ):
+            norm = np.linalg.norm(np.array(pair[1].coords) - np.array(pair[0].coords))
+            norms[idx] = norm
+            check[idx] = norm > lenght
         return all(check)
 
     @staticmethod
@@ -186,12 +191,56 @@ class PointsNotTooClose(PolygonRule):
         idx_poly_with_error: int,
         domain: Domain,
     ) -> Polygon:
-        parent_structure = copy.deepcopy(structure)
-        del parent_structure.polygons[idx_poly_with_error]
-        poly = get_random_poly(parent_structure, domain)
-        if poly is None:
-            poly = structure[idx_poly_with_error]
+        poly = copy.deepcopy(structure[idx_poly_with_error])
+        poly = domain.geometry.simplify(poly, domain.dist_between_points * 1.05)
+
+        if poly[0] != poly[-1] and domain.geometry.is_closed:
+            poly.points.append(poly[0])
+        elif poly[0] == poly[-1] and not domain.geometry.is_closed:
+            poly.points = poly.points[:-1]
         return poly
+
+
+class PolygonNotOverlapsProhibited(PolygonRule):
+    @staticmethod
+    def validate(
+        structure: Structure,
+        idx_poly_with_error: int,
+        domain: Domain,
+    ) -> bool:
+
+        geom = domain.geometry
+        if domain.geometry.is_closed:
+            raise NotImplementedError()
+        else:
+            prohib = geom.get_prohibited_geom(domain.prohibited_area, domain.dist_between_polygons)
+            prohib = cascaded_union(prohib)
+            poly = geom._poly_to_shapely_line(structure[idx_poly_with_error])
+            if poly.intersects(prohib):
+                return True
+
+        return False
+
+    @staticmethod
+    def correct(
+        structure: Structure,
+        idx_poly_with_error: int,
+        domain: Domain,
+    ) -> Polygon:
+        geom = domain.geometry
+        if domain.geometry.is_closed:
+            raise NotImplementedError()
+        else:
+            prohib = geom.get_prohibited_geom(domain.prohibited_area, domain.dist_between_polygons)
+            prohib = cascaded_union(prohib)
+            poly = geom._poly_to_shapely_line(structure[idx_poly_with_error])
+            if poly.intersects(prohib):
+                parts = [geom for geom in poly.difference(prohib.buffer(0.001)).geoms]
+                parts = [geom for geom in parts if not geom.intersects(prohib)]
+                poly = np.random.choice(parts)[0]
+                poly = [Point(p[0], p[1]) for p in poly.coords]
+            else:
+                return poly
 
 
 class PolygonNotClosed(PolygonRule):
@@ -202,7 +251,11 @@ class PolygonNotClosed(PolygonRule):
         domain: Domain,
     ) -> bool:
         poly = structure[idx_poly_with_error]
-        return domain.geometry.is_closed and (poly[0] == poly[-1])
+        if (domain.geometry.is_closed and (poly[0] == poly[-1])) or (
+            not domain.geometry.is_closed and (poly[0] != poly[-1])
+        ):
+            return True
+        return False
 
     @staticmethod
     def correct(
@@ -211,8 +264,10 @@ class PolygonNotClosed(PolygonRule):
         domain: Domain,
     ) -> Polygon:
         poly = structure[idx_poly_with_error]
-        if domain.geometry.is_closed and (poly[0] != poly[-1]):
+        if domain.geometry.is_closed and domain.geometry.is_convex and (poly[0] != poly[-1]):
             poly.points.append(poly.points[0])
+        elif not domain.geometry.is_closed and (poly[0] == poly[-1]):
+            poly.points = poly.points[:-1]
         return poly
 
 
@@ -226,7 +281,6 @@ class PolygonNotOutOfBounds(PolygonRule):
         geom_poly_allowed = ShapelyPolygon(
             [ShapelyPoint(pt.x, pt.y) for pt in domain.allowed_area],
         )
-
         for pt in structure[idx_poly_with_error]:
             geom_pt = ShapelyPoint(pt.x, pt.y)
             if (
@@ -259,6 +313,12 @@ class PolygonNotOutOfBounds(PolygonRule):
 
         if point_moved:
             poly = domain.geometry.resize_poly(poly=poly, x_scale=0.8, y_scale=0.8)
+
+        if poly[0] != poly[-1] and domain.geometry.is_closed:
+            poly.points.append(poly[0])
+        elif poly[0] == poly[-1] and not domain.geometry.is_closed:
+            poly.points = poly.points[:-1]
+
         return poly
 
 
@@ -274,7 +334,7 @@ class PolygonNotSelfIntersects(PolygonRule):
             len(poly) > 2
             and _forbidden_validity(
                 explain_validity(
-                    ShapelyPolygon([ShapelyPoint(pt.x, pt.y) for pt in poly]),
+                    ShapelyPolygon([ShapelyPoint(pt.x, pt.y) for pt in poly]).boundary,
                 ),
             )
         )
@@ -285,13 +345,16 @@ class PolygonNotSelfIntersects(PolygonRule):
         idx_poly_with_error: int,
         domain: Domain,
     ) -> Polygon:
-        return domain.geometry.get_convex(structure[idx_poly_with_error])
+        poly = structure[idx_poly_with_error]
+        poly = domain.geometry.get_convex(poly)
+        return poly
 
 
 def _forbidden_validity(validity):
     return validity != 'Valid Geometry' and 'Ring Self-intersection' not in validity
 
 
+@logger.catch
 def validate(
     structure: Structure,
     rules: list[Union[StructureRule, PolygonRule]],
@@ -302,31 +365,24 @@ def validate(
     if any(
         [(not poly or len(poly) == 0 or any([not p for p in poly])) for poly in structure],
     ):
-        print('Wrong structure - problems with points')
+        logger.error('Wrong structure - problems with points')
         return False
-
-    # for rule in (rule for rule in rules if isinstance(rule, PolygonRule)):
-    #     if not all([rule.validate(structure, idx_, domain) for idx_, _ in enumerate(structure)]):
-    #         return False
-    # for rule in (rule for rule in rules if isinstance(rule, StructureRule)):
-    #     if not rule.validate(structure, domain):
-    #         return False
 
     for rule in (rule for rule in rules if isinstance(rule, PolygonRule)):
         for idx_, _ in enumerate(structure):
             if not rule.validate(structure, idx_, domain):
+                logger.info(f'{rule.__class__.__name__} final fail')
                 return False
 
     for rule in (rule for rule in rules if isinstance(rule, StructureRule)):
         if not rule.validate(structure, domain):
+            logger.info(f'{rule.__class__.__name__} final fail')
             return False
 
     return True
 
 
-from uuid import uuid4
-
-
+@logger.catch
 def postprocess(
     structure: Structure,
     rules: list[Union[StructureRule, PolygonRule]],
@@ -349,57 +405,46 @@ def postprocess(
 
     """
     if structure is None:
+        logger.error('None struct postproc input')
         return None
     if any(
-        [(not poly or len(poly) == 0 or any([not pt for pt in poly])) for poly in structure],
+        [
+            (not poly or len(poly) == 0 or any([not pt for pt in poly]))
+            for poly in structure.polygons
+        ],
     ):
-        print('Wrong structure - problems with points')
+        logger.error('Wrong structure - problems with points')
         return None
 
     corrected_structure = deepcopy(structure)
-    gm = GIFMaker(domain=domain)
-    colors = {
-        0: 'blue',
-        1: 'orange',
-        2: 'green',
-        3: 'red',
-        4: 'purple',
-    }
 
-    gm.create_frame(corrected_structure, {'test': 'start'})
     for idx_, _ in enumerate(structure.polygons):
         for rule in (rule for rule in rules if isinstance(rule, PolygonRule)):
             for at in range(attempts):
                 if not rule.validate(corrected_structure, idx_, domain):
                     corrected_structure[idx_] = rule.correct(corrected_structure, idx_, domain)
-                    # gm.create_frame(corrected_structure, {f'{rule.__class__.__name__}, poly_id: {colors[idx_]}': f'attempt {at}'})
                 else:
-                    # gm.create_frame(corrected_structure, {f'{rule.__class__.__name__}, poly_id: {colors[idx_]}': 'OK'})
                     break
             else:
                 if not rule.validate(corrected_structure, idx_, domain):
-                    # gm.create_frame(corrected_structure, {f'{rule.__class__.__name__}, poly_id: {colors[idx_]}': 'Failed'})
-                    # gm.make_gif(str(uuid4()))
+                    logger.info(f'{rule.__class__.__name__} fail')
                     return None
 
-    for rule in (rule for rule in rules if isinstance(rule, StructureRule)):
+    for idx_, rule in enumerate(rule for rule in rules if isinstance(rule, StructureRule)):
         for at in range(attempts):
             if not rule.validate(corrected_structure, domain):
                 corrected_structure = rule.correct(corrected_structure, domain)
-                # gm.create_frame(corrected_structure, {f'{rule.__class__.__name__}, poly_id: {colors[idx_]}': f'attempt {at}'})
             else:
-                # gm.create_frame(corrected_structure, {f'{rule.__class__.__name__}, poly_id: {colors[idx_]}': 'OK'})
+                if any([len(poly) == 1 for poly in corrected_structure]):
+                    logger.error(rule.__class__.__name__)
                 break
         else:
             if not rule.validate(corrected_structure, domain):
-                # gm.create_frame(corrected_structure, {f'{rule.__class__.__name__}, poly_id: {colors[idx_]}': 'Failed'})
-                # gm.make_gif(str(uuid4()))
                 return None
 
     if validate(corrected_structure, rules, domain):
         return corrected_structure
-    # gm.create_frame(corrected_structure, {f'Final validation : {rulename}': 'Failed'})
-    # gm.make_gif(str(uuid4()))
+    logger.error('None struct postproc out')
     return None
 
 

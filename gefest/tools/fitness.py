@@ -1,7 +1,10 @@
 from abc import ABCMeta, abstractmethod
 from typing import Any, Optional
 
+from loguru import logger
+
 from gefest.core.geometry import Structure
+from gefest.core.utils import where
 from gefest.tools import Estimator
 
 
@@ -19,9 +22,10 @@ class Fitness(metaclass=ABCMeta):
     ) -> list[Structure]:
         return self.set_pop_fitness(pop=pop)
 
+    @logger.catch
     def set_pop_fitness(self, pop: list[Structure]):
-        for idx, ind in enumerate(pop):
-            pop[idx].fitness = self.fitness(ind)
+        for idx in where(pop, lambda ind: len(ind.fitness) == 0):
+            pop[idx].fitness = self.fitness(pop[idx])
         return pop
 
     @abstractmethod

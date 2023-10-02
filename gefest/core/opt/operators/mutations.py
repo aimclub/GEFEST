@@ -1,13 +1,15 @@
 import copy
-import random
 from typing import Callable
 
 import numpy as np
+from loguru import logger
+from shapely.geometry import LineString, MultiPoint
+from shapely.geometry import Point as SPoint
 
 from gefest.core.algs.postproc.resolve_errors import postprocess
-from gefest.core.geometry import Point, Structure
+from gefest.core.geometry import Point, Polygon, Structure
 from gefest.core.geometry.domain import Domain
-from gefest.core.geometry.utils import get_random_point, get_random_poly
+from gefest.core.geometry.utils import get_random_poly, get_selfintersection_safe_point
 
 
 def mutate_structure(
@@ -17,18 +19,19 @@ def mutate_structure(
     mutation_chance: float,
     mutations_probs: list[int],
 ) -> Structure:
-    """Apply mutation for polygons in structure.
+    """Apply mutation random mutation from list
+        for each polygons in structure.
 
     Args:
-        structure (Structure): _description_
-        domain (Domain): _description_
-        mutations (list[Callable]): _description_
-        mutation_chance (float): _description_
-        mutations_probs (list[int]): _description_
+        structure (Structure): Structure to mutate.
+        domain (Domain): Task domain.
+        mutations (list[Callable]): List of mutation operations to choose.
+        mutation_chance (float): Chance to mutate polygon.
+        mutations_probs (list[int]): Probablilites of each mutation operation.
 
     Returns:
         Structure: Mutated structure. It is not guaranteed
-            that the resulting structure will be valid, dont
+            that the resulting structure will be valid or changed.
     """
     new_structure = copy.deepcopy(structure)
 
@@ -41,19 +44,27 @@ def mutate_structure(
                 p=mutations_probs,
             )
             new_structure = chosen_mutation[0](new_structure, domain, idx_)
+            if not new_structure:
+                logger.warning(f'None out: {chosen_mutation[0].__name__}')
 
     return new_structure
 
 
-def rotate_poly(new_structure: Structure, domain: Domain, idx_: int = None) -> Structure:
+@logger.catch
+def rotate_poly(
+    new_structure: Structure,
+    domain: Domain,
+    idx_: int = None,
+) -> Structure:
     angle = float(np.random.randint(-120, 120))
-    new_structure.polygons[idx_] = domain.geometry.rotate_poly(
-        new_structure.polygons[idx_],
+    new_structure[idx_] = domain.geometry.rotate_poly(
+        new_structure[idx_],
         angle,
     )
     return new_structure
 
 
+@logger.catch
 def drop_poly(
     new_structure: Structure,
     domain: Domain,
@@ -67,170 +78,328 @@ def drop_poly(
     return new_structure
 
 
+@logger.catch
 def add_poly(
     new_structure: Structure,
     domain: Domain,
     idx_: int = None,
 ) -> Structure:
-    if len(new_structure.polygons) < (domain.max_poly_num - 1):
+    if len(new_structure) < (domain.max_poly_num - 1):
         new_poly = get_random_poly(new_structure, domain)
         if new_poly is not None:
-            new_structure.polygons.append(new_poly)
+            new_structure.append(new_poly)
     return new_structure
 
 
+@logger.catch
 def resize_poly(
     new_structure: Structure,
     domain: Domain,
     idx_: int = None,
 ) -> Structure:
-    new_structure.polygons[idx_] = domain.geometry.resize_poly(
-        new_structure.polygons[idx_],
+    new_structure[idx_] = domain.geometry.resize_poly(
+        new_structure[idx_],
         x_scale=np.random.uniform(0.25, 3, 1)[0],
         y_scale=np.random.uniform(0.25, 3, 1)[0],
     )
     return new_structure
 
 
-from math import cos, pi, sin, sqrt
+@logger.catch
+def _get_convex_safe_area(
+    poly: Polygon,
+    domain: Domain,
+    point_left_idx: int,
+    point_right_idx: int,
+) -> Polygon:
+    geom = domain.geometry
+    if poly[0] == poly[-1]:
+        poly = poly[:-1]
+    l = len(poly)
+    if l == 2:
+        p = poly[(point_left_idx + 1) % l]
+        circle = SPoint(p.x, p.y).buffer(geom.get_length(poly))
+        base_area = [Point(p[0], p[1]) for p in list(circle.exterior.coords)]
+        return base_area
+
+    left_cut = [
+        poly[(point_left_idx - 1) % l],
+        poly[(point_left_idx) % l],
+    ]
+    right_cut = [
+        poly[(point_right_idx + 1) % l],
+        poly[(point_right_idx) % l],
+    ]
+    cut_angles = (
+        geom.get_angle(
+            left_cut,
+            [
+                left_cut[0],
+                right_cut[0],
+            ],
+        ),
+        geom.get_angle(
+            right_cut,
+            [
+                right_cut[0],
+                left_cut[0],
+            ],
+        ),
+    )
+
+    p1, p2 = left_cut[1], right_cut[1]
+    pad_vector_points = [p1, geom.rotate_point(p2, p1, 90)]
+    pad_vector = (
+        pad_vector_points[1].x - pad_vector_points[0].x,
+        pad_vector_points[1].y - pad_vector_points[0].y,
+    )
+    # pad_vector == len(vector[left_point, right_point])
+    slice_line = (
+        Point(left_cut[1].x + pad_vector[0], left_cut[1].y + pad_vector[1]),
+        Point(right_cut[1].x + pad_vector[0], right_cut[1].y + pad_vector[1]),
+    )
+    scale_factor = max(domain.max_x, domain.max_y) * 100
+
+    if sum(cut_angles) < 180:
+
+        intersection_point = geom.intersection_line_line(
+            left_cut,
+            right_cut,
+            scale_factor,
+            scale_factor,
+        )
+        if intersection_point is not None:
+            mid_points = [intersection_point]
+        else:
+            mid_points = [
+                geom.intersection_line_line(left_cut, slice_line, scale_factor, scale_factor),
+                geom.intersection_line_line(right_cut, slice_line, scale_factor, scale_factor),
+            ]
+        slice_points = geom.intersection_poly_line(
+            Polygon(
+                [
+                    left_cut[1],
+                    *mid_points,
+                    right_cut[1],
+                ],
+            ),
+            slice_line,
+            scale_factor,
+        )
+
+        if not slice_points.is_empty:
+            if isinstance(slice_points, SPoint):
+                mid_points = [Point(slice_points.x, slice_points.y)]
+            elif isinstance(slice_points, MultiPoint):
+                mid_points = [Point(p.x, p.y) for p in slice_points.geoms]
+            else:
+                mid_points = [Point(p.x, p.y) for p in slice_points.coords]
+
+        base_area = [
+            left_cut[1],
+            *mid_points,
+            right_cut[1],
+        ]
+
+        base_area = [
+            Point(p[0], p[1])
+            for p in geom._poly_to_shapely_poly(Polygon(base_area)).convex_hull.exterior.coords
+        ]
+
+    else:
+
+        base_area = [
+            left_cut[1],
+            geom.intersection_line_line(left_cut, slice_line, scale_factor, scale_factor),
+            geom.intersection_line_line(right_cut, slice_line, scale_factor, scale_factor),
+            right_cut[1],
+        ]
+
+    return Polygon(base_area) if base_area else base_area
 
 
-def random_polar(rscale, dx, dy):
-    theta = random.random() * 2 * pi
-    r = random.random() * rscale
-    return (r * cos(theta)) + dx, (r * sin(theta)) + dy
-
-
+@logger.catch
 def pos_change_point_mutation(
     new_structure: Structure,
     domain: Domain,
     idx_: int = None,
 ) -> Structure:
+    geom = domain.geometry
+    poly = copy.deepcopy(new_structure[idx_])
 
-    structure = copy.deepcopy(new_structure)
+    if poly[0] == poly[-1]:
+        poly = poly[:-1]
+    mutate_point_idx = int(np.random.randint(1, len(poly)))  # fix 1 to 0
 
-    mutate_point_idx = int(np.random.randint(0, len(structure[idx_])))
-    if mutate_point_idx == len(structure[idx_]) - 1:
-        neighbour_left = mutate_point_idx - 1
-        neighbour_right = 0
-    elif mutate_point_idx == 0:
-        neighbour_left = len(new_structure[idx_]) - 1
-        neighbour_right = 1
-    else:
-        neighbour_left = mutate_point_idx - 1
-        neighbour_right = mutate_point_idx + 1
+    if geom.is_convex:
+        poly = geom.get_convex(poly=poly)
 
-    x1 = structure[idx_][neighbour_left].x
-    y1 = structure[idx_][neighbour_left].y
-    x2 = structure[idx_][neighbour_right].x
-    y2 = structure[idx_][neighbour_right].y
-    base_x = structure[idx_][mutate_point_idx].x
-    base_y = structure[idx_][mutate_point_idx].y
+    if not geom.is_convex or (len(poly) in (2, 3)):
+        point, _ = get_selfintersection_safe_point(
+            poly,
+            domain,
+            mutate_point_idx - 1,
+            mutate_point_idx + 1,
+        )
+        if point:
+            poly[mutate_point_idx] = point
 
-    dx, dy = (x1 - x2) / 2, (y1 - y2) / 2
-    d = sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+    elif geom.is_convex:
 
-    delta_point = random_polar((d / 2), dx, dy)
-    x_new, y_new = base_x + delta_point[0], base_y + delta_point[1]
+        base_area = _get_convex_safe_area(
+            poly,
+            domain,
+            mutate_point_idx - 1,
+            mutate_point_idx + 1,
+        )
 
-    i = 20
-    while Point(x_new, y_new) not in domain:
-        delta_point = random_polar((d / 2), dx, dy)
-        x_new, y_new = base_x + delta_point[0], base_y + delta_point[1]
-        i -= 1
-        if i == 0:
-            structure[idx_][mutate_point_idx].x += delta_point[0]
-            structure[idx_][mutate_point_idx].y += delta_point[1]
-            return structure
-
-    structure[idx_][mutate_point_idx].x += delta_point[0]
-    structure[idx_][mutate_point_idx].y += delta_point[1]
-
-    # return structure
-
-    # '''
-    #     mutate_point_idx = int(np.random.randint(0, len(new_structure[idx_])))
-    #     # Neighborhood to reposition
-    #     eps_x = round(domain.len_x / 10)
-    #     eps_y = round(domain.len_y / 10)
-
-    #     structure = copy.deepcopy(new_structure)
-
-    #     # Displacement in the neighborhood
-    #     displacement_x = random.randint(-eps_x, eps_x)
-    #     displacement_y = random.randint(-eps_y, eps_y)
-
-    #     x_new = structure.polygons[idx_].points[mutate_point_idx].x + displacement_x
-    #     y_new = structure.polygons[idx_].points[mutate_point_idx].y + displacement_y
-
-    #     i = 20  # Number of attempts to change the position of the point
-    #     while Point(x_new, y_new) not in domain:
-    #         x_new = structure.polygons[idx_].points[mutate_point_idx].x + displacement_x
-    #         y_new = structure.polygons[idx_].points[mutate_point_idx].y + displacement_y
-    #         i -= 1
-    #         if i == 0:
-    #             return new_structure
-
-    #     structure.polygons[idx_].points[mutate_point_idx].x = x_new
-    #     structure.polygons[idx_].points[mutate_point_idx].y = y_new
-    # '''
-    # from gefest.core.viz.struct_vizualizer import StructVizualizer
-    # from matplotlib import pyplot as plt
-
-    # plt.figure(figsize=(7, 7))
-    # visualiser = StructVizualizer(domain)
-
-    # info = {
-    #     'spend_time': 1,
-    #     'fitness': 0,
-    #     'type': 'prediction',
-    # }
-    # visualiser.plot_structure(
-    #     [structure, new_structure], [info, info], ['-', '-.'],
-    # )
-
-    # plt.show(block=True)
-
-    return structure
-
-
-def add_point(new_structure: Structure, domain: Domain, idx_: int = None):
-    mutate_point_idx = int(np.random.randint(0, len(new_structure[idx_])))
-
-    polygon_to_mutate = new_structure[idx_]
-
-    new_point = get_random_point(
-        polygon_to_mutate,
-        new_structure,
-        domain,
-    )
-
-    if new_point is not None:
-        if mutate_point_idx + 1 < len(polygon_to_mutate):
-            new_structure.polygons[idx_].points.insert(
-                mutate_point_idx + 1,
-                new_point,
+        if base_area:
+            movment_area = geom._poly_to_shapely_poly(base_area).intersection(
+                geom._poly_to_shapely_poly(domain.allowed_area),
             )
-        else:
-            new_structure.polygons[idx_].points.insert(
-                mutate_point_idx - 1,
-                new_point,
+            prohibs = geom.get_prohibited_geom(
+                domain.prohibited_area,
+                buffer_size=domain.dist_between_polygons,
             )
+            for fig in prohibs.geoms:
+                movment_area = movment_area.difference(
+                    fig.buffer(
+                        domain.min_dist_from_boundary,
+                    ),
+                )
+
+            for idx in [idx for idx in range(len(new_structure)) if idx != idx_]:
+                movment_area = movment_area.difference(
+                    geom._poly_to_shapely_poly(new_structure[idx]).buffer(
+                        domain.dist_between_polygons,
+                    ),
+                )
+            if movment_area.is_empty:
+                logger.warning('Empty movment area.')
+                return new_structure
+
+            point = geom.get_random_point_in_poly(movment_area)  # pick in geom collection : todo
+            if point:
+                poly[mutate_point_idx % len(poly)] = point
+
+    if geom.is_closed:
+        poly.points.append(poly[0])
+    new_structure[idx_] = poly
+    if new_structure is None:
+        logger.error('None structure.')
+
     return new_structure
 
 
+@logger.catch
+def add_point(new_structure: Structure, domain: Domain, idx_: int = None):
+
+    if new_structure is None:
+        logger.error('None struct')
+
+    geom = domain.geometry
+    poly = copy.deepcopy(new_structure[idx_])
+    if geom.is_closed:
+        if poly[0] == poly[-1]:
+            poly = poly[:-1]
+    mutate_point_idx = int(np.random.randint(0, len(poly)))
+
+    if not geom.is_convex or len(poly) == 3:
+        point, _ = get_selfintersection_safe_point(
+            poly,
+            domain,
+            mutate_point_idx,
+            mutate_point_idx + 1,
+        )
+        if point:
+            poly.points.insert(mutate_point_idx, point)
+        else:
+            logger.warning('Failed to add point without self intersection.')
+
+    elif geom.is_convex:
+        poly = geom.get_convex(poly=poly)
+        base_area = _get_convex_safe_area(
+            poly,
+            domain,
+            mutate_point_idx,
+            mutate_point_idx + 1,
+        )
+
+        if base_area:
+            base_area = geom._poly_to_shapely_poly(base_area)
+            if not base_area.is_simple:
+                logger.error('Base area not simple.')
+
+            movment_area = base_area.intersection(
+                geom._poly_to_shapely_poly(domain.allowed_area),
+            )
+
+            prohibs = geom.get_prohibited_geom(
+                domain.prohibited_area,
+                buffer_size=domain.dist_between_polygons,
+            )
+            for fig in prohibs.geoms:
+                movment_area = movment_area.difference(
+                    fig.buffer(
+                        domain.min_dist_from_boundary,
+                    ),
+                )
+
+            for idx in [idx for idx in range(len(new_structure)) if idx != idx_]:
+                movment_area = movment_area.difference(
+                    geom._poly_to_shapely_poly(new_structure[idx]).buffer(
+                        domain.dist_between_polygons,
+                    ),
+                )
+            if movment_area.is_empty:
+                logger.warning('Empty movment area')
+                return new_structure
+            else:
+                logger.warning('Not implemented select adjacent to poly movment_area part.')
+                logger.warning('Not implemented number of parts check. If there is 1 part - ok.')
+            point = geom.get_random_point_in_poly(movment_area)
+            if point:
+                if mutate_point_idx + 1 < len(poly):
+                    poly.points.insert(
+                        mutate_point_idx + 1,
+                        point,
+                    )
+                else:
+                    poly.points.insert(
+                        mutate_point_idx - 1,
+                        point,
+                    )
+
+    if geom.is_closed:
+        poly.points.append(poly[0])
+    new_structure[idx_] = poly
+    if new_structure is None:
+        logger.error('None struct')
+    return new_structure
+
+
+@logger.catch
 def drop_point(new_structure: Structure, domain: Domain, idx_: int = None):
-    mutate_point_idx = int(np.random.randint(0, len(new_structure[idx_])))
 
     polygon_to_mutate = new_structure[idx_]
+    if domain.geometry.is_closed:
+        if polygon_to_mutate[0] == polygon_to_mutate[-1]:
+            polygon_to_mutate = polygon_to_mutate[:-1]
+
+    mutate_point_idx = int(np.random.randint(0, len(polygon_to_mutate)))
     point_to_mutate = polygon_to_mutate[mutate_point_idx]
 
     if len(polygon_to_mutate) > domain.min_points_num:
-        # if drop point from polygon
-        new_structure.polygons[idx_].points.remove(point_to_mutate)
+        if domain.geometry.is_closed or idx_ == 0 or idx_ == (len(polygon_to_mutate) - 1):
+            polygon_to_mutate.points.remove(point_to_mutate)
+        else:
+            new_poly = [
+                polygon_to_mutate[idx]
+                for idx in range(len(polygon_to_mutate))
+                if idx != mutate_point_idx
+            ]
+            if LineString([(p.x, p.y) for p in new_poly]).is_simple:
+                polygon_to_mutate.points.remove(point_to_mutate)
 
+    new_structure[idx_] = polygon_to_mutate
     return new_structure
-
-
-# class BaseMutations(Enum):
-#     mutation_name = mutation

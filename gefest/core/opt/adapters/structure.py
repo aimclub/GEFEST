@@ -28,6 +28,8 @@ class StructureAdapter(BaseOptimizationAdapter):
         nodes = []
         for polygon in adaptee.polygons:
             prev_node = None
+            if polygon.points[0] == polygon.points[-1]:
+                polygon.points = polygon.points[:-1]
             for point_id in range(len(polygon.points)):
                 node = self._point_to_node(polygon.points[point_id])
                 if prev_node:
@@ -57,6 +59,7 @@ class StructureAdapter(BaseOptimizationAdapter):
                     node.content['params']['y'],
                 ),
             )
+        poly.points.append(poly[0])
         if poly not in structure:
             # add last poly
             structure.append(poly)

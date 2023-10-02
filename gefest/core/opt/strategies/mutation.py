@@ -4,7 +4,7 @@ from typing import Callable
 
 from gefest.core.geometry import Structure
 from gefest.core.opt.operators.mutations import mutate_structure
-from gefest.core.utils import chain, where
+from gefest.core.utils import chained_call, where
 from gefest.core.utils.parallel_manager import BaseParallelDispatcher
 
 from .strategy import Strategy
@@ -37,7 +37,7 @@ class MutationStrategy(Strategy):
         pop_ = copy.deepcopy(pop)
 
         mutated_pop = self._pm.exec_parallel(
-            func=chain(mutator, partial(self.postprocess, attempts=3)),
+            func=chained_call(mutator, partial(self.postprocess, attempts=3)),
             arguments=pop_,
             use=True,
         )

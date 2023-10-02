@@ -36,10 +36,15 @@ class BaseParallelDispatcher:
         Returns:
             list[Any]
         """
-
-        parallel = Parallel(n_jobs=self.n_jobs, verbose=0, pre_dispatch='2*n_jobs')
-        if use:
-            result = parallel(delayed(func)(arg) for arg in arguments)
+        if self.n_jobs == 0:
+            if use:
+                result = [func(arg) for arg in arguments]
+            else:
+                result = [func() for _ in arguments]
         else:
-            result = parallel(delayed(func)() for _ in arguments)
+            parallel = Parallel(n_jobs=self.n_jobs, verbose=0, pre_dispatch='2*n_jobs')
+            if use:
+                result = parallel(delayed(func)(arg) for arg in arguments)
+            else:
+                result = parallel(delayed(func)() for _ in arguments)
         return result

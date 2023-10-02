@@ -2,12 +2,15 @@ from functools import reduce
 from pathlib import Path
 from typing import Any, Callable
 
+from loguru import logger
+
 
 def project_root() -> Path:
     """Returns project root folder."""
     return Path(__file__).parent.parent.parent
 
 
+@logger.catch
 def where(
     sequence: list[Any],
     mask_rule: Callable[[Callable], bool],
@@ -23,17 +26,18 @@ def where(
     return [idx for idx, ind in enumerate(sequence) if mask_rule(ind)]
 
 
-def chain(*funcs):
+def chained_call(*funcs):
     _initial_missing = object()
 
-    def chained_call(args=_initial_missing):
+    def several_functions_chained_call(args=_initial_missing):
         if args is _initial_missing:
             return reduce(lambda r, f: f(r), funcs[1::], funcs[0]())
         return reduce(lambda r, f: f(r), funcs, args)
 
-    def single_call(args=_initial_missing):
+    def single_function_call(args=_initial_missing):
         if args is _initial_missing:
             return funcs[0]()
         return funcs[0](args)
 
-    return chained_call if len(funcs) > 1 else single_call
+    call = several_functions_chained_call if len(funcs) > 1 else single_function_call
+    return call
