@@ -1,35 +1,41 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from golem.core.adapter.adapter import BaseOptimizationAdapter
 from golem.core.optimisers.graph import OptGraph, OptNode
+from loguru import logger
 
 from gefest.core.geometry import Point, Polygon, Structure
+from gefest.core.geometry.domain import Domain
 
 
 class StructureAdapter(BaseOptimizationAdapter):
-    def __init__(self):
+    def __init__(self, domain: Domain) -> None:
         """
         Optimization adapter for Pipeline class
         """
         super().__init__(base_graph_class=Structure)
+        self.domain = domain
 
-    def _point_to_node(self, point):
-        # Prepare content for nodes
-        if isinstance(point, OptNode):
+    def _point_to_node(self, point) -> OptNode:
+        if type(point) == OptNode:
             self._log.warn('Unexpected: OptNode found in adapter instead' 'Point.')
         else:
             content = {'name': f'pt_{point.x}_{point.y}', 'params': {}}
+
             node = OptNode(content=content)
-            node.content['params'] = {'x': point.x, 'y': point.y}
+            node.content['params'] = {
+                'x': point.x,
+                'y': point.y,
+            }
             return node
 
-    def _adapt(self, adaptee: Structure):
-        """Convert Structure class into OptGraph class"""
+    def _adapt(self, adaptee: Structure) -> OptGraph:
+        """Convert Structure into OptGraph."""
         nodes = []
         for polygon in adaptee.polygons:
+            if polygon[-1] == polygon[0]:
+                polygon = polygon[:-1]
             prev_node = None
-            if polygon.points[0] == polygon.points[-1]:
-                polygon.points = polygon.points[:-1]
             for point_id in range(len(polygon.points)):
                 node = self._point_to_node(polygon.points[point_id])
                 if prev_node:
@@ -40,17 +46,26 @@ class StructureAdapter(BaseOptimizationAdapter):
         graph = OptGraph(nodes)
         return graph
 
-    def _restore(
-        self,
-        opt_graph: OptGraph,
-        metadata: Optional[Dict[str, Any]] = None,
-    ) -> Structure:
-        """Convert OptGraph class into Structure class"""
+    def _restore(self, opt_graph: OptGraph) -> Structure:
+        """Convert OptGraph into Structure."""
         structure = []
         poly = Polygon()
-        for node in opt_graph.nodes:
-            if node.nodes_from is None:
+        first_node = opt_graph.nodes[0]
+        if not len(first_node.nodes_from):
+            poly.points.append(
+                Point(
+                    first_node.content['params']['x'],
+                    first_node.content['params']['y'],
+                ),
+            )
+        else:
+            logger.critical('Unexpected nodes order. First node is not root.')
+
+        for node in opt_graph.nodes[1:]:
+            if not len(node.nodes_from):
                 # next polygon started
+                if self.domain.geometry.is_closed:
+                    poly.points.append(poly[0])
                 structure.append(poly)
                 poly = Polygon()
             poly.points.append(
@@ -59,8 +74,10 @@ class StructureAdapter(BaseOptimizationAdapter):
                     node.content['params']['y'],
                 ),
             )
-        poly.points.append(poly[0])
+
         if poly not in structure:
+            if self.domain.geometry.is_closed:
+                poly.points.append(poly[0])
             # add last poly
             structure.append(poly)
 
