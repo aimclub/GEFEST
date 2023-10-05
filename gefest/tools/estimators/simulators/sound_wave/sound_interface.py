@@ -171,6 +171,7 @@ class SoundSimulator(Estimator):
             integration_interval = self.pressure_hist.shape[0]
         rms_p = np.sqrt(np.mean(np.square(self.pressure_hist[-integration_interval:-1]), axis=0))
 
+        rms_p[rms_p == 0.0] = 0.000000001
         matrix_db = 20 * np.log10(rms_p / p0)
         return matrix_db
 
