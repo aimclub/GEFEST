@@ -35,6 +35,7 @@ class OptimizationParams(BaseModel):
     crossover_prob: float = 0.6
     mutation_each_prob: Optional[list[float]] = None
     crossover_each_prob: Optional[list[float]] = None
+    extra: int = 5
     n_jobs: Optional[int] = -1
     golem_adapter: Callable = StructureAdapter
     tuner_cfg: Optional[TunerParams] = None

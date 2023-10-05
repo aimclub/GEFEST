@@ -34,7 +34,7 @@ class BaseGA(Optimizer):
             self._pop = self.selector(self._pop, self.opt_params.pop_size)
             self._pop = self.crossover(self._pop)
             self._pop = self.mutation(self._pop)
-            self._pop.extend(self.sampler(5))
+            self._pop.extend(self.sampler(self.opt_params.extra))
             self._pop = self.estimator(self._pop)
             self.logger.log_pop(self._pop, step)
         self._pop = sorted(self._pop, key=lambda x: x.fitness)

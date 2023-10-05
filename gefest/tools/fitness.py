@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, Optional
+from typing import Optional
 
 from loguru import logger
 
@@ -31,9 +31,12 @@ class Fitness(metaclass=ABCMeta):
         pop: list[Structure],
     ) -> list[Structure]:
         for idx in where(pop, lambda ind: len(ind.fitness) == 0):
-            pop[idx].fitness = self.fitness(pop[idx])
+            fit = self.fitness(pop[idx])
+            if not isinstance(fit, list):
+                fit = [fit]
+            pop[idx].fitness = fit
         return pop
 
     @abstractmethod
-    def fitness(self, ind: Structure) -> list[float]:
+    def fitness(self, ind: Structure) -> float:
         ...

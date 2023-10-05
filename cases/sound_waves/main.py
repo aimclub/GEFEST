@@ -78,7 +78,7 @@ if __name__ == '__main__':
     #  tuner config
     tp = TunerParams(
         tuner_type='iopt',
-        n_steps_tune=10,
+        n_steps_tune=2,
         sampling_variance=0.1,
         hyperopt_dist=hp.uniform,
     )
@@ -106,7 +106,7 @@ if __name__ == '__main__':
             current_spl = np.nan_to_num(spl, nan=0, neginf=0, posinf=0)
 
             l_f = np.sum(np.abs(self.best_spl - current_spl))
-            return [l_f]
+            return l_f
 
     #  fitness estimator
     estimator = SoundFieldFitness(
@@ -145,11 +145,12 @@ if __name__ == '__main__':
             Rules.not_overlaps_prohibited.value,
             Rules.not_too_close_points.value,
         ],
+        extra=3,
         n_jobs=-1,
         golem_adapter=StructureAdapter,
         tuner_cfg=tp,
-        n_steps=8,
-        pop_size=5,
+        n_steps=1,
+        pop_size=3,
     )
 
     optimizer = BaseGA(opt_params)
