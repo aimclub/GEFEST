@@ -4,9 +4,11 @@ from shapely.geometry.point import Point
 
 from gefest.core.geometry import Point as G_Point
 from gefest.core.geometry import Polygon, PolyID, Structure
+from gefest.core.geometry.domain import Domain
 
 
 def create_prohibited(
+    points_radius,
     targets: Optional[list[list]] = None,
     fixed_points: Optional[list[list]] = None,
     fixed_area: Optional[list[list]] = None,
@@ -22,7 +24,7 @@ def create_prohibited(
     """
     prohibited_area = []
     if targets is not None:
-        target_polygons = [list(Point(target).buffer(20).exterior.coords) for target in targets]
+        target_polygons = [list(Point(target).buffer(points_radius).exterior.coords) for target in targets]
         target_points = [[G_Point(p[0], p[1]) for p in target] for target in target_polygons]
         poly_targets = [Polygon(id_=PolyID.PROH_TARG, points=points) for points in target_points]
         prohibited_area += poly_targets

@@ -160,7 +160,7 @@ def _get_convex_safe_area(
     )
     scale_factor = max(domain.max_x, domain.max_y) * 100
 
-    if sum(cut_angles) < 180:
+    if sum(cut_angles) < 170:
 
         intersection_point = geom.intersection_line_line(
             left_cut,
@@ -175,19 +175,33 @@ def _get_convex_safe_area(
                 geom.intersection_line_line(left_cut, slice_line, scale_factor, scale_factor),
                 geom.intersection_line_line(right_cut, slice_line, scale_factor, scale_factor),
             ]
-        slice_points = geom.intersection_poly_line(
-            Polygon(
-                [
-                    left_cut[1],
-                    *mid_points,
-                    right_cut[1],
-                ],
-            ),
-            slice_line,
-            scale_factor,
-        )
+        try:
+            slice_points = geom.intersection_poly_line(
+                Polygon(
+                    [
+                        left_cut[1],
+                        *mid_points,
+                        right_cut[1],
+                    ],
+                ),
+                slice_line,
+                scale_factor,
+            )
+        except Exception as e:
+            from shapely.plotting import plot_line
+            from matplotlib import pyplot as plt
+            plot_line(geom._poly_to_shapely_line(poly))
+            plot_line(LineString(
+                    [(p.x,p.y) for p in
+                    [
+                        left_cut[1],
+                        *mid_points,
+                        right_cut[1],
+                    ]]), color='r')
+            plot_line(LineString([(p.x,p.y) for p in slice_line]), color='g')
+            plt.show()
 
-        if not slice_points.is_empty:
+        if slice_points:
             if isinstance(slice_points, SPoint):
                 mid_points = [Point(slice_points.x, slice_points.y)]
             elif isinstance(slice_points, MultiPoint):
@@ -326,7 +340,7 @@ def add_point(new_structure: Structure, domain: Domain, idx_: int = None):
         )
 
         if base_area:
-            base_area = geom._poly_to_shapely_poly(base_area)
+            base_area = geom._poly_to_shapely_poly(Polygon(base_area))
             if not base_area.is_simple:
                 logger.error('Base area not simple.')
 

@@ -9,7 +9,7 @@ import numpy as np
 from loguru import logger
 from shapely.geometry import Point as ShapelyPoint
 from shapely.geometry import Polygon as ShapelyPolygon
-from shapely.ops import cascaded_union
+from shapely.ops import unary_union
 from shapely.validation import explain_validity
 
 from gefest.core.geometry import Point, Polygon, Structure, get_random_poly
@@ -211,15 +211,21 @@ class PolygonNotOverlapsProhibited(PolygonRule):
 
         geom = domain.geometry
         if domain.geometry.is_closed:
-            raise NotImplementedError()
+            logger.warning("There is no errors if no construction. NotImplemented validation and fix.")
         else:
+            from shapely.plotting import plot_polygon, plot_line
+            from matplotlib import pyplot as plt
             prohib = geom.get_prohibited_geom(domain.prohibited_area, domain.dist_between_polygons)
-            prohib = cascaded_union(prohib)
+            prohib = unary_union(prohib)
             poly = geom._poly_to_shapely_line(structure[idx_poly_with_error])
+            # for g in prohib.geoms:
+            #     plot_polygon(g)
+            # plot_line(poly, color='r')
+            # plt.show(block=True)
             if poly.intersects(prohib):
-                return True
+                return False
 
-        return False
+        return True
 
     @staticmethod
     def correct(
@@ -231,16 +237,34 @@ class PolygonNotOverlapsProhibited(PolygonRule):
         if domain.geometry.is_closed:
             raise NotImplementedError()
         else:
+            from shapely.plotting import plot_polygon, plot_line
+            from matplotlib import pyplot as plt
             prohib = geom.get_prohibited_geom(domain.prohibited_area, domain.dist_between_polygons)
-            prohib = cascaded_union(prohib)
+            # for g in prohib.geoms:
+                # plot_polygon(g)
+            # plt.show(block=True)
+            prohib = unary_union(prohib)
+            # for g in prohib.geoms:
+            #     plot_polygon(g)
+            
             poly = geom._poly_to_shapely_line(structure[idx_poly_with_error])
+            
+            # plot_line(poly)
+            # plt.show(block=True)
             if poly.intersects(prohib):
-                parts = [geom for geom in poly.difference(prohib.buffer(0.001)).geoms]
-                parts = [geom for geom in parts if not geom.intersects(prohib)]
-                poly = np.random.choice(parts)[0]
-                poly = [Point(p[0], p[1]) for p in poly.coords]
+                res = poly.difference(prohib.buffer(0.001))
+                from shapely.geometry import MultiPoint, LineString, GeometryCollection
+                if isinstance(res, (MultiPoint, LineString)):
+                    res = GeometryCollection(res)
+                parts = [g for g in res.geoms]
+                parts = [g for g in parts if not g.intersects(prohib)]
+                poly = np.random.choice(parts)
+                # plot_line(poly)
+                # poly = [Point(p[0], p[1]) for p in poly.coords]
+                # plt.show(block=True)
+                return Polygon([Point(p[0], p[1]) for p in poly.coords])
             else:
-                return poly
+                return Polygon([Point(p[0], p[1]) for p in poly.coords])
 
 
 class PolygonNotClosed(PolygonRule):
@@ -453,4 +477,5 @@ class Rules(Enum):
     not_closed_polygon = PolygonNotClosed()
     not_out_of_bounds = PolygonNotOutOfBounds()
     not_self_intersects = PolygonNotSelfIntersects()
+    not_overlaps_prohibited = PolygonNotOverlapsProhibited()
     not_too_close_points = PointsNotTooClose()

@@ -88,8 +88,8 @@ class GIFMaker(StructVizualizer):
         self.frames = []
         self.counter = 0
 
-    def create_frame(self, structure, infos, domain=None):
-        fig = self.plot_structure(structure, domain, infos)
+    def create_frame(self, structure, infos):
+        fig = self.plot_structure(structure, self.domain, infos)
         numpy_fig = mplfig_to_npimage(fig)
         self.frames.append(numpy_fig)
         plt.close()

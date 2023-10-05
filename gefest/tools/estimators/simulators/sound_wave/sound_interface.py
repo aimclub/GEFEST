@@ -1,5 +1,6 @@
 import itertools
 from copy import deepcopy
+from typing import Any
 
 import numpy as np
 from numpy import ndarray
@@ -7,6 +8,7 @@ from numpy.core.umath import pi
 from skimage.draw import polygon as skipolygon
 from skimage.draw import random_shapes
 from tqdm import tqdm
+from gefest.core.geometry import Structure
 
 from gefest.core.geometry import Structure
 from gefest.tools import Estimator
@@ -73,7 +75,8 @@ def generate_random_map(map_size, random_seed):
     width_center = map_size[0] // 2
     length_center = map_size[1] // 2
     obstacle_map[
-        width_center - 20 : width_center + 21, length_center - 20 : length_center + 21,
+        width_center - 20 : width_center + 21,
+        length_center - 20 : length_center + 21,
     ] = 255
     free_media = obstacle_map == 255
     # Obstacles = 1, free media = 0
@@ -114,10 +117,10 @@ class SoundSimulator(Estimator):
             obstacle_map is not None
             and (obstacle_map.shape[0], obstacle_map.shape[1]) == self.map_size
         ):
-            print("** Map Accepted **")
+            print('** Map Accepted **')
             self.obstacle_map = obstacle_map
         elif obstacle_map is not None and obstacle_map.shape != self.map_size:
-            print("** Map size denied **")
+            print('** Map size denied **')
             self.obstacle_map = np.zeros((self.size_y, self.size_x))
         else:
             self.obstacle_map = np.zeros((self.size_y, self.size_x))

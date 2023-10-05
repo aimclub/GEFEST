@@ -10,7 +10,7 @@ import pickledb
 from gefest.core.geometry import Structure
 from gefest.tools import Estimator
 
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 USE_AVG_CONST = False
 
 
@@ -44,11 +44,11 @@ class Comsol(Estimator):
             model, idx = self._load_simulation_result(self.client, structure)
             if model is None:
                 poly_box = []
-                print("Start COMSOL")
+                print('Start COMSOL')
                 for i, pol in enumerate(structure.polygons):
                     poly_repr = []
-                    poly_repr.append(" ".join([str(pt.x) for pt in pol.points]))
-                    poly_repr.append(" ".join([str(pt.y) for pt in pol.points]))
+                    poly_repr.append(' '.join([str(pt.x) for pt in pol.points]))
+                    poly_repr.append(' '.join([str(pt.y) for pt in pol.points]))
                     poly_box.append(poly_repr)
 
                 model = self.client.load(self.path_to_mph)
@@ -67,22 +67,22 @@ class Comsol(Estimator):
 
             try:
                 outs = [
-                    model.evaluate("vlct_1"),
-                    model.evaluate("vlct_2"),
-                    model.evaluate("vlct_3"),
-                    model.evaluate("vlct_4"),
-                    model.evaluate("vlct_5"),
-                    model.evaluate("vlct_side"),
-                    model.evaluate("vlct_main"),
+                    model.evaluate('vlct_1'),
+                    model.evaluate('vlct_2'),
+                    model.evaluate('vlct_3'),
+                    model.evaluate('vlct_4'),
+                    model.evaluate('vlct_5'),
+                    model.evaluate('vlct_side'),
+                    model.evaluate('vlct_main'),
                 ]
             except Exception as ex:
                 print(ex)
                 self.client.clear()
                 return 0.0
 
-            u = model.evaluate("spf.U")
-            curl = model.evaluate("curl")
-            curv = model.evaluate("curv") / 10 ** 7
+            u = model.evaluate('spf.U')
+            curl = model.evaluate('curl')
+            curv = model.evaluate('curv') / 10 ** 7
 
             fast_u_tresh = 0
             fast_u = np.mean(u[u > 0]) + (np.max(u) - np.mean(u[u > 0])) * fast_u_tresh
@@ -92,7 +92,7 @@ class Comsol(Estimator):
 
             target = float(sum(outs[0:4])) / float(sum(outs[4:7]))
             if (curl > 30000) or ((width_ratio < 0.25) or (width_ratio > 0.43)):
-                print("Speed common condition violated")
+                print('Speed common condition violated')
                 target = 0
 
             mean_diff = float(
@@ -102,7 +102,7 @@ class Comsol(Estimator):
                 [abs(float(o) / np.mean(outs[0:4]) - 1) * 100 > 5.0 for o in outs[0:4]],
             ):
                 print(
-                    "Speed equality violated",
+                    'Speed equality violated',
                     [abs(float(o) / np.mean(outs[0:4]) - 1) * 100 for o in outs[0:4]],
                 )
                 target = 0
@@ -120,64 +120,66 @@ class Comsol(Estimator):
             self.client.clear()
 
         else:
-            print(f"Cached: {target}")
+            print(f'Cached: {target}')
 
         return -target
 
     def _poly_add(self, model, polygons):
         for n, poly in enumerate(polygons):
             try:
-                model.java.component("comp1").geom("geom1").create("pol" + str(n + 1), "Polygon")
+                model.java.component('comp1').geom('geom1').create('pol' + str(n + 1), 'Polygon')
             except Exception:
                 pass
-            model.java.component("comp1").geom("geom1").feature("pol" + str(n + 1)).set(
-                "x", poly[0],
+            model.java.component('comp1').geom('geom1').feature('pol' + str(n + 1)).set(
+                'x',
+                poly[0],
             )
-            model.java.component("comp1").geom("geom1").feature("pol" + str(n + 1)).set(
-                "y", poly[1],
+            model.java.component('comp1').geom('geom1').feature('pol' + str(n + 1)).set(
+                'y',
+                poly[1],
             )
         return model
 
     def _save_simulation_result(self, configuration, model):
-        if not os.path.exists("./models"):
-            os.mkdir("./models")
+        if not os.path.exists('./models'):
+            os.mkdir('./models')
         model_uid = str(uuid4())
-        model.save(f"./models/{model_uid}.mph")
-        db = pickledb.load("comsol_db.saved", False)
+        model.save(f'./models/{model_uid}.mph')
+        db = pickledb.load('comsol_db.saved', False)
         db.set(str(configuration), model_uid)
         db.dump()
 
-        if not os.path.exists("./structures"):
-            os.mkdir("./structures")
+        if not os.path.exists('./structures'):
+            os.mkdir('./structures')
 
-        with open(f"./structures/{model_uid}.str", "wb") as f:
+        with open(f'./structures/{model_uid}.str', 'wb') as f:
             pickle.dump(configuration, f)
 
         return model_uid
 
     def _load_simulation_result(self, client, configuration):
-        db = pickledb.load("comsol_db.saved", False)
+        db = pickledb.load('comsol_db.saved', False)
 
         model_uid = db.get(str(configuration))
 
         if model_uid is False:
             return None, None
 
-        model = client.load(f"./models/{model_uid}.mph")
+        model = client.load(f'./models/{model_uid}.mph')
 
         return model, model_uid
 
     def _save_fitness(self, configuration, fitness):
         array_structure = [[[p.x, p.y] for p in poly.points] for poly in configuration.polygons]
-        db = pickledb.load("fitness_db.saved", False)
+        db = pickledb.load('fitness_db.saved', False)
         db.set(str(array_structure), str(round(fitness, 4)))
         db.dump()
 
     def _load_fitness(self, configuration):
         array_structure = [[[p.x, p.y] for p in poly.points] for poly in configuration.polygons]
-        db = pickledb.load("fitness_db.saved", False)
+        db = pickledb.load('fitness_db.saved', False)
 
-        db_models = pickledb.load("comsol_db.saved", False)
+        db_models = pickledb.load('comsol_db.saved', False)
 
         model_uid = db_models.get(str(configuration))
 

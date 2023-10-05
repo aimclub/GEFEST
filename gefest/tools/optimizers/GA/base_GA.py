@@ -5,8 +5,8 @@ from tqdm import tqdm
 
 from gefest.core.geometry import Structure
 from gefest.core.opt.strategies.strategy import Strategy
+from gefest.core.utils.logger import LogDispatcher
 from gefest.tools.optimizers.optimizer import Optimizer
-from refactored import LogDispatcher
 
 
 class BaseGA(Optimizer):
