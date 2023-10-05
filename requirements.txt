@@ -1,6 +1,6 @@
 cython==0.29.36
 pandas==1.4.4
-numpy==1.19.4
+numpy
 typing==3.7.4.1
 matplotlib==3.6.3
 seaborn==0.9.0
@@ -19,6 +19,8 @@ pydantic-yaml==1.1.1
 PyYAML==6.0.1
 moviepy==1.0.3
 joblib==1.3.2
+
+polygenerator
 
 flake8==6.0.0
 brunette==0.2.8

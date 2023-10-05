@@ -53,6 +53,22 @@ def load_file_from_path(path: str):
 
 
 if __name__ == '__main__':
+    class SoundSimulator_(SoundSimulator):
+        def __init__(self, domain, obstacle_map=None):
+            super().__init__(domain, obstacle_map=None)
+            self.duration = 150
+            self.pressure_hist = np.zeros((self.duration, self.size_y, self.size_x))
+            if (
+                    obstacle_map is not None
+                    and (obstacle_map.shape[0], obstacle_map.shape[1]) == self.map_size
+            ):
+                print("** Map Accepted **")
+                self.obstacle_map = obstacle_map
+            elif obstacle_map is not None and obstacle_map.shape != self.map_size:
+                print("** Map size denied **")
+                self.obstacle_map = np.zeros((self.size_y, self.size_x))
+            else:
+                self.obstacle_map = np.zeros((self.size_y, self.size_x))
 
     #  in the future all model can be loaded from configs
 
@@ -86,9 +102,9 @@ if __name__ == '__main__':
     #  fitness function
     class SoundFieldFitness(Fitness):
         def __init__(self, domain, estimator, path_best_struct=None):
-            super().__init__(domain, SoundSimulator(domain=domain))
+            super().__init__(domain)
             self.path_best_struct = path_best_struct
-
+            self.estimator=estimator
             if self.path_best_struct is None:
                 print('please, set up the best spl matrix into configuration')
                 print('the best structure will be generated randomly')
@@ -111,7 +127,7 @@ if __name__ == '__main__':
     #  fitness estimator
     estimator = SoundFieldFitness(
         domain,
-        SoundSimulator(domain, None),
+        SoundSimulator_(domain, None),
         None,
     )
 
@@ -121,6 +137,7 @@ if __name__ == '__main__':
             partial(polygon_level_crossover, domain=domain),
             partial(structure_level_crossover, domain=domain),
         ],
+        crossover_prob=0.3,
         crossover_each_prob=[0.0, 1.0],
         mutations=[
             rotate_poly,
@@ -145,12 +162,12 @@ if __name__ == '__main__':
             Rules.not_overlaps_prohibited.value,
             Rules.not_too_close_points.value,
         ],
-        extra=3,
+        extra=25,
         n_jobs=-1,
         golem_adapter=StructureAdapter,
         tuner_cfg=tp,
-        n_steps=1,
-        pop_size=3,
+        n_steps=10,
+        pop_size=25,
     )
 
     optimizer = BaseGA(opt_params)
