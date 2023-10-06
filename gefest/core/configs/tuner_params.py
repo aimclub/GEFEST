@@ -1,7 +1,10 @@
+from ctypes import Structure
 from typing import Callable, Union
 
 from hyperopt import hp
 from pydantic import BaseModel, ConfigDict, field_validator
+
+from gefest.core.opt.tuning.uitls import average_edge_variance
 
 
 class TunerParams(BaseModel):
@@ -15,6 +18,7 @@ class TunerParams(BaseModel):
     sampling_variance: float
     hyperopt_dist: Union[Callable, str] = hp.uniform
     verbose: bool = True
+    variacne_generator: Callable[[Structure], list[float]] = average_edge_variance
 
     @field_validator('hyperopt_dist')
     def hyperopt_fun_validate(cls, value):

@@ -1,5 +1,3 @@
-from typing import Any, Dict
-
 from golem.core.adapter.adapter import BaseOptimizationAdapter
 from golem.core.optimisers.graph import OptGraph, OptNode
 from loguru import logger
@@ -17,11 +15,13 @@ class StructureAdapter(BaseOptimizationAdapter):
         self.domain = domain
 
     def _point_to_node(self, point) -> OptNode:
-        if type(point) == OptNode:
+        if type(point) is OptNode:
             self._log.warn('Unexpected: OptNode found in adapter instead' 'Point.')
         else:
-            content = {'name': f'pt_{point.x}_{point.y}', 'params': {}}
-
+            content = {
+                'name': f'pt_{point.x}_{point.y}',
+                'params': {},
+            }
             node = OptNode(content=content)
             node.content['params'] = {
                 'x': point.x,
@@ -63,7 +63,6 @@ class StructureAdapter(BaseOptimizationAdapter):
 
         for node in opt_graph.nodes[1:]:
             if not len(node.nodes_from):
-                # next polygon started
                 if self.domain.geometry.is_closed:
                     poly.points.append(poly[0])
                 structure.append(poly)
@@ -78,7 +77,6 @@ class StructureAdapter(BaseOptimizationAdapter):
         if poly not in structure:
             if self.domain.geometry.is_closed:
                 poly.points.append(poly[0])
-            # add last poly
             structure.append(poly)
 
         return Structure(structure)
