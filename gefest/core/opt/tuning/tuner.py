@@ -1,7 +1,6 @@
 from enum import Enum
-from typing import Any, Callable, Union
+from typing import Union
 
-from golem.core.adapter import BaseOptimizationAdapter
 from golem.core.optimisers.graph import OptGraph
 from golem.core.optimisers.objective import Objective, ObjectiveEvaluate
 from golem.core.tuning.iopt_tuner import IOptTuner
@@ -9,14 +8,9 @@ from golem.core.tuning.optuna_tuner import OptunaTuner
 from golem.core.tuning.search_space import OperationParametersMapping, SearchSpace
 from golem.core.tuning.sequential import SequentialTuner
 from golem.core.tuning.simultaneous import SimultaneousTuner
-from hyperopt import hp
 
 from gefest.core.configs.optimization_params import OptimizationParams
-from gefest.core.configs.tuner_params import TunerParams
 from gefest.core.geometry import Structure
-from gefest.core.geometry.domain import Domain
-from gefest.core.opt.adapters.structure import StructureAdapter
-from gefest.tools.fitness import Fitness
 
 GolemTunerType = Union[IOptTuner, OptunaTuner, SequentialTuner, SimultaneousTuner]
 
@@ -31,6 +25,9 @@ class TunerType(Enum):
 class GolemTuner:
     """Wrap for GOLEM tuners.
     Provides interface for tuning stucture points coordinates.
+    For more details about tuners see:
+    https://thegolem.readthedocs.io/en/latest/api/tuning.html
+    https://fedot.readthedocs.io/en/latest/advanced/hyperparameters_tuning.html
     """
 
     def __init__(
