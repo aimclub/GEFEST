@@ -39,6 +39,8 @@ class OptimizationParams(BaseModel):
     n_jobs: Optional[int] = -1
     golem_adapter: Callable = StructureAdapter
     tuner_cfg: Optional[TunerParams] = None
+    log_dir: str = 'logs'
+    run_name: str = 'run_name'
 
     @model_validator(mode='after')
     def create_classes_instances(self):

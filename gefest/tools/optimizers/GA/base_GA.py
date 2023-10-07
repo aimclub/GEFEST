@@ -15,7 +15,7 @@ class BaseGA(Optimizer):
         opt_params,
         **kwargs,
     ):
-        super().__init__(LogDispatcher())
+        super().__init__(LogDispatcher(opt_params.log_dir, opt_params.run_name))
         self.opt_params = opt_params
         self.crossover: Strategy = opt_params.crossover_strategy
         self.mutation: Strategy = opt_params.mutation_strategy
