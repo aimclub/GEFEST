@@ -27,15 +27,15 @@ class BaseGA(Optimizer):
         self.domain = self.opt_params.domain
         self._pop: list[Structure] = self.sampler(self.opt_params.pop_size)
         self._pop = self.estimator(self._pop)
-        self.logger.log_pop(self._pop, 'init')
+        self.logger.log_pop(self._pop, '00000_init')
 
     def optimize(self) -> list[Structure]:
         for step in tqdm(range(self.n_steps)):
-            self._pop = self.selector(self._pop, self.opt_params.pop_size)
             self._pop = self.crossover(self._pop)
             self._pop = self.mutation(self._pop)
             self._pop.extend(self.sampler(self.opt_params.extra))
             self._pop = self.estimator(self._pop)
-            self.logger.log_pop(self._pop, step)
+            self._pop = self.selector(self._pop, self.opt_params.pop_size)
+            self.logger.log_pop(self._pop, str(step + 1))
         self._pop = sorted(self._pop, key=lambda x: x.fitness)
         return self._pop
