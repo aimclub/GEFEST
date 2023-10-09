@@ -1,7 +1,5 @@
 from typing import Callable
 
-import numpy as np
-
 from gefest.core.geometry import Structure
 from gefest.core.geometry.domain import Domain
 from gefest.tools.fitness import Fitness
@@ -29,7 +27,7 @@ def fitness_validation_wrap(
     if validator(struct):
         fitness = fitness_fun.fitness(struct)
     else:
-        fitness = np.inf
+        fitness = 1.e42
     return fitness
 
 
