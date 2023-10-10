@@ -39,6 +39,7 @@ class GolemTuner:
         opt_params: OptimizationParams,
         **kwargs,
     ) -> None:
+        self.log_dispatcher = opt_params.log_dispatcher
         self.domain: Domain = opt_params.domain
         validator = partial(validate, rules=opt_params.postprocess_rules, domain=self.domain)
         estimator_with_validaion = partial(
@@ -119,6 +120,9 @@ class GolemTuner:
             )
             tuner = self._get_tuner(graph, SearchSpace(search_space))
             tuned_structure = tuner.tune(graph=graph, show_progress=self.verbose)
-            tuned_structure.fitness = tuner.obtained_metric
+            metric = tuner.obtained_metric
+            tuned_structure.fitness = [metric] if not isinstance(metric, list) else metric
             tuned_objects.append(tuned_structure)
+        tuned_objects = sorted(tuned_objects, key=lambda x: x.fitness)
+        self.log_dispatcher.log_pop(tuned_objects, 'tuned')
         return tuned_objects

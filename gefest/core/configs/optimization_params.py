@@ -14,6 +14,7 @@ from gefest.core.opt.operators.selections import tournament_selection
 from gefest.core.opt.operators.crossovers import panmixis
 from gefest.tools.samplers.standard.standard import StandardSampler
 from gefest.tools.fitness import Fitness
+from gefest.core.utils.logger import LogDispatcher
 
 
 class OptimizationParams(BaseModel):
@@ -41,6 +42,7 @@ class OptimizationParams(BaseModel):
     tuner_cfg: Optional[TunerParams] = None
     log_dir: str = 'logs'
     run_name: str = 'run_name'
+    log_dispatcher: Callable = LogDispatcher
 
     @model_validator(mode='after')
     def create_classes_instances(self):
@@ -56,5 +58,6 @@ class OptimizationParams(BaseModel):
         self.crossover_strategy = self.crossover_strategy(opt_params=self)
         self.mutation_strategy = self.mutation_strategy(opt_params=self)
         self.golem_adapter = self.golem_adapter(self.domain)
+        self.log_dispatcher = self.log_dispatcher(self.log_dir, self.run_name)
 
     model_config = ConfigDict({'arbitrary_types_allowed': True})

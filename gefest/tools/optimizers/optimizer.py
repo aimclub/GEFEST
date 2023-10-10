@@ -6,10 +6,10 @@ from gefest.core.geometry import Structure
 class Optimizer(metaclass=ABCMeta):
     def __init__(
         self,
-        logger=None,
+        log_dispatcher=None,
         **kwargs,
     ) -> None:
-        self.logger = logger
+        self.log_dispatcher = log_dispatcher
 
     @abstractmethod
     def optimize(

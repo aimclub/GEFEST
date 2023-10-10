@@ -15,7 +15,7 @@ class BaseGA(Optimizer):
         opt_params,
         **kwargs,
     ):
-        super().__init__(LogDispatcher(opt_params.log_dir, opt_params.run_name))
+        super().__init__(opt_params.log_dispatcher)
         self.opt_params = opt_params
         self.crossover: Strategy = opt_params.crossover_strategy
         self.mutation: Strategy = opt_params.mutation_strategy
@@ -27,7 +27,7 @@ class BaseGA(Optimizer):
         self.domain = self.opt_params.domain
         self._pop: list[Structure] = self.sampler(self.opt_params.pop_size)
         self._pop = self.estimator(self._pop)
-        self.logger.log_pop(self._pop, '00000_init')
+        self.log_dispatcher.log_pop(self._pop, '00000_init')
 
     def optimize(self) -> list[Structure]:
         for step in tqdm(range(self.n_steps)):
@@ -36,6 +36,5 @@ class BaseGA(Optimizer):
             self._pop.extend(self.sampler(self.opt_params.extra))
             self._pop = self.estimator(self._pop)
             self._pop = self.selector(self._pop, self.opt_params.pop_size)
-            self.logger.log_pop(self._pop, str(step + 1))
-        self._pop = sorted(self._pop, key=lambda x: x.fitness)
+            self.log_dispatcher.log_pop(self._pop, str(step + 1))
         return self._pop

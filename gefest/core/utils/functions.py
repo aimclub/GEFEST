@@ -3,11 +3,33 @@ from pathlib import Path
 from typing import Any, Callable
 
 from loguru import logger
+from pydantic import RootModel
+
+from gefest.core.geometry import Structure
 
 
 def project_root() -> Path:
     """Returns project root folder."""
     return Path(__file__).parent.parent.parent
+
+
+def parse_structs(path: str) -> list[Structure]:
+    """Generates list of structures from file with dicts.
+
+    Args:
+        path (str): Path to file contains Structure object dumps,
+            splitted with new line.
+
+    Returns:
+        list[Structure]: Serialized population.
+    """
+    with open(path, 'r') as file:
+        dict_strings = file.readlines()
+    pop = []
+    for dict_string in dict_strings:
+        ind = RootModel(Structure).model_construct(dict_string)
+        pop.append(ind)
+    return pop
 
 
 @logger.catch
