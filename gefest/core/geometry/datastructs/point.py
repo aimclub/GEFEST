@@ -7,6 +7,6 @@ class Point:
     x: float
     y: float
 
-    @computed_field
+    @computed_field(repr=False)
     def coords(self) -> list[float]:
         return [self.x, self.y]

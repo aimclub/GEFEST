@@ -20,6 +20,9 @@ class LogDispatcher:
             filter=lambda record: record['level'].name in ['Level 4'],
         )
         for ind in pop:
-            logger.log(4, RootModel[Structure](ind).model_dump())
+            dump = RootModel[Structure](ind).model_dump_json(
+                exclude={'polygons': {'__all__': {'points': {'__all__': {'coords'}}}}},
+            )
+            logger.log(4, dump)
         logger.remove(inividual_log_handler)
         logger.info('Population logged. May be not sorted by fitness.')

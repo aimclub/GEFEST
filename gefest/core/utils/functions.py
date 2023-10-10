@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from loguru import logger
-from pydantic import RootModel
+import json
 
 from gefest.core.geometry import Structure
 
@@ -27,7 +27,7 @@ def parse_structs(path: str) -> list[Structure]:
         dict_strings = file.readlines()
     pop = []
     for dict_string in dict_strings:
-        ind = RootModel(Structure).model_construct(dict_string)
+        ind = Structure(**json.loads(dict_string))
         pop.append(ind)
     return pop
 

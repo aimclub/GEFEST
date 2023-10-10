@@ -13,7 +13,7 @@ class Structure:
     polygons: tuple[Polygon, ...] = Field(default_factory=tuple)
     fitness: list[float] = Field(default_factory=list)
     extra_characteristics: dict = Field(default_factory=dict)
-    _id: UUID = Field(default_factory=uuid4)
+    id_: UUID = Field(default_factory=uuid4)
 
     def __len__(self):
         return len(self.polygons)
