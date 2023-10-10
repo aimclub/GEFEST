@@ -119,7 +119,7 @@ class GolemTuner:
                 self.generate_variances(struct, self.domain),
             )
             tuner = self._get_tuner(graph, SearchSpace(search_space))
-            tuned_structure = tuner.tune(graph=graph, show_progress=self.verbose)
+            tuned_structure = tuner.tune(graph)
             metric = tuner.obtained_metric
             tuned_structure.fitness = [metric] if not isinstance(metric, list) else metric
             tuned_objects.append(tuned_structure)
