@@ -15,7 +15,6 @@ class TunerParams(BaseModel):
 
     tuner_type: str
     n_steps_tune: int
-    sampling_variance: float
     hyperopt_dist: Union[Callable, str] = hp.uniform
     verbose: bool = True
     variacne_generator: Callable[[Structure], list[float]] = average_edge_variance

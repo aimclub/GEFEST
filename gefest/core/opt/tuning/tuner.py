@@ -56,7 +56,7 @@ class GolemTuner:
         self.eval_n_jobs: int = 1 if opt_params.estimator.estimator else -1
         self.objective_evaluate: ObjectiveEvaluate = ObjectiveEvaluate(objective, self.eval_n_jobs)
         self.adapter: Callable = opt_params.golem_adapter
-        self.hyperopt_dist: Union[Callable, str] = opt_params.tuner_cfg.hyperopt_dist
+        self.hyperopt_distrib: Union[Callable, str] = opt_params.tuner_cfg.hyperopt_dist
         self.n_steps_tune: int = opt_params.tuner_cfg.n_steps_tune
         self.verbose: bool = opt_params.tuner_cfg.verbose
         self.generate_variances: VarianceGeneratorType = opt_params.tuner_cfg.variacne_generator
@@ -82,19 +82,18 @@ class GolemTuner:
         return {
             node.name: {
                 param: {
-                    'hyperopt-dist': self.hyperopt_dist,
+                    'hyperopt-dist': self.hyperopt_distrib,
                     'sampling-scope': [
-                        val - sampling_variances[idx_],
-                        val + sampling_variances[idx_],
+                        sampling_variances[(idx_node * 2) + idx_coord][0],
+                        sampling_variances[(idx_node * 2) + idx_coord][1],
                     ],
                     'type': 'continuous',
                 }
-                for param, val in zip(
-                    list(graph.nodes[idx_].content['params'].keys()),
-                    list(graph.nodes[idx_].content['params'].values()),
+                for idx_coord, param in enumerate(
+                    list(graph.nodes[idx_node].content['params'].keys()),
                 )
             }
-            for idx_, node in enumerate(graph.nodes)
+            for idx_node, node in enumerate(graph.nodes)
         }
 
     def tune(
@@ -116,7 +115,7 @@ class GolemTuner:
             graph = self.adapter.adapt(struct)
             search_space = self._generate_search_space(
                 graph,
-                self.generate_variances(struct, self.domain),
+                self.generate_variances(struct, self.domain, self.hyperopt_distrib),
             )
             tuner = self._get_tuner(graph, SearchSpace(search_space))
             tuned_structure = tuner.tune(graph)

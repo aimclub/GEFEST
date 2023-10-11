@@ -3,18 +3,21 @@ from typing import Callable, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from gefest.core.algs.postproc.resolve_errors import PolygonRule, StructureRule
-from gefest.core.opt.strategies.crossover import CrossoverStrategy
-from gefest.core.opt.strategies.mutation import MutationStrategy
+from gefest.core.algs.postproc.resolve_errors import (
+    PolygonRule,
+    StructureRule,
+    postprocess,
+)
 from gefest.core.configs.tuner_params import TunerParams
 from gefest.core.geometry.domain import Domain
 from gefest.core.opt.adapters.structure import StructureAdapter
-from gefest.core.algs.postproc.resolve_errors import postprocess
-from gefest.core.opt.operators.selections import tournament_selection
 from gefest.core.opt.operators.crossovers import panmixis
-from gefest.tools.samplers.standard.standard import StandardSampler
-from gefest.tools.fitness import Fitness
+from gefest.core.opt.operators.selections import tournament_selection
+from gefest.core.opt.strategies.crossover import CrossoverStrategy
+from gefest.core.opt.strategies.mutation import MutationStrategy
 from gefest.core.utils.logger import LogDispatcher
+from gefest.tools.fitness import Fitness
+from gefest.tools.samplers.standard.standard import StandardSampler
 
 
 class OptimizationParams(BaseModel):
@@ -46,9 +49,7 @@ class OptimizationParams(BaseModel):
 
     @model_validator(mode='after')
     def create_classes_instances(self):
-        self.crossovers = [
-            partial(fun, domain=self.domain) for fun in self.crossovers
-        ]
+        self.crossovers = [partial(fun, domain=self.domain) for fun in self.crossovers]
         self.postprocessor = partial(
             self.postprocessor,
             domain=self.domain,
