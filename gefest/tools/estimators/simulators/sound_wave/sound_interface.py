@@ -1,24 +1,21 @@
 import itertools
 from copy import deepcopy
-from typing import Any
 
 import numpy as np
 from numpy import ndarray
 from numpy.core.umath import pi
 from skimage.draw import polygon as skipolygon
 from skimage.draw import random_shapes
-from tqdm import tqdm
-from gefest.core.geometry import Structure
 
 from gefest.core.geometry import Structure
 from gefest.tools import Estimator
 
 # initial values
-damping = 1 - 0.001
-ca2 = 0.5
-initial_P = 200
-max_pressure = initial_P / 2
-min_presure = -initial_P / 2
+DAMPING = 1 - 0.001
+CA2 = 0.5
+INITIAL_P = 200
+MAX_PRESSURE = INITIAL_P / 2
+MIN_PRESSURE = -INITIAL_P / 2
 
 
 def generate_map(domain, structure):
@@ -105,13 +102,13 @@ class SoundSimulator(Estimator):
         _velocities (np.array): velocity field at current iteration.
     """
 
-    def __init__(self, domain, obstacle_map=None):
+    def __init__(self, domain, duration=200, obstacle_map=None):
         self.omega = 3 / (2 * pi)
         self.iteration = 0
         self.domain = domain
         self.map_size = (round(1.2 * domain.max_y), round(1.2 * domain.max_x))
         self.size_y, self.size_x = self.map_size
-        self.duration = 150
+        self.duration = duration
         # obstacle_map handling
         if (
             obstacle_map is not None
@@ -147,11 +144,11 @@ class SoundSimulator(Estimator):
 
     def updateP(self):
         """Update the pressure field based on Komatsuzaki's transition rules."""
-        self.pressure -= ca2 * damping * np.sum(self._velocities, axis=2)
+        self.pressure -= CA2 * DAMPING * np.sum(self._velocities, axis=2)
 
     def step(self):
         """Perform a simulation step, upadting the wind an pressure fields."""
-        self.pressure[self.s_y, self.s_x] = initial_P * np.sin(self.omega * self.iteration)
+        self.pressure[self.s_y, self.s_x] = INITIAL_P * np.sin(self.omega * self.iteration)
         self.updateV()
         self.updateP()
         self.iteration += 1
@@ -176,7 +173,7 @@ class SoundSimulator(Estimator):
         return matrix_db
 
     def run(self):
-        for iteration in tqdm(range(self.duration)):
+        for iteration in range(self.duration):
             self.pressure_hist[iteration] = deepcopy(self.pressure)
             self.step()
 
