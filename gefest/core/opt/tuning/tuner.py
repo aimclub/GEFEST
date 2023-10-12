@@ -1,3 +1,4 @@
+from datetime import timedelta
 from enum import Enum
 from functools import partial
 from typing import Callable, Union
@@ -59,6 +60,7 @@ class GolemTuner:
         self.hyperopt_distrib: Union[Callable, str] = opt_params.tuner_cfg.hyperopt_dist
         self.n_steps_tune: int = opt_params.tuner_cfg.n_steps_tune
         self.verbose: bool = opt_params.tuner_cfg.verbose
+        self.timeout = timedelta(minutes=opt_params.tuner_cfg.timeout_minutes)
         self.generate_variances: VarianceGeneratorType = opt_params.tuner_cfg.variacne_generator
 
     def _get_tuner(
@@ -72,6 +74,7 @@ class GolemTuner:
             adapter=self.adapter,
             iterations=self.n_steps_tune,
             n_jobs=self.eval_n_jobs,
+            timeout=self.timeout,
         )
 
     def _generate_search_space(

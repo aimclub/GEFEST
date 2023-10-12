@@ -18,6 +18,7 @@ class TunerParams(BaseModel):
     hyperopt_dist: Union[Callable, str] = hp.uniform
     verbose: bool = True
     variacne_generator: Callable[[Structure], list[float]] = average_edge_variance
+    timeout_minutes: int = 60
 
     @field_validator('hyperopt_dist')
     def hyperopt_fun_validate(cls, value):
