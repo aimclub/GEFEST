@@ -56,5 +56,9 @@ class MutationStrategy(Strategy):
             generated = self.sampler(len(idx_failed))
             for enum_id, idx in enumerate(idx_failed):
                 mutated_pop[idx] = generated[enum_id]
-
+        # while len(idx_failed) > 0:
+        #     generated = self.sampler(len(idx_failed))
+        #     for enum_id, idx in enumerate(idx_failed[:len(generated)]):
+        #         mutated_pop[idx] = generated[enum_id]
+        #     idx_failed = where(mutated_pop, lambda ind: ind is None)
         return mutated_pop

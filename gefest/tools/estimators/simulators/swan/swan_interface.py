@@ -15,7 +15,7 @@ class Swan(Estimator):
         targets,
         grid,
         domain,
-        input_file_path='/INPUT',
+        input_file_path='INPUT',
         hs_file_path='r/hs47dd8b1c0d4447478fec6f956c7e32d9.d',
     ):
         self.path_to_model = path
@@ -26,36 +26,36 @@ class Swan(Estimator):
         self.domain = domain
         # self._grid_configuration()
 
-    def _grid_configuration(self):
-
-        file_to_read = open(self.path_to_input, 'r')
-        content_read = file_to_read.read()
-
-        for_replace = ['xpc', 'xlenc', 'ypc', 'ylenc', 'mxc', 'myc']
-        content_for_add = [
-            self.domain.min_x,
-            self.domain.max_x,
-            self.domain.min_y,
-            self.domain.max_y,
-            self.grid[0],
-            self.grid[1],
-        ]
-
-        new_content = copy.deepcopy(content_read)
-        for replace, content in zip(for_replace, content_for_add):
-            content_to_replace = replace + '=' + str(content)
-            start = new_content.find(replace)
-            end = new_content[start:].find(' ')
-            content_write = new_content.replace(
-                new_content[start : start + end],
-                content_to_replace,
-            )
-            new_content = content_write
-        file_to_read.close()
-
-        file_to_write = open(self.path_to_input, 'w')
-        file_to_write.writelines(new_content)
-        file_to_write.close()
+    # def _grid_configuration(self):
+    #
+    #     file_to_read = open(self.path_to_input, 'r')
+    #     content_read = file_to_read.read()
+    #
+    #     for_replace = ['xpc', 'xlenc', 'ypc', 'ylenc', 'mxc', 'myc']
+    #     content_for_add = [
+    #         self.domain.min_x,
+    #         self.domain.max_x,
+    #         self.domain.min_y,
+    #         self.domain.max_y,
+    #         self.grid[0],
+    #         self.grid[1],
+    #     ]
+    #
+    #     new_content = copy.deepcopy(content_read)
+    #     for replace, content in zip(for_replace, content_for_add):
+    #         content_to_replace = replace + '=' + str(content)
+    #         start = new_content.find(replace)
+    #         end = new_content[start:].find(' ')
+    #         content_write = new_content.replace(
+    #             new_content[start : start + end],
+    #             content_to_replace,
+    #         )
+    #         new_content = content_write
+    #     file_to_read.close()
+    #
+    #     file_to_write = open(self.path_to_input, 'w')
+    #     file_to_write.writelines(new_content)
+    #     file_to_write.close()
 
     def estimate(self, struct: Structure):
         polygons = struct.polygons
@@ -86,7 +86,9 @@ class Swan(Estimator):
                 points = np.array([p.coords[:2] for p in poly.points])
                 individ = points.reshape(-1)
                 for i, gen in enumerate(individ):
-                    for_input += '{:.6f}'.format(gen) + ', '
+                    for_input += '{:.6f}'.format(gen/500)
+                    if i != len(individ)-1:
+                        for_input += ', '
                 #for_input += '\nOBSTACLE TRANSM 0. REFL 0. LINE '
                 #if j == (num_of_polygons - 1):
             for_input += '\n$optline'
@@ -106,12 +108,12 @@ class Swan(Estimator):
             file_to_write.write(content_write)
 
         logger.info('Swan estimation started...')
-        subprocess.run(
-            'swan.exe',
-            shell=True,
-            cwd=self.path_to_model,
-            stdout=subprocess.DEVNULL,
-        )
+        # subprocess.run(
+        #     'swan.exe',
+        #     shell=True,
+        #     cwd=self.path_to_model,
+        #     stdout=subprocess.DEVNULL,
+        # )
         logger.info('Swan estimation finished.')
 
         z = np.loadtxt(self.path_to_hs)

@@ -1,6 +1,6 @@
 import pickle
 from functools import partial
-
+from gefest.core.algs.postproc.resolve_errors import Rules, apply_postprocess
 import numpy as np
 from hyperopt import hp
 from gefest.core.opt.operators.selections import tournament_selection,roulette_selection
@@ -63,7 +63,7 @@ coord_Y = np.linspace(min([p[1] for p in allow_area])*500, max([p[1] for p in al
 coord_X = np.linspace(min([p[0] for p in allow_area])*500, max([p[0] for p in allow_area])*500, grid_resolution_x + 1)
 grid = [grid_resolution_x, grid_resolution_y]  # points grid
 fixed_area = None
-targets = [[10,14],[10,16],[10,18]]
+targets = [[14,10],[16,10],[18,10]]
 
 
 def load_file_from_path(path: str):
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     #  in the future all model can be loaded from configs
 
     #  domain configuration
-    geometry = Geometry2D(is_closed=True, is_convex=True)
+    geometry = Geometry2D(is_closed=False, is_convex=True)
     prohibited = create_prohibited(1, [], [], fixed_area=fixed_area)
     domain = Domain(
         allowed_area=[
@@ -108,7 +108,7 @@ if __name__ == '__main__':
         max_poly_num=1,
         min_poly_num=1,
         max_points_num=10,
-        min_points_num=6,
+        min_points_num=4,
         prohibited_area=prohibited,
     )
 
@@ -119,14 +119,14 @@ if __name__ == '__main__':
         sampling_variance=1,
         hyperopt_dist=hp.uniform,
     )
-    path_=f"{root_path}/cases/breakwaters/ob2"
+    path_=f"{root_path}/cases/breakwaters/ob2/"
     #Estimator
     swan_estimator = Swan(
         targets=targets,
         domain=domain,
         grid=grid,
         path=path_,
-        hs_file_path='/results/HSig_ob_example.dat'
+        hs_file_path='results/HSig_ob_example.dat'
     )
     #  fitness function
     class SoundFieldFitness(Fitness):
@@ -146,8 +146,8 @@ if __name__ == '__main__':
     #  optimization params config
     opt_params = OptimizationParams(
         crossovers=[
-            partial(polygon_level_crossover, domain=domain),
-            partial(structure_level_crossover, domain=domain),
+            polygon_level_crossover,
+            structure_level_crossover,
         ],
         crossover_prob=0.3,
         crossover_each_prob=[0.0, 1.0],
@@ -162,9 +162,9 @@ if __name__ == '__main__':
         ],
         mutation_each_prob=[0.125, 0.125, 0.25, 0.25, 0.00, 0.00, 0.25],
         pair_selector=panmixis,
-        postprocess_attempts=3,
+        postprocess_attempts=10,
         domain=domain,
-        postprocessor=postprocess,
+        postprocessor=apply_postprocess,
         estimator=estimator,
         postprocess_rules=[
             Rules.not_out_of_bounds.value,
@@ -178,8 +178,8 @@ if __name__ == '__main__':
         n_jobs=-1,
         golem_adapter=StructureAdapter,
         tuner_cfg=tp,
-        n_steps=2,
-        pop_size=2,
+        n_steps=5,
+        pop_size=6,
         selector=roulette_selection
     )
 
@@ -188,9 +188,9 @@ if __name__ == '__main__':
 
     #  make mp4 of optimized pop here if need
 
-    tuner = GolemTuner(opt_params)
-    n_best_for_tune = 1
-    tuned_individuals = tuner.tune(optimized_pop[0:n_best_for_tune])
+    # tuner = GolemTuner(opt_params)
+    # n_best_for_tune = 1
+    # tuned_individuals = tuner.tune(optimized_pop[0:n_best_for_tune])
 
     #  make mp4 of tuned pop here if need
 
