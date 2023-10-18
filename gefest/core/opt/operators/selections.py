@@ -19,7 +19,7 @@ def roulette_selection(
     Returns:
         list[Structure]: best individuals from pop
     """
-    _fitness = [i.fitness for i in pop]
+    _fitness = [i.fitness[0] for i in pop]
     probability = [(i / (sum(_fitness))) for i in _fitness]
     probability = [(max(probability) / i) for i in probability]
     probability = [i / sum(probability) for i in probability]
@@ -27,7 +27,7 @@ def roulette_selection(
     chosen = []
 
     while len(chosen) < pop_size:
-        chosen.append(np.random.choice(a=pop, p=probability))
+        chosen.append(pop[np.random.choice(a=range(len(pop)), p=probability)])
     return chosen
 
 
