@@ -6,7 +6,6 @@ from loguru import logger
 from gefest.core.geometry import Structure
 from gefest.core.geometry.domain import Domain
 from gefest.core.geometry.utils import get_random_structure
-from gefest.core.utils import chained_call
 from gefest.core.utils.parallel_manager import BaseParallelDispatcher
 from gefest.tools.samplers.sampler import Sampler
 
@@ -26,16 +25,18 @@ class StandardSampler(Sampler):
         return self.sample(n_samples=n_samples)
 
     def sample(self, n_samples: int) -> list[Structure]:
-        generator = chained_call(
-            partial(get_random_structure, domain=self.domain), self.postprocessor,
-        )
-
         random_pop = self._pm.exec_parallel(
-            generator,
+            partial(get_random_structure, domain=self.domain),
             tuple(range(n_samples + 1)),
             False,
+            False,
         )
-        random_pop = [ind for ind in random_pop if ind is not None]
+        corrected = self._pm.exec_parallel(
+            self.postprocessor,
+            [(ind,) for ind in random_pop],
+        )
+
+        random_pop = [ind for ind in corrected if ind is not None]
 
         logger.info(f'{n_samples}, {len(random_pop)}')
         pop = random_pop[:n_samples]
