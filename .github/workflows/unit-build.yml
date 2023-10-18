@@ -2,7 +2,7 @@ name: unit tests
 
 on:
   push:
-    branches: [ main refactoring refactorin_ci]
+    branches: [ main refactoring refactoring_ci]
   pull_request:
     branches: [ main ]
 
