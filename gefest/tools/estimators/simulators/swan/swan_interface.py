@@ -15,7 +15,7 @@ class Swan(Estimator):
         targets,
         grid,
         domain,
-        input_file_path='INPUT',
+        input_file_path='/INPUT',
         hs_file_path='r/hs47dd8b1c0d4447478fec6f956c7e32d9.d',
     ):
         self.path_to_model = path
@@ -121,4 +121,4 @@ class Swan(Estimator):
             res.append(hs_target)
         hs_target = sum(res)/len(res)
         print('hs_target',hs_target)
-        return  hs_target
+        return hs_target
