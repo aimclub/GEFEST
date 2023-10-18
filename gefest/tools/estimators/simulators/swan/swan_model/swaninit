@@ -1,7 +1,7 @@
     4                                   version of initialisation file
 Delft University of Technology          name of institute
     3                                   command file ref. number
-bw_example_cfg                                      command file name
+INPUT                                   command file name
     4                                   print file ref. number
 PRINT                                   print file name
     4                                   test file ref. number

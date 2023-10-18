@@ -3,7 +3,7 @@ from functools import partial
 
 import numpy as np
 from hyperopt import hp
-
+from gefest.core.opt.operators.selections import tournament_selection,roulette_selection
 from gefest.core.algs.postproc.resolve_errors import Rules, postprocess
 from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.configs.tuner_params import TunerParams
@@ -17,6 +17,7 @@ from gefest.core.opt.operators.crossovers import (
     polygon_level_crossover,
     structure_level_crossover,
 )
+from cases.sound_waves.microphone_points import Microphone
 from gefest.core.opt.operators.mutations import (
     add_point,
     add_poly,
@@ -35,7 +36,8 @@ from gefest.tools.estimators.simulators.sound_wave.sound_interface import (
 )
 from gefest.tools.fitness import Fitness
 from gefest.tools.optimizers.GA.base_GA import BaseGA
-
+from pathlib import Path
+from poly_from_point import poly_from_comsol_txt
 # pre domain params
 grid_resolution_x = 300  # Number of points on x-axis
 grid_resolution_y = 300  # Number of points on y-axis
@@ -56,7 +58,7 @@ if __name__ == '__main__':
     class SoundSimulator_(SoundSimulator):
         def __init__(self, domain, obstacle_map=None):
             super().__init__(domain, obstacle_map=None)
-            self.duration = 150
+            self.duration = 200
             self.pressure_hist = np.zeros((self.duration, self.size_y, self.size_x))
             if (
                     obstacle_map is not None
@@ -86,16 +88,16 @@ if __name__ == '__main__':
         geometry=geometry,
         max_poly_num=1,
         min_poly_num=1,
-        max_points_num=30,
-        min_points_num=20,
+        max_points_num=10,
+        min_points_num=6,
         prohibited_area=prohibited,
     )
 
     #  tuner config
     tp = TunerParams(
-        tuner_type='iopt',
-        n_steps_tune=2,
-        sampling_variance=0.1,
+        tuner_type='sequential',
+        n_steps_tune=25,
+        sampling_variance=1,
         hyperopt_dist=hp.uniform,
     )
 
@@ -111,24 +113,30 @@ if __name__ == '__main__':
                 rnd_structure = get_random_structure(domain)
                 best_spl = generate_map(domain, rnd_structure)
             else:
-                best_structure = load_file_from_path(path_best_struct)
+                best_structure = poly_from_comsol_txt(path_best_struct)
                 best_spl = self.estimator(best_structure)
                 best_spl = np.nan_to_num(best_spl, nan=0, neginf=0, posinf=0)
-
+                micro = Microphone(matrix=best_spl).array()
+                best_spl = np.concatenate(micro[1])
             self.best_spl = best_spl
 
         def fitness(self, ind: Structure):
             spl = self.estimator(ind)
             current_spl = np.nan_to_num(spl, nan=0, neginf=0, posinf=0)
+            micro_spl = Microphone(matrix=current_spl).array()
 
-            l_f = np.sum(np.abs(self.best_spl - current_spl))
+            spl = np.concatenate(micro_spl[1])
+            lenght = len(spl)
+            l_f = np.sum(np.abs(self.best_spl - spl))/lenght
             return l_f
 
     #  fitness estimator
+    #root_path = Path(__file__).parent.parent.parent
+    path_to_init_figure = f'figures/bottom_square.txt'
     estimator = SoundFieldFitness(
         domain,
         SoundSimulator_(domain, None),
-        None,
+        path_to_init_figure,
     )
 
     #  optimization params config
@@ -166,8 +174,9 @@ if __name__ == '__main__':
         n_jobs=-1,
         golem_adapter=StructureAdapter,
         tuner_cfg=tp,
-        n_steps=10,
+        n_steps=100,
         pop_size=25,
+        selector=roulette_selection
     )
 
     optimizer = BaseGA(opt_params)
