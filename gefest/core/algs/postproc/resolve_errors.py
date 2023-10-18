@@ -211,10 +211,12 @@ class PolygonNotOverlapsProhibited(PolygonRule):
 
         geom = domain.geometry
         if domain.geometry.is_closed:
-            logger.warning("There is no errors if no construction. NotImplemented validation and fix.")
+            # logger.warning("There is no errors if no construction. NotImplemented validation and fix.")
+            pass
         else:
-            from shapely.plotting import plot_polygon, plot_line
             from matplotlib import pyplot as plt
+            from shapely.plotting import plot_line, plot_polygon
+
             prohib = geom.get_prohibited_geom(domain.prohibited_area, domain.dist_between_polygons)
             prohib = unary_union(prohib)
             poly = geom._poly_to_shapely_line(structure[idx_poly_with_error])
@@ -237,23 +239,25 @@ class PolygonNotOverlapsProhibited(PolygonRule):
         if domain.geometry.is_closed:
             raise NotImplementedError()
         else:
-            from shapely.plotting import plot_polygon, plot_line
             from matplotlib import pyplot as plt
+            from shapely.plotting import plot_line, plot_polygon
+
             prohib = geom.get_prohibited_geom(domain.prohibited_area, domain.dist_between_polygons)
             # for g in prohib.geoms:
-                # plot_polygon(g)
+            # plot_polygon(g)
             # plt.show(block=True)
             prohib = unary_union(prohib)
             # for g in prohib.geoms:
             #     plot_polygon(g)
-            
+
             poly = geom._poly_to_shapely_line(structure[idx_poly_with_error])
-            
+
             # plot_line(poly)
             # plt.show(block=True)
             if poly.intersects(prohib):
                 res = poly.difference(prohib.buffer(0.001))
-                from shapely.geometry import MultiPoint, LineString, GeometryCollection
+                from shapely.geometry import GeometryCollection, LineString, MultiPoint
+
                 if isinstance(res, (MultiPoint, LineString)):
                     res = GeometryCollection(res)
                 parts = [g for g in res.geoms]
@@ -395,15 +399,27 @@ def validate(
     for rule in (rule for rule in rules if isinstance(rule, PolygonRule)):
         for idx_, _ in enumerate(structure):
             if not rule.validate(structure, idx_, domain):
-                logger.info(f'{rule.__class__.__name__} final fail')
+                # logger.info(f'{rule.__class__.__name__} final fail')
                 return False
 
     for rule in (rule for rule in rules if isinstance(rule, StructureRule)):
         if not rule.validate(structure, domain):
-            logger.info(f'{rule.__class__.__name__} final fail')
+            # logger.info(f'{rule.__class__.__name__} final fail')
             return False
 
     return True
+
+
+def apply_postprocess(
+    structures: Union[Structure, list[Structure]],
+    rules: list[Union[StructureRule, PolygonRule]],
+    domain: Domain,
+    attempts: int = 3,
+) -> list[Union[Structure, None]]:
+    if not isinstance(structures, (list, tuple)):
+        structures = [structures]
+    post_processed = [postprocess(struct, rules, domain, attempts) for struct in structures]
+    return post_processed
 
 
 @logger.catch

@@ -4,7 +4,7 @@ from typing import Callable
 from tqdm import tqdm
 
 from gefest.core.geometry import Structure
-from gefest.core.opt.strategies.strategy import Strategy
+from gefest.core.opt import strategies
 from gefest.core.utils.logger import LogDispatcher
 from gefest.tools.optimizers.optimizer import Optimizer
 
@@ -17,8 +17,8 @@ class BaseGA(Optimizer):
     ):
         super().__init__(opt_params.log_dispatcher)
         self.opt_params = opt_params
-        self.crossover: Strategy = opt_params.crossover_strategy
-        self.mutation: Strategy = opt_params.mutation_strategy
+        self.crossover = getattr(strategies, opt_params.crossover_strategy)(opt_params=opt_params)
+        self.mutation = getattr(strategies, opt_params.mutation_strategy)(opt_params=opt_params)
         self.sampler: Callable = opt_params.sampler
         self.estimator: Callable[[list[Structure]], list[Structure]] = opt_params.estimator
         self.selector: Callable = opt_params.selector

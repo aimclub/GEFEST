@@ -1,9 +1,9 @@
+import json
 from functools import reduce
 from pathlib import Path
 from typing import Any, Callable
 
 from loguru import logger
-import json
 
 from gefest.core.geometry import Structure
 
@@ -46,20 +46,3 @@ def where(
         list[int]: _description_
     """
     return [idx for idx, ind in enumerate(sequence) if mask_rule(ind)]
-
-
-def chained_call(*funcs):
-    _initial_missing = object()
-
-    def several_functions_chained_call(args=_initial_missing):
-        if args is _initial_missing:
-            return reduce(lambda r, f: f(r), funcs[1::], funcs[0]())
-        return reduce(lambda r, f: f(r), funcs, args)
-
-    def single_function_call(args=_initial_missing):
-        if args is _initial_missing:
-            return funcs[0]()
-        return funcs[0](args)
-
-    call = several_functions_chained_call if len(funcs) > 1 else single_function_call
-    return call

@@ -6,7 +6,6 @@ from loguru import logger
 from shapely.geometry import LineString, MultiPoint
 from shapely.geometry import Point as SPoint
 
-from gefest.core.algs.postproc.resolve_errors import postprocess
 from gefest.core.geometry import Point, Polygon, Structure
 from gefest.core.geometry.domain import Domain
 from gefest.core.geometry.utils import get_random_poly, get_selfintersection_safe_point
@@ -15,9 +14,10 @@ from gefest.core.geometry.utils import get_random_poly, get_selfintersection_saf
 def mutate_structure(
     structure: Structure,
     domain: Domain,
-    mutations: list[Callable],
-    mutation_chance: float,
-    mutations_probs: list[int],
+    operations: list[Callable],
+    operation_chance: float,
+    operations_probs: list[int],
+    **kwargs,
 ) -> Structure:
     """Apply mutation random mutation from list
         for each polygons in structure.
@@ -37,11 +37,11 @@ def mutate_structure(
 
     for _ in enumerate(range(len(new_structure))):
         idx_ = np.random.randint(0, len(new_structure))
-        if np.random.random() < mutation_chance:
+        if np.random.random() < operation_chance:
             chosen_mutation = np.random.choice(
-                a=mutations,
+                a=operations,
                 size=1,
-                p=mutations_probs,
+                p=operations_probs,
             )
             new_structure = chosen_mutation[0](new_structure, domain, idx_)
             if not new_structure:
@@ -55,6 +55,7 @@ def rotate_poly(
     new_structure: Structure,
     domain: Domain,
     idx_: int = None,
+    **kwargs,
 ) -> Structure:
     angle = float(np.random.randint(-120, 120))
     new_structure[idx_] = domain.geometry.rotate_poly(
@@ -69,6 +70,7 @@ def drop_poly(
     new_structure: Structure,
     domain: Domain,
     idx_: int = None,
+    **kwargs,
 ) -> Structure:
     if len(new_structure.polygons) > (domain.min_poly_num + 1):
         idx_ = idx_ if idx_ else int(np.random.randint(0, len(new_structure)))
@@ -83,6 +85,7 @@ def add_poly(
     new_structure: Structure,
     domain: Domain,
     idx_: int = None,
+    **kwargs,
 ) -> Structure:
     if len(new_structure) < (domain.max_poly_num - 1):
         new_poly = get_random_poly(new_structure, domain)
@@ -96,6 +99,7 @@ def resize_poly(
     new_structure: Structure,
     domain: Domain,
     idx_: int = None,
+    **kwargs,
 ) -> Structure:
     new_structure[idx_] = domain.geometry.resize_poly(
         new_structure[idx_],
@@ -111,6 +115,7 @@ def _get_convex_safe_area(
     domain: Domain,
     point_left_idx: int,
     point_right_idx: int,
+    **kwargs,
 ) -> Polygon:
     geom = domain.geometry
     if poly[0] == poly[-1]:
@@ -212,20 +217,17 @@ def _get_convex_safe_area(
                 mid_points = [Point(p.x, p.y) for p in slice_points.geoms]
             else:
                 mid_points = [Point(p.x, p.y) for p in slice_points.coords]
-
         base_area = [
             left_cut[1],
             *mid_points,
             right_cut[1],
         ]
-
         base_area = [
             Point(p[0], p[1])
             for p in geom._poly_to_shapely_poly(Polygon(base_area)).convex_hull.exterior.coords
         ]
 
     else:
-
         base_area = [
             left_cut[1],
             geom.intersection_line_line(left_cut, slice_line, scale_factor, scale_factor),
@@ -241,6 +243,7 @@ def pos_change_point_mutation(
     new_structure: Structure,
     domain: Domain,
     idx_: int = None,
+    **kwargs,
 ) -> Structure:
     geom = domain.geometry
     poly = copy.deepcopy(new_structure[idx_])
@@ -310,7 +313,12 @@ def pos_change_point_mutation(
 
 
 @logger.catch
-def add_point(new_structure: Structure, domain: Domain, idx_: int = None):
+def add_point(
+    new_structure: Structure,
+    domain: Domain,
+    idx_: int = None,
+    **kwargs,
+):
 
     if new_structure is None:
         logger.error('None struct')
@@ -373,8 +381,9 @@ def add_point(new_structure: Structure, domain: Domain, idx_: int = None):
                 logger.warning('Empty movment area')
                 return new_structure
             else:
-                logger.warning('Not implemented select adjacent to poly movment_area part.')
-                logger.warning('Not implemented number of parts check. If there is 1 part - ok.')
+                pass
+                # logger.warning('Not implemented select adjacent to poly movment_area part.')
+                # logger.warning('Not implemented number of parts check. If there is 1 part - ok.')
             point = geom.get_random_point_in_poly(movment_area)
             if point:
                 if mutate_point_idx + 1 < len(poly):
@@ -397,7 +406,12 @@ def add_point(new_structure: Structure, domain: Domain, idx_: int = None):
 
 
 @logger.catch
-def drop_point(new_structure: Structure, domain: Domain, idx_: int = None):
+def drop_point(
+    new_structure: Structure,
+    domain: Domain,
+    idx_: int = None,
+    **kwargs,
+):
 
     polygon_to_mutate = new_structure[idx_]
     if domain.geometry.is_closed:

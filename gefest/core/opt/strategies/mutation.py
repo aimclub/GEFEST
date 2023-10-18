@@ -2,21 +2,22 @@ import copy
 from functools import partial
 from typing import Callable
 
+from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.geometry import Structure
 from gefest.core.opt.operators.mutations import mutate_structure
-from gefest.core.utils import chained_call, where
+from gefest.core.utils import where
 from gefest.core.utils.parallel_manager import BaseParallelDispatcher
 
 from .strategy import Strategy
 
 
 class MutationStrategy(Strategy):
-    def __init__(self, opt_params):
+    def __init__(self, opt_params: OptimizationParams):
 
         self.domain = opt_params.domain
-        self.mutation_prob = opt_params.mutation_prob
+        self.mutation_chance = opt_params.mutation_prob
         self.mutations = opt_params.mutations
-        self.each_prob = opt_params.mutation_each_prob
+        self.mutations_probs = opt_params.mutation_each_prob
         self.postprocess: Callable = opt_params.postprocessor
         self.sampler = opt_params.sampler
         self.postprocess_attempts = opt_params.postprocess_attempts
@@ -30,16 +31,24 @@ class MutationStrategy(Strategy):
         mutator = partial(
             mutate_structure,
             domain=self.domain,
-            mutations=self.mutations,
-            mutation_chance=self.mutation_prob,
-            mutations_probs=self.each_prob,
+            operations=self.mutations,
+            operation_chance=self.mutation_chance,
+            operations_probs=self.mutations_probs,
         )
         pop_ = copy.deepcopy(pop)
 
         mutated_pop = self._pm.exec_parallel(
-            func=chained_call(mutator, partial(self.postprocess, attempts=3)),
-            arguments=pop_,
+            func=mutator,
+            arguments=[(ind,) for ind in pop_],
             use=True,
+            flatten=False,
+        )
+
+        mutated_pop = self._pm.exec_parallel(
+            func=partial(self.postprocess, attempts=3),
+            arguments=[(ind,) for ind in mutated_pop],
+            use=True,
+            flatten=True,
         )
 
         idx_failed = where(mutated_pop, lambda ind: ind is None)

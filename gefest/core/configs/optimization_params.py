@@ -13,8 +13,6 @@ from gefest.core.geometry.domain import Domain
 from gefest.core.opt.adapters.structure import StructureAdapter
 from gefest.core.opt.operators.crossovers import panmixis
 from gefest.core.opt.operators.selections import tournament_selection
-from gefest.core.opt.strategies.crossover import CrossoverStrategy
-from gefest.core.opt.strategies.mutation import MutationStrategy
 from gefest.core.utils.logger import LogDispatcher
 from gefest.tools.fitness import Fitness
 from gefest.tools.samplers.standard.standard import StandardSampler
@@ -32,8 +30,8 @@ class OptimizationParams(BaseModel):
     sampler: Callable = StandardSampler
     postprocessor: Callable = postprocess
     postprocess_rules: list[Union[PolygonRule, StructureRule]]
-    mutation_strategy: Callable = MutationStrategy
-    crossover_strategy: Callable = CrossoverStrategy
+    mutation_strategy: str = 'MutationStrategy'
+    crossover_strategy: str = 'CrossoverStrategy'
     postprocess_attempts: int = 3
     mutation_prob: float = 0.6
     crossover_prob: float = 0.6
@@ -41,6 +39,8 @@ class OptimizationParams(BaseModel):
     crossover_each_prob: Optional[list[float]] = None
     extra: int = 5
     n_jobs: Optional[int] = -1
+    early_stopping_timeout: int = 60
+    early_stopping_iterations: int = 1000
     golem_adapter: Callable = StructureAdapter
     tuner_cfg: Optional[TunerParams] = None
     log_dir: str = 'logs'
@@ -49,15 +49,13 @@ class OptimizationParams(BaseModel):
 
     @model_validator(mode='after')
     def create_classes_instances(self):
-        self.crossovers = [partial(fun, domain=self.domain) for fun in self.crossovers]
         self.postprocessor = partial(
             self.postprocessor,
             domain=self.domain,
             rules=self.postprocess_rules,
+            attempts=self.postprocess_attempts,
         )
         self.sampler = self.sampler(opt_params=self)
-        self.crossover_strategy = self.crossover_strategy(opt_params=self)
-        self.mutation_strategy = self.mutation_strategy(opt_params=self)
         self.golem_adapter = self.golem_adapter(self.domain)
         self.log_dispatcher = self.log_dispatcher(self.log_dir, self.run_name)
 

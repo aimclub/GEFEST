@@ -1,7 +1,7 @@
 import copy
 import random
 from itertools import product
-from multiprocessing import Pool
+from typing import Callable
 
 import numpy as np
 from loguru import logger
@@ -9,6 +9,43 @@ from loguru import logger
 from gefest.core.geometry import Point, Polygon, Structure
 from gefest.core.geometry.domain import Domain
 from gefest.core.utils import where
+
+
+def crossover_structures(
+    structure1: Structure,
+    structure2: Structure,
+    domain: Domain,
+    operations: list[Callable],
+    operation_chance: float,
+    operations_probs: list[int],
+    **kwargs,
+) -> Structure:
+    """Apply mutation random mutation from list
+        for each polygons in structure.
+
+    Args:
+        structure (Structure): Structure to mutate.
+        domain (Domain): Task domain.
+        mutations (list[Callable]): List of mutation operations to choose.
+        mutation_chance (float): Chance to mutate polygon.
+        mutations_probs (list[int]): Probablilites of each mutation operation.
+
+    Returns:
+        Structure: Mutated structure. It is not guaranteed
+            that the resulting structure will be valid or changed.
+    """
+    s1, s2 = copy.deepcopy(structure1), copy.deepcopy(structure2)
+
+    chosen_crossover = np.random.choice(
+        a=operations,
+        size=1,
+        p=operations_probs,
+    )
+    new_structure = chosen_crossover[0](s1, s2, domain)
+    if not new_structure:
+        logger.warning(f'None out: {chosen_crossover[0].__name__}')
+
+    return new_structure
 
 
 # pairs for crossover selection
@@ -19,11 +56,12 @@ def panmixis(pop: list[Structure]) -> list[tuple[Structure, Structure]]:
 
 # best indivisual selection
 def structure_level_crossover(
-    operands: tuple[Structure, Structure],
+    s1: Structure,
+    s2: Structure,
     domain: Domain,
     **kwargs,
 ):
-    s1, s2 = operands
+    s1, s2 = copy.deepcopy(s1), copy.deepcopy(s2)
     polygons1 = s1.polygons
     polygons2 = s2.polygons
     crossover_point = np.random.randint(
@@ -44,17 +82,18 @@ def structure_level_crossover(
 
     new_structure = Structure(polygons=result)
 
-    return new_structure
+    return (new_structure,)
 
 
 @logger.catch
 def polygon_level_crossover(
-    operands: tuple[Structure, Structure],
+    s1: Structure,
+    s2: Structure,
     domain: Domain,
     **kwargs,
 ):
     geom = domain.geometry
-    s1, s2 = copy.deepcopy(operands)
+    s1, s2 = copy.deepcopy(s1), copy.deepcopy(s2)
     intersected = False
     split_angle = 0
     pairs_dists = [

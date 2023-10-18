@@ -2,24 +2,26 @@ import copy
 from functools import partial
 from typing import Callable
 
-import numpy as np
-
+from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.geometry import Structure
-from gefest.core.utils import chained_call, where
+from gefest.core.opt.operators.crossovers import crossover_structures
+from gefest.core.utils import where
 from gefest.core.utils.parallel_manager import BaseParallelDispatcher
 
 from .strategy import Strategy
 
 
 class CrossoverStrategy(Strategy):
-    def __init__(self, opt_params):
+    def __init__(self, opt_params: OptimizationParams):
 
         self.prob = opt_params.crossover_prob
         self.crossovers = opt_params.crossovers
-        self.each_prob = opt_params.crossover_each_prob
+        self.crossovers_probs = opt_params.crossover_each_prob
+        self.crossover_chacne = opt_params.crossover_prob
         self.postprocess: Callable = opt_params.postprocessor
         self.parent_pairs_selector: Callable = opt_params.pair_selector
         self.sampler: Callable = opt_params.sampler
+        self.domain = opt_params.domain
         self.postprocess_attempts = opt_params.postprocess_attempts
         self._pm = BaseParallelDispatcher(opt_params.n_jobs)
 
@@ -28,17 +30,26 @@ class CrossoverStrategy(Strategy):
 
     def crossover(self, pop: list[Structure]):
 
-        chosen_crossover = np.random.choice(
-            a=self.crossovers,
-            size=1,
-            p=self.each_prob,
-        )[0]
+        crossover = partial(
+            crossover_structures,
+            domain=self.domain,
+            operations=self.crossovers,
+            operation_chance=self.crossover_chacne,
+            operations_probs=self.crossovers_probs,
+        )
+
         pairs = copy.deepcopy(self.parent_pairs_selector(pop))
 
         new_generation = self._pm.exec_parallel(
-            func=chained_call(chosen_crossover, partial(self.postprocess, attempts=3)),
+            func=crossover,
             arguments=pairs,
             use=True,
+        )
+        new_generation = self._pm.exec_parallel(
+            func=self.postprocess,
+            arguments=[(ind,) for ind in new_generation],
+            use=True,
+            flatten=True,
         )
 
         idx_failed = where(new_generation, lambda ind: ind is None)

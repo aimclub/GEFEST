@@ -301,7 +301,8 @@ def get_selfintersection_safe_point(
     )  # 1.5 ??
     points = []
     p_area = geom.get_prohibited_geom(
-        domain.prohibited_area, buffer_size=domain.dist_between_polygons,
+        domain.prohibited_area,
+        buffer_size=domain.dist_between_polygons,
     )
     for _ in range(200):
         point = random_polar(origin, scalefactor)

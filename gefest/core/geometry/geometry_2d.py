@@ -120,7 +120,7 @@ class Geometry2D(Geometry):
         u = array([vector1[1].x - vector1[0].x, vector1[1].y - vector1[0].y])
         v = array([vector2[1].x - vector2[0].x, vector2[1].y - vector2[0].y])
         if norm(v) == 0 or norm(u) == 0:
-            logger.critical(f"invalid vectors: {vector1}, {vector2}")
+            logger.critical(f'invalid vectors: {vector1}, {vector2}')
         c = dot(u, v) / norm(u) / norm(v)
         angle = arccos(clip(c, -1, 1))
         return np.rad2deg(angle)
@@ -314,7 +314,6 @@ class Geometry2D(Geometry):
             if not compressed.is_empty:
                 poly = compressed.buffer(tolerance * 1.05, join_style='mitre')
             simplified = poly.simplify(tolerance)
-
 
             if isinstance(simplified, MultiPolygon):
                 simplified = max(simplified.geoms, key=lambda p: p.area)
