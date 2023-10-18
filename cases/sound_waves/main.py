@@ -107,9 +107,9 @@ if __name__ == '__main__':
     #  fitness function
     class SoundFieldFitness(Fitness):
         def __init__(self, domain, estimator, path_best_struct=None):
-            super().__init__(domain, SoundSimulator(domain=domain))
+            super().__init__(domain)
             self.path_best_struct = path_best_struct
-
+            self.estimator=estimator
             if self.path_best_struct is None:
                 print('please, set up the best spl matrix into configuration')
                 print('the best structure will be generated randomly')
@@ -137,7 +137,7 @@ if __name__ == '__main__':
     path_to_init_figure = f'figures/bottom_square.txt'
     estimator = SoundFieldFitness(
         domain,
-        SoundSimulator(domain, None),
+        SoundSimulator_(domain, None),
         None,
     )
 
