@@ -33,7 +33,7 @@ class OptimizationParams(BaseModel):
     mutation_strategy: str = 'MutationStrategy'
     crossover_strategy: str = 'CrossoverStrategy'
     postprocess_attempts: int = 3
-    mutation_prob: float = 0.6
+    mutation_prob: float = 0.9
     crossover_prob: float = 0.6
     mutation_each_prob: Optional[list[float]] = None
     crossover_each_prob: Optional[list[float]] = None

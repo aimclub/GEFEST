@@ -59,7 +59,7 @@ class Swan(Estimator):
 
     def estimate(self, struct: Structure):
         polygons = struct.polygons
-        #
+
         file_toread = self.path_to_input+'_2'
         with open(file_toread, 'r') as file_to_read:
             content_read = file_to_read.read()
@@ -108,12 +108,12 @@ class Swan(Estimator):
             file_to_write.write(content_write)
 
         logger.info('Swan estimation started...')
-        # subprocess.run(
-        #     'swan.exe',
-        #     shell=True,
-        #     cwd=self.path_to_model,
-        #     stdout=subprocess.DEVNULL,
-        # )
+        subprocess.run(
+            'swan.exe',
+            shell=True,
+            cwd=self.path_to_model,
+            stdout=subprocess.DEVNULL,
+        )
         logger.info('Swan estimation finished.')
 
         z = np.loadtxt(self.path_to_hs)

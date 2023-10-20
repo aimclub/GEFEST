@@ -34,6 +34,7 @@ class StandardSampler(Sampler):
         corrected = self._pm.exec_parallel(
             self.postprocessor,
             [(ind,) for ind in random_pop],
+
         )
 
         random_pop = [ind for ind in corrected if ind is not None]

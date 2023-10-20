@@ -181,8 +181,13 @@ class PointsNotTooClose(PolygonRule):
             ),
         ):
             norm = np.linalg.norm(np.array(pair[1].coords) - np.array(pair[0].coords))
+            while norm is None:
+
+                norm = np.linalg.norm(np.array(pair[1].coords) - np.array(pair[0].coords))
             norms[idx] = norm
             check[idx] = norm > lenght
+            if norm < lenght:
+                print('Длина стороны слишком маленькая!')
         return all(check)
 
     @staticmethod

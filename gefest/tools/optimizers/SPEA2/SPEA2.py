@@ -16,7 +16,7 @@ class SPEA2(BaseGA):
         super().__init__(opt_params)
         self.arch_size = int(self.pop_size / 2)  # Archive size
         self.archive = []  # Archive population
-        self.n_criteria = 2  # Number of criteria
+        self.n_criteria = len(self._pop[0].fitness)  # Number of criteria
         self.calculate_sepa2_fitness()
 
     def dominate(self, idx_1: int, idx_2: int) -> bool:
@@ -141,17 +141,18 @@ class SPEA2(BaseGA):
 
     def optimize(self):
         for step in tqdm(range(self.n_steps)):
-            # self._pop = self.selector(self._pop, self.opt_params.pop_size)
+            #self._pop = self.selector(self._pop, self.opt_params.pop_size)
             self.environmental_selection()
             if step == self.n_steps:
                 return self.archive
-            self._pop = self.selector(self._pop, self.opt_params.pop_size)
+
             self._pop = self.crossover(self._pop)
             self._pop = self.mutation(self._pop)
-            self._pop.extend(self.sampler(5))
+            self._pop.extend(self.sampler(self.opt_params.extra))
             self._pop = self.estimator(self._pop)
             self.calculate_sepa2_fitness()
-            self.logger.log_pop(self._pop, step)
+            self._pop = self.selector(self._pop, self.opt_params.pop_size)
+            self.log_dispatcher.log_pop(self._pop, str(step + 1))
 
         self._pop = sorted(self._pop, key=lambda x: x.fitness)
         return self._pop
@@ -185,7 +186,7 @@ class SPEA2(BaseGA):
         # Step 5, variation (genetic operators step)
         self._pop = self.crossover(self._pop)
         self._pop = self.mutation(self._pop)
-        self._pop.extend(self.sampler(1))
+        self._pop.extend(self.sampler(self.opt_params.extra))
         self._pop = self.estimator(self._pop)
 
         return population

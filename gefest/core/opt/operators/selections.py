@@ -27,10 +27,52 @@ def roulette_selection(
     chosen = []
 
     while len(chosen) < pop_size:
-        chosen.append(pop[np.random.choice(a=range(len(pop)), p=probability)])
-    return chosen
+        if len(chosen) < pop_size // 3:
+            chosen.append(pop[np.random.choice(a=range(len(pop)), p=probability)])
+        else:
+            choose = pop[np.random.choice(a=range(len(pop)), p=probability)]
+            chosen.append(choose)
+            pop.remove(choose)
+            _fitness = [i.fitness[0] for i in pop]
+            probability = [(i / (sum(_fitness))) for i in _fitness]
+            probability = [(max(probability) / i) for i in probability]
+            probability = [i / sum(probability) for i in probability]
 
+    return sorted(chosen, key=lambda x: [x.fitness[i] for i in range(len(x.fitness))])
 
+def roulette_selection_sepa_2(
+    pop: list[Structure],
+    pop_size: int,
+) -> list[Structure]:
+    """Selects the best ones from provided population.
+
+    Args:
+        pop (list[Structure]): population
+        pop_size (int): population size limit
+
+    Returns:
+        list[Structure]: best individuals from pop
+    """
+    _fitness = [i.extra_characteristics['SEPA2_fitness'] for i in pop]
+    probability = [(i / (sum(_fitness))) for i in _fitness]
+    probability = [(max(probability) / i) for i in probability]
+    probability = [i / sum(probability) for i in probability]
+
+    chosen = []
+
+    while len(chosen) < pop_size:
+        if len(chosen) < pop_size//3:
+            chosen.append(pop[np.random.choice(a=range(len(pop)), p=probability)])
+        else:
+            choose = pop[np.random.choice(a=range(len(pop)), p=probability)]
+            chosen.append(choose)
+            pop.remove(choose)
+            _fitness = [i.extra_characteristics['SEPA2_fitness'] for i in pop]
+            probability = [(i / (sum(_fitness))) for i in _fitness]
+            probability = [(max(probability) / i) for i in probability]
+            probability = [i / sum(probability) for i in probability]
+
+    return sorted(chosen, key=lambda x: [x.fitness[i] for i in range(len(x.fitness))])
 def tournament_selection(
     pop: list[Structure],
     pop_size: int,

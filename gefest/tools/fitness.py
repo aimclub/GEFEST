@@ -35,7 +35,7 @@ class Fitness(metaclass=ABCMeta):
             if not isinstance(fit, list):
                 fit = [fit]
             pop[idx].fitness = fit
-        return sorted(pop, key=lambda x: x.fitness)
+        return sorted(pop, key=lambda x: [x.fitness[i] for i in range(len(x.fitness))])
 
     @abstractmethod
     def fitness(self, ind: Structure) -> float:

@@ -1,3 +1,4 @@
+import copy
 from random import randint
 from typing import Callable
 
@@ -25,16 +26,25 @@ class BaseGA(Optimizer):
         self.pop_size = opt_params.pop_size
         self.n_steps = opt_params.n_steps
         self.domain = self.opt_params.domain
-        self._pop: list[Structure] = self.sampler(self.opt_params.pop_size)
+        self._pop = self.sampler(self.opt_params.pop_size)
+        print('Длина популяции инит', len(self._pop))
         self._pop = self.estimator(self._pop)
+        #self._pop = sorted(self._pop,key = lambda x: x.fitness[0])
         self.log_dispatcher.log_pop(self._pop, '00000_init')
 
     def optimize(self) -> list[Structure]:
         for step in tqdm(range(self.n_steps)):
+            best = copy.deepcopy(self._pop[0])
             self._pop = self.crossover(self._pop)
+            print('Длина популяции после crossover', len(self._pop))
             self._pop = self.mutation(self._pop)
+            print('Длина популяции после мутации',len(self._pop))
             self._pop.extend(self.sampler(self.opt_params.extra))
+            print('Длина популяции после экстры',len(self._pop))
             self._pop = self.estimator(self._pop)
             self._pop = self.selector(self._pop, self.opt_params.pop_size)
+            self._pop.append(best)
+            #self._pop = sorted(self._pop, key=lambda x: x.fitness[0])
+            print('Длина популяции после selector', len(self._pop))
             self.log_dispatcher.log_pop(self._pop, str(step + 1))
         return self._pop

@@ -3,7 +3,7 @@ from functools import partial
 from gefest.core.algs.postproc.resolve_errors import Rules, apply_postprocess
 import numpy as np
 from hyperopt import hp
-from gefest.core.opt.operators.selections import tournament_selection,roulette_selection
+from gefest.core.opt.operators.selections import tournament_selection,roulette_selection,roulette_selection_sepa_2
 from gefest.core.algs.postproc.resolve_errors import Rules, postprocess
 from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.configs.tuner_params import TunerParams
@@ -35,6 +35,7 @@ from gefest.tools.estimators.simulators.sound_wave.sound_interface import (
     generate_map,
 )
 from gefest.tools.fitness import Fitness
+from gefest.tools.optimizers.SPEA2.SPEA2 import SPEA2
 from gefest.tools.optimizers.GA.base_GA import BaseGA
 from pathlib import Path
 from tools.estimators.simulators.swan.swan_interface import Swan
@@ -120,7 +121,7 @@ if __name__ == '__main__':
         sampling_variance=1,
         hyperopt_dist=hp.uniform,
     )
-    path_=f"{root_path}/cases/breakwaters/ob2/"
+    path_=f"{root_path}/cases/breakwaters/ob2_sepa/"
     #Estimator
     swan_estimator = Swan(
         targets=targets,
@@ -135,8 +136,12 @@ if __name__ == '__main__':
             super().__init__(domain)
             self.estimator=estimator
         def fitness(self, ind: Structure):
+            total_lenght = 0
+            for poly in ind.polygons:
+                length =domain.geometry.get_length(poly)
+                total_lenght+=length
             fitness = self.estimator(ind)
-            return fitness
+            return [fitness,length]
 
     #  fitness estimator
     estimator = SoundFieldFitness(
@@ -181,10 +186,10 @@ if __name__ == '__main__':
         tuner_cfg=tp,
         n_steps=50,
         pop_size=25,
-        selector=roulette_selection
+        selector=roulette_selection_sepa_2
     )
-
-    optimizer = BaseGA(opt_params)
+    #optimizer = BaseGA(opt_params)
+    optimizer = SPEA2(opt_params)
     optimized_pop = optimizer.optimize()
 
     #  make mp4 of optimized pop here if need
