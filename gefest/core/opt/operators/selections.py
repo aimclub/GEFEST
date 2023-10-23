@@ -61,7 +61,7 @@ def roulette_selection_sepa_2(
     chosen = []
 
     while len(chosen) < pop_size:
-        if len(chosen) < pop_size//3:
+        if len(chosen) < pop_size//2:
             chosen.append(pop[np.random.choice(a=range(len(pop)), p=probability)])
         else:
             choose = pop[np.random.choice(a=range(len(pop)), p=probability)]
@@ -72,7 +72,7 @@ def roulette_selection_sepa_2(
             probability = [(max(probability) / i) for i in probability]
             probability = [i / sum(probability) for i in probability]
 
-    return sorted(chosen, key=lambda x: [x.fitness[i] for i in range(len(x.fitness))])
+    return sorted(chosen, key=lambda x: x.extra_characteristics['SEPA2_fitness'])
 def tournament_selection(
     pop: list[Structure],
     pop_size: int,
@@ -105,4 +105,4 @@ def tournament_selection(
             n_iter = 0
             rnd = pop[randint(0, len(pop) - 1)]
             chosen.append(rnd)
-    return chosen
+    return sorted(chosen, key=lambda x: [x.fitness[i] for i in range(len(x.fitness))])
