@@ -1,0 +1,54 @@
+$***********MODEL INPUT*********************************
+SET NAUTical
+MODE NONSTationary TWODimensional
+COORDinates spherical
+
+CGRID REGular xpc=74.70350703505787  ypc=67.88206697110601 alpc=0. &
+                  xlenc=0.128969 ylenc=0.086128 mxc=17 myc=31 &
+                  CIRCLE mdc=36 flow=0.05 fhigh=1. msc=25
+
+INPgrid BOTtom REGular xpinp=74.70350703505787  ypinp=67.88206697110601 & 
+                alpinp=0. mxinp=17 myinp=31 &
+                dxinp=0.0071370458 dyinp=0.0026897599 EXCeption -9
+READinp BOTtom fac=1 'data\bathy.bot' idla=1 0 FREE
+
+INPgrid WIND  REGular xpinp=74.70350703505787  ypinp=67.88206697110601 & 
+                alpinp=0. mxinp=17 myinp=31 &
+                dxinp=0.0071370458 dyinp=0.0026897599  &
+NONSTATIONARY 20180101.000000 6 HR 20180103.230000
+READinp WIND fac=1.21 SERIES 'data\wind_inventory.txt' 1 0 1 0 FREE
+
+BOUnd SHAPespec JONswap 3.3 PEAK DSPR DEGRees
+
+
+
+OBSTACLE TRANSM 0. REFL 0. LINE 74.810470, 67.930902, 74.806538, 67.930025, 74.803719, 67.928509, 74.809836, 67.923163, 74.810798, 67.922973, 74.811649, 67.926213, 74.811374, 67.929569
+$optline
+
+
+GEN3 ST6 6.5E-6 8.5E-5 4.0 4.0 UP HWANG VECTAU U10PROXY 35.0 AGROW 
+BREAKING
+FRiction JONswap CONstant 0.067
+TRIAD
+DIFFRACtion
+ PROP BSBT
+QUANTity  Per short='Tm-1,0' power=0.
+
+
+
+OUTPUT OPTIONS '%' TABLE 16 BLOCK 6 18
+
+BLOCK 'COMPGRID' NOHEAD 'results\HSig_ob_example.dat' LAYOUT 1 HSig OUT 20180102.000000 1. HR
+BLOCK 'COMPGRID' NOHEAD 'results\PDIR_ob_example.dat' LAYOUT 1 PDIR OUT 20180102.000000 1. HR
+BLOCK 'COMPGRID' NOHEAD 'results\RTP_ob_example.dat' LAYOUT 1 RTP OUT 20180102.000000 1. HR
+
+
+
+
+
+
+
+
+COMPUTE NONSTat 20180101.000000 10 MIN 20180103.230000
+
+STOP

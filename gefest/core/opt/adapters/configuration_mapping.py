@@ -3,6 +3,7 @@ from functools import partial
 from golem.core.optimisers.adaptive.operator_agent import MutationAgentTypeEnum
 from golem.core.optimisers.genetic.gp_params import GPAlgorithmParameters
 from golem.core.optimisers.genetic.operators.inheritance import GeneticSchemeTypesEnum
+from golem.core.optimisers.genetic.operators.selection import SelectionTypesEnum
 from golem.core.optimisers.optimization_parameters import GraphRequirements
 from golem.core.optimisers.optimizer import GraphGenerationParams
 
@@ -71,6 +72,7 @@ def map_into_gpa(
                 attempts=opt_params.postprocess_attempts,
             ),
         ],
+        selection_types=[SelectionTypesEnum.spea2],
         pop_size=opt_params.pop_size,
         max_pop_size=int(opt_params.pop_size * 1.5),
         crossover_prob=opt_params.crossover_prob,

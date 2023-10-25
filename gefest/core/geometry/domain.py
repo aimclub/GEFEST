@@ -18,8 +18,8 @@ class Domain:
     max_poly_num: int = 4
     min_points_num: int = 20
     max_points_num: int = 50
-    polygon_side: float = 0.05
-    min_dist_from_boundary: float = 1.0
+    polygon_side: float = 0.0001
+    min_dist_from_boundary: float = 0.0001
     prohibited_area: Optional[Structure] = Field(default=Structure([]))
     fixed_points: Optional[Union[Polygon, list[list[float]]]] = Field(default_factory=list)
     geometry: Optional[Geometry2D] = Geometry2D()

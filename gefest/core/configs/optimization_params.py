@@ -3,18 +3,14 @@ from typing import Callable, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from gefest.core.algs.postproc.resolve_errors import (
-    PolygonRule,
-    StructureRule,
-    postprocess,
-)
+from gefest.core.algs.postproc.resolve_errors import Postrocessor
+from gefest.core.algs.postproc.rules import PolygonRule, StructureRule
 from gefest.core.configs.tuner_params import TunerParams
 from gefest.core.geometry.domain import Domain
 from gefest.core.opt.adapters.structure import StructureAdapter
 from gefest.core.opt.operators.crossovers import panmixis
 from gefest.core.opt.operators.selections import tournament_selection
 from gefest.core.utils.logger import LogDispatcher
-from gefest.tools.fitness import Fitness
 from gefest.tools.samplers.standard.standard import StandardSampler
 
 
@@ -24,11 +20,11 @@ class OptimizationParams(BaseModel):
     n_steps: int
     pop_size: int
     domain: Domain
-    estimator: Fitness
+    objectives: list[Callable]
     selector: Callable = tournament_selection
     pair_selector: Callable = panmixis
     sampler: Callable = StandardSampler
-    postprocessor: Callable = postprocess
+    postprocessor: Callable = Postrocessor.apply_postprocess
     postprocess_rules: list[Union[PolygonRule, StructureRule]]
     mutation_strategy: str = 'MutationStrategy'
     crossover_strategy: str = 'CrossoverStrategy'
