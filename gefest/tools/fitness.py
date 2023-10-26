@@ -35,6 +35,7 @@ class Fitness(metaclass=ABCMeta):
             if not isinstance(fit, list):
                 fit = [fit]
             pop[idx].fitness = fit
+            #if x.extra_characteristics[''] is not None
         return sorted(pop, key=lambda x: [x.fitness[i] for i in range(len(x.fitness))])
 
     @abstractmethod

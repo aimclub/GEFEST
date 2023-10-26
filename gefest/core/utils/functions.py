@@ -10,7 +10,7 @@ from gefest.core.geometry import Structure
 
 def project_root() -> Path:
     """Returns project root folder."""
-    return Path(__file__).parent.parent.parent
+    return Path(__file__).parent.parent.parent.parent
 
 
 def parse_structs(path: str) -> list[Structure]:

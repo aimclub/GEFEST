@@ -152,7 +152,7 @@ class Geometry2D(Geometry):
             rotated :obj:`poly`
         """
 
-        geom_polygon = self._poly_to_shapely_line(poly)
+        geom_polygon = self._poly_to_shapely_poly(poly)
 
         rotated_geom_polygon = affinity.rotate(
             geom_polygon,

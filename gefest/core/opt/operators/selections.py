@@ -27,7 +27,7 @@ def roulette_selection(
     chosen = []
 
     while len(chosen) < pop_size:
-        if len(chosen) < pop_size // 3:
+        if len(chosen) < pop_size // 2:
             chosen.append(pop[np.random.choice(a=range(len(pop)), p=probability)])
         else:
             choose = pop[np.random.choice(a=range(len(pop)), p=probability)]
