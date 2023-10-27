@@ -363,14 +363,15 @@ class PolygonNotSelfIntersects(PolygonRule):
         domain: Domain,
     ) -> bool:
         poly = structure[idx_poly_with_error]
-        return not (
+        return (
             len(poly) > 2
             and _forbidden_validity(
                 explain_validity(
-                    ShapelyPolygon([ShapelyPoint(pt.x, pt.y) for pt in poly]).boundary,
+                    ShapelyPolygon([ShapelyPoint(pt.x, pt.y) for pt in poly]).exterior,
                 ),
             )
         )
+
 
     @staticmethod
     def correct(
@@ -384,7 +385,11 @@ class PolygonNotSelfIntersects(PolygonRule):
 
 
 def _forbidden_validity(validity):
-    return validity != 'Valid Geometry' and 'Ring Self-intersection' not in validity
+    if 'Valid Geometry' in validity:
+        return True
+    if 'Ring Self-intersection' in validity:
+        return False
+    #return validity != 'Valid Geometry' and 'Ring Self-intersection' not in validity
 
 
 @logger.catch

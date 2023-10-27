@@ -121,7 +121,7 @@ if __name__ == '__main__':
         sampling_variance=1,
         hyperopt_dist=hp.uniform,
     )
-    path_=f"{root_path}/cases/breakwaters/ob2_sepa/"
+    path_=f"{root_path}/cases/breakwaters/ob2_upd/"
     #Estimator
     swan_estimator = Swan(
         targets=targets,
@@ -184,7 +184,7 @@ if __name__ == '__main__':
         n_jobs=-1,
         golem_adapter=StructureAdapter,
         tuner_cfg=tp,
-        n_steps=50,
+        n_steps=150,
         pop_size=25,
         selector=roulette_selection_sepa_2
     )

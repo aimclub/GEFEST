@@ -1,7 +1,15 @@
 import copy
+
+import shapely
+from shapely.validation import explain_validity
+
 from cases.sound_waves.poly_from_point import poly_from_comsol_txt
+from core.algs.postproc.resolve_errors import PolygonNotSelfIntersects
+from core.geometry.domain import Domain
 from gefest.core.utils.functions import parse_structs,project_root
 from gefest.core.geometry import Point, Polygon, Structure
+from shapely.geometry import Point as ShapelyPoint
+from shapely.geometry import Polygon as ShapelyPolygon
 from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
@@ -31,11 +39,32 @@ geometry = Geometry2D()
 
 path_=f"{root}/cases/synthetic/syn_gen/Comsol_points/lightning.txt"
 #best_poly = poly_from_comsol_txt(path=path_).polygons[0]
-best_poly = random_star_shaped_polygon(num_points=20)
+best_poly = random_star_shaped_polygon(num_points=14)
+
 len_x =max(coord_X)- min(coord_X)
 len_y =max(coord_Y)- min(coord_Y)
+#Setup a reference poly
 best_poly = Polygon([Point(p[0]*min(coord_X)+len_x/2,p[1]*min(coord_Y)+len_y/2) for p in best_poly])
-def noise_coords(poly,scale=1.0):
+best_poly.points.append(best_poly.points[0])
+#Just for self-intersect rule
+domain = Domain(
+        allowed_area=[
+            (min(coord_X), min(coord_Y)),
+            (min(coord_X), max(coord_Y)),
+            (max(coord_X), max(coord_Y)),
+            (max(coord_X), min(coord_Y)),
+            (min(coord_X), min(coord_Y)),
+        ],
+        geometry=geometry,
+        max_poly_num=1,
+        min_poly_num=1,
+        max_points_num=30,
+        min_points_num=7,
+        polygon_side=0.00001
+
+    )
+
+def noise_coords(poly,scale=1.0,domain=None):
     new_poly = Polygon([])
     angle = np.random.randint(-100, 100)
 
@@ -53,18 +82,34 @@ def noise_coords(poly,scale=1.0):
         if i==0 or i==(len(poly)-1):
             new_poly.points.append(Point(point.coords[0] + x_noise_start, point.coords[1] + y_noise_start))
             continue
-        if np.random.uniform(0,1) <0.5:
+        if np.random.uniform(0,1) <0.75:
             new_poly.points.append(point)
         else:
             x_noise = np.random.uniform(-sigma,sigma)
             y_noise = np.random.uniform(-sigma, sigma)
             new_poly.points.append(Point(point.coords[0] + x_noise, point.coords[1] + y_noise))
-    if np.random.uniform(0, 1) < 0.5:
-        x_scale= np.random.uniform(0.5, 2)
-        y_scale = np.random.uniform(0.5, 2)
-        new_poly=geometry.resize_poly(new_poly,x_scale,y_scale)
-    if np.random.uniform(0, 1) < 0.5:
-        new_poly = geometry.rotate_poly(new_poly,angle)
+    if np.random.uniform(0, 1) < 0.75:
+        if len(new_poly.points)//4>=1:
+            max_to_del = len(new_poly.points)//4
+        else:
+            max_to_del = 1
+
+        for i in range(0,max_to_del):
+            pnt_to_del = np.random.randint(1, len(new_poly.points)-1)
+            new_poly.points.remove(new_poly.points[pnt_to_del])
+    # if np.random.uniform(0, 1) < 0.75:
+    #     x_scale= np.random.uniform(0.5, 2)
+    #     y_scale = np.random.uniform(0.5, 2)
+    #     new_poly=geometry.resize_poly(new_poly,x_scale,y_scale)
+    # if np.random.uniform(0, 1) < 0.75:
+    #     new_poly = geometry.rotate_poly(new_poly,angle)
+    rule = PolygonNotSelfIntersects()
+    struct = Structure(polygons=([new_poly]))
+    while not rule.validate(struct,0,domain):
+        new_poly = noise_coords(poly, scale=scale, domain=domain)
+        struct = Structure(polygons=([new_poly]))
+
+
     return new_poly
 
 plt.ion()
@@ -75,10 +120,12 @@ for _ in range(200):
     plt.plot([b[0] for b in [p.coords for p in best_poly.points]],[b[1] for b in [p.coords for p in best_poly.points]])
     #plt.plot([b[0] for b in [p.coords for p in geometry.rotate_poly(best_poly,angle).points]],
     # [b[1] for b in [p.coords for p in geometry.rotate_poly(best_poly,angle).points]])
-    noised = noise_coords(best_poly, scale=0.05).points
+    noised = noise_coords(best_poly, scale=0.05,domain=domain).points
     plt.plot([b[0] for b in [p.coords for p in noised]],
-             [b[1] for b in [p.coords for p in noised]])
+             [b[1] for b in [p.coords for p in noised]],
+             label='generated')
+    plt.legend()
     plt.draw()
     plt.gcf().canvas.flush_events()
-    time.sleep(0.06)
+    time.sleep(0.08)
 plt.show()
