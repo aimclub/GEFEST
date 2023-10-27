@@ -1,9 +1,7 @@
 import copy
 import subprocess
-import matplotlib.pyplot as plt
 import numpy as np
 from loguru import logger
-from gefest.core.geometry import Point, Polygon, Structure
 from gefest.core.geometry import Structure
 from gefest.tools import Estimator
 from pathlib import Path
@@ -24,38 +22,7 @@ class Swan(Estimator):
         self.targets = targets
         self.grid = grid
         self.domain = domain
-        # self._grid_configuration()
 
-    # def _grid_configuration(self):
-    #
-    #     file_to_read = open(self.path_to_input, 'r')
-    #     content_read = file_to_read.read()
-    #
-    #     for_replace = ['xpc', 'xlenc', 'ypc', 'ylenc', 'mxc', 'myc']
-    #     content_for_add = [
-    #         self.domain.min_x,
-    #         self.domain.max_x,
-    #         self.domain.min_y,
-    #         self.domain.max_y,
-    #         self.grid[0],
-    #         self.grid[1],
-    #     ]
-    #
-    #     new_content = copy.deepcopy(content_read)
-    #     for replace, content in zip(for_replace, content_for_add):
-    #         content_to_replace = replace + '=' + str(content)
-    #         start = new_content.find(replace)
-    #         end = new_content[start:].find(' ')
-    #         content_write = new_content.replace(
-    #             new_content[start : start + end],
-    #             content_to_replace,
-    #         )
-    #         new_content = content_write
-    #     file_to_read.close()
-    #
-    #     file_to_write = open(self.path_to_input, 'w')
-    #     file_to_write.writelines(new_content)
-    #     file_to_write.close()
 
     def estimate(self, struct: Structure):
         polygons = struct.polygons
@@ -89,19 +56,12 @@ class Swan(Estimator):
                     for_input += '{:.6f}'.format(gen/500)
                     if i != len(individ)-1:
                         for_input += ', '
-                #for_input += '\nOBSTACLE TRANSM 0. REFL 0. LINE '
-                #if j == (num_of_polygons - 1):
             for_input += '\n$optline'
-                # else:
-                #     for_input += '\nOBSTACLE TRANSM 0. REFL 0. LINE '
-
             content_to_replace = for_input
             content_write = content_read.replace(
                 content_read[content_read.find('OBSTACLE') -1: content_read.rfind('$optline') + 10],
                 content_to_replace,
             )
-            #print(content_write)
-
         input_created = Path(self.path_to_input)
         input_created.touch(exist_ok=True)
         with open(self.path_to_input, 'w') as file_to_write:

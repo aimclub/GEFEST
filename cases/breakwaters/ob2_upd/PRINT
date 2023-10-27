@@ -1,0 +1,1925 @@
+1
+
+                    Execution started at 20231025.233444         
+
+
+
+                    ---------------------------------------
+                                     SWAN
+                    SIMULATION OF WAVES IN NEAR SHORE AREAS
+                             VERSION NUMBER 41.31A              
+                    ---------------------------------------
+
+
+    
+ $***********MODEL INPUT*********************************
+    
+ SET NAUTical
+    
+ MODE NONSTationary TWODimensional
+    
+ COORDinates spherical
+    
+ 
+    
+ CGRID REGular xpc=74.70350703505787  ypc=67.88206697110601 alpc=0. &
+                   xlenc=0.128969 ylenc=0.086128 mxc=17 myc=31 &
+                   CIRCLE mdc=36 flow=0.05 fhigh=1. msc=25
+ Resolution in sigma-space: df/f =  0.1273
+    
+ 
+    
+ INPgrid BOTtom REGular xpinp=74.70350703505787  ypinp=67.88206697110601 &
+                 alpinp=0. mxinp=17 myinp=31 &
+                 dxinp=0.0071370458 dyinp=0.0026897599 EXCeption -9
+    
+ READinp BOTtom fac=1 'data\bathy.bot' idla=1 0 FREE
+    
+ 
+    
+ INPgrid WIND  REGular xpinp=74.70350703505787  ypinp=67.88206697110601 &
+                 alpinp=0. mxinp=17 myinp=31 &
+                 dxinp=0.0071370458 dyinp=0.0026897599  &
+ NONSTATIONARY 20180101.000000 6 HR 20180103.230000
+ ** Warning          : [deltinp] is not a fraction of the period
+    
+ READinp WIND fac=1.21 SERIES 'data\wind_inventory.txt' 1 0 1 0 FREE
+ **  Heading lines  **
+ -> 20180101.000000                                                                 
+    
+ 
+    
+ BOUnd SHAPespec JONswap 3.3 PEAK DSPR DEGRees
+    
+ 
+    
+ 
+    
+ 
+    
+ OBSTACLE TRANSM 0. REFL 0. LINE 74.799845, 67.926401, 74.803075, 67.930403, 74.797853, 67.933104, 74.796371, 67.932385
+    
+ $optline
+    
+ 
+    
+ 
+    
+ GEN3 ST6 6.5E-6 8.5E-5 4.0 4.0 UP HWANG VECTAU U10PROXY 35.0 AGROW
+    
+ BREAKING
+    
+ FRiction JONswap CONstant 0.067
+    
+ TRIAD
+    
+ DIFFRACtion
+    
+  PROP BSBT
+    
+ QUANTity  Per short='Tm-1,0' power=0.
+    
+ 
+    
+ 
+    
+ 
+    
+ OUTPUT OPTIONS '%' TABLE 16 BLOCK 6 18
+    
+ 
+    
+ BLOCK 'COMPGRID' NOHEAD 'results\HSig_ob_example.dat' LAYOUT 1 HSig OUT 20180102.000000 1. HR
+    
+ BLOCK 'COMPGRID' NOHEAD 'results\PDIR_ob_example.dat' LAYOUT 1 PDIR OUT 20180102.000000 1. HR
+    
+ BLOCK 'COMPGRID' NOHEAD 'results\RTP_ob_example.dat' LAYOUT 1 RTP OUT 20180102.000000 1. HR
+    
+ 
+    
+ 
+    
+ 
+    
+ 
+    
+ 
+    
+ 
+    
+ 
+    
+ 
+    
+ COMPUTE NONSTat 20180101.000000 10 MIN 20180103.230000
+ ** Warning          : Corner of comp grid outside bottom grid
+ Coordinates :     74.70     67.97
+ ** Warning          : Corner of comp grid outside bottom grid
+ Coordinates :     74.83     67.88
+ ** Warning          : Corner of comp grid outside bottom grid
+ Coordinates :     74.83     67.97
+ ** Warning          : (corner)point outside bottom grid
+       Set of output locations: BOUND_02  coordinates:     74.83     67.88
+ ** Warning          : (corner)point outside bottom grid
+       Set of output locations: BOUND_03  coordinates:     74.83     67.97
+ ** Warning          : (corner)point outside bottom grid
+       Set of output locations: BOUND_04  coordinates:     74.70     67.97
+ Time of computation ->  20180101.001000      in sec:        600.
+ **  Heading lines  **
+ -> 20180101.060000                                                                 
+
+----------------------------------------------------------------
+                  COMPUTATIONAL PART OF SWAN
+----------------------------------------------------------------
+
+ Gridresolution       : MXC              18 MYC             32
+                      : MCGRD           483
+                      : MSC              26 MDC             36
+                      : MTC             426
+                      : NSTATC            1 ITERMX           1
+ Propagation flags    : ITFRE             1 IREFR            1
+ Source term flags    : IBOT              1 ISURF            1
+                      : IWCAP             8 IWIND            8
+                      : ITRIAD           11 IQUAD            2
+                      : IVEG              0 ITURBV           0
+                      : IMUD              0 IICE             0
+ Spatial step         : DX       0.7586E-02 DY      0.2778E-02
+ Spectral bin         : df/f     0.1273E+00 DDIR    0.1000E+02
+ Physical constants   : GRAV     0.9810E+01 RHO     0.1025E+04
+ Wind input           : WSPEED   0.0000E+00 DIR     0.0000E+00
+                      : ICEWIND  0.00
+ Tail parameters      : E(f)     0.4000E+01 E(k)    0.2500E+01
+                      : A(f)     0.5000E+01 A(k)    0.3000E+01
+ Accuracy parameters  : DREL     0.1000E-01 NPNTS   0.9950E+02
+                      : DHABS    0.5000E-02 CURVAT  0.5000E-02
+                      : GRWMX    0.1000E+00
+ Drying/flooding      : LEVEL    0.0000E+00 DEPMIN  0.5000E-01
+ The nautical  convention for wind and wave directions is used
+ Scheme for geographic propagation is BSBT  
+ Scheme geogr. space  : PROPSC            1 ICMAX            5
+ Scheme spectral space: CSS      0.5000E+00 CDD     0.5000E+00
+ Current is off
+ Quadruplets          : IQUAD             2
+                      : LAMBDA   0.2500E+00 CNL4    0.3000E+08
+                      : CSH1     0.5500E+01 CSH2    0.8330E+00
+                      : CSH3    -0.1250E+01
+ Maximum Ursell nr for Snl4 :    0.1000E+02
+ Triads               : ITRIAD           11 TRFAC   0.5000E-01
+                      : CUTFR    0.2500E+01 URCRI   0.2000E+00
+ Minimum Ursell nr for Snl3 :    0.1000E-01
+ JONSWAP (`73)        : GAMMA    0.6700E-01
+ Vegetation is off
+ Turbulence is off
+ Fluid mud is off
+ Dissipation by sea ice is off
+ W-cap Babanin        : A1       0.6500E-05 A2      0.8500E-04
+                      : P1       0.4000E+01 P2      0.4000E+01
+                      : CDSV     0.1200E+01
+ Babanin Sds:  concave up behavior   :   T
+ DBYB Sin: tau calculated from vector:   T
+ DBYB Sin: true U10 used             :   F
+ DBYB Sin: U10PROXY =   35.0 * Ustar
+ DBYB Sin: factor on Cdrag to counter wind bias: 1.000
+ Wind drag is Hwang
+ DBYB/Tsagareli/Rogers wind input
+ Battjes&Janssen (`78): ALPHA    0.1000E+01 GAMMA   0.7300E+00
+ Set-up is off
+ Diffraction          : SMPAR    0.0000E+00 SMNUM            0
+ Janssen (`89,`90)    : ALPHA    0.1000E-01 KAPPA   0.4100E+00
+ Janssen (`89,`90)    : RHOA     0.1280E+01 RHOW    0.1025E+04
+ 
+ 1st and 2nd gen. wind: CF10     0.1880E+03 CF20    0.5900E+00
+                      : CF30     0.1200E+00 CF40    0.2500E+03
+                      : CF50     0.2300E-02 CF60   -0.2230E+00
+                      : CF70     0.0000E+00 CF80   -0.5600E+00
+                      : RHOAW    0.1249E-02 EDMLPM  0.3600E-02
+                      : CDRAG    0.1230E-02 UMIN    0.1000E+01
+                      : LIM_PM   0.1300E+00
+ 
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.002000      in sec:       1200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.003000      in sec:       1800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.004000      in sec:       2400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.005000      in sec:       3000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.010000      in sec:       3600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.011000      in sec:       4200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.012000      in sec:       4800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.013000      in sec:       5400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.014000      in sec:       6000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.015000      in sec:       6600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.020000      in sec:       7200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.021000      in sec:       7800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.022000      in sec:       8400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.023000      in sec:       9000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.024000      in sec:       9600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.025000      in sec:      10200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.030000      in sec:      10800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.031000      in sec:      11400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.032000      in sec:      12000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.033000      in sec:      12600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.034000      in sec:      13200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.035000      in sec:      13800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.040000      in sec:      14400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.041000      in sec:      15000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.042000      in sec:      15600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.043000      in sec:      16200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.044000      in sec:      16800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.045000      in sec:      17400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.050000      in sec:      18000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.051000      in sec:      18600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.052000      in sec:      19200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.053000      in sec:      19800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.054000      in sec:      20400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.055000      in sec:      21000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.060000      in sec:      21600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.061000      in sec:      22200.
+ **  Heading lines  **
+ -> 20180101.120000                                                                 
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.062000      in sec:      22800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.063000      in sec:      23400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.064000      in sec:      24000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.065000      in sec:      24600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.070000      in sec:      25200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.071000      in sec:      25800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.072000      in sec:      26400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.073000      in sec:      27000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.074000      in sec:      27600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.075000      in sec:      28200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.080000      in sec:      28800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.081000      in sec:      29400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.082000      in sec:      30000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.083000      in sec:      30600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.084000      in sec:      31200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.085000      in sec:      31800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.090000      in sec:      32400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.091000      in sec:      33000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.092000      in sec:      33600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.093000      in sec:      34200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.094000      in sec:      34800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.095000      in sec:      35400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.100000      in sec:      36000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.101000      in sec:      36600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.102000      in sec:      37200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.103000      in sec:      37800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.104000      in sec:      38400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.105000      in sec:      39000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.110000      in sec:      39600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.111000      in sec:      40200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.112000      in sec:      40800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.113000      in sec:      41400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.114000      in sec:      42000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.115000      in sec:      42600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.120000      in sec:      43200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.121000      in sec:      43800.
+ **  Heading lines  **
+ -> 20180101.180000                                                                 
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.122000      in sec:      44400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.123000      in sec:      45000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.124000      in sec:      45600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.125000      in sec:      46200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.130000      in sec:      46800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.131000      in sec:      47400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.132000      in sec:      48000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.133000      in sec:      48600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.134000      in sec:      49200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.135000      in sec:      49800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.140000      in sec:      50400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.141000      in sec:      51000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.142000      in sec:      51600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.143000      in sec:      52200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.144000      in sec:      52800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.145000      in sec:      53400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.150000      in sec:      54000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.151000      in sec:      54600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.152000      in sec:      55200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.153000      in sec:      55800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.154000      in sec:      56400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.155000      in sec:      57000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.160000      in sec:      57600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.161000      in sec:      58200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.162000      in sec:      58800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.163000      in sec:      59400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.164000      in sec:      60000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.165000      in sec:      60600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.170000      in sec:      61200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.171000      in sec:      61800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.172000      in sec:      62400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.173000      in sec:      63000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.174000      in sec:      63600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.175000      in sec:      64200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.180000      in sec:      64800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.181000      in sec:      65400.
+ **  Heading lines  **
+ -> 20180102.000000                                                                 
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.182000      in sec:      66000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.183000      in sec:      66600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.184000      in sec:      67200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.185000      in sec:      67800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.190000      in sec:      68400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.191000      in sec:      69000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.192000      in sec:      69600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.193000      in sec:      70200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.194000      in sec:      70800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.195000      in sec:      71400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.200000      in sec:      72000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.201000      in sec:      72600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.202000      in sec:      73200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.203000      in sec:      73800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.204000      in sec:      74400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.205000      in sec:      75000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.210000      in sec:      75600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.211000      in sec:      76200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.212000      in sec:      76800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.213000      in sec:      77400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.214000      in sec:      78000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.215000      in sec:      78600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.220000      in sec:      79200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.221000      in sec:      79800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.222000      in sec:      80400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.223000      in sec:      81000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.224000      in sec:      81600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.225000      in sec:      82200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.230000      in sec:      82800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.231000      in sec:      83400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.232000      in sec:      84000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.233000      in sec:      84600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.234000      in sec:      85200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180101.235000      in sec:      85800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.000000      in sec:      86400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.001000      in sec:      87000.
+ **  Heading lines  **
+ -> 20180102.060000                                                                 
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.002000      in sec:      87600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.003000      in sec:      88200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.004000      in sec:      88800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.005000      in sec:      89400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.010000      in sec:      90000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.011000      in sec:      90600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.012000      in sec:      91200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.013000      in sec:      91800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.014000      in sec:      92400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.015000      in sec:      93000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.020000      in sec:      93600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.021000      in sec:      94200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.022000      in sec:      94800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.023000      in sec:      95400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.024000      in sec:      96000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.025000      in sec:      96600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.030000      in sec:      97200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.031000      in sec:      97800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.032000      in sec:      98400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.033000      in sec:      99000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.034000      in sec:      99600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.035000      in sec:     100200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.040000      in sec:     100800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.041000      in sec:     101400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.042000      in sec:     102000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.043000      in sec:     102600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.044000      in sec:     103200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.045000      in sec:     103800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.050000      in sec:     104400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.051000      in sec:     105000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.052000      in sec:     105600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.053000      in sec:     106200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.054000      in sec:     106800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.055000      in sec:     107400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.060000      in sec:     108000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.061000      in sec:     108600.
+ **  Heading lines  **
+ -> 20180102.120000                                                                 
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.062000      in sec:     109200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.063000      in sec:     109800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.064000      in sec:     110400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.065000      in sec:     111000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.070000      in sec:     111600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.071000      in sec:     112200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.072000      in sec:     112800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.073000      in sec:     113400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.074000      in sec:     114000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.075000      in sec:     114600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.080000      in sec:     115200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.081000      in sec:     115800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.082000      in sec:     116400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.083000      in sec:     117000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.084000      in sec:     117600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.085000      in sec:     118200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.090000      in sec:     118800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.091000      in sec:     119400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.092000      in sec:     120000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.093000      in sec:     120600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.094000      in sec:     121200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.095000      in sec:     121800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.100000      in sec:     122400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.101000      in sec:     123000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.102000      in sec:     123600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.103000      in sec:     124200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.104000      in sec:     124800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.105000      in sec:     125400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.110000      in sec:     126000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.111000      in sec:     126600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.112000      in sec:     127200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.113000      in sec:     127800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.114000      in sec:     128400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.115000      in sec:     129000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.120000      in sec:     129600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.121000      in sec:     130200.
+ **  Heading lines  **
+ -> 20180102.180000                                                                 
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.122000      in sec:     130800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.123000      in sec:     131400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.124000      in sec:     132000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.125000      in sec:     132600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.130000      in sec:     133200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.131000      in sec:     133800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.132000      in sec:     134400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.133000      in sec:     135000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.134000      in sec:     135600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.135000      in sec:     136200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.140000      in sec:     136800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.141000      in sec:     137400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.142000      in sec:     138000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.143000      in sec:     138600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.144000      in sec:     139200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.145000      in sec:     139800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.150000      in sec:     140400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.151000      in sec:     141000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.152000      in sec:     141600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.153000      in sec:     142200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.154000      in sec:     142800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.155000      in sec:     143400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.160000      in sec:     144000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.161000      in sec:     144600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.162000      in sec:     145200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.163000      in sec:     145800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.164000      in sec:     146400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.165000      in sec:     147000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.170000      in sec:     147600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.171000      in sec:     148200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.172000      in sec:     148800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.173000      in sec:     149400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.174000      in sec:     150000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.175000      in sec:     150600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.180000      in sec:     151200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.181000      in sec:     151800.
+ **  Heading lines  **
+ -> 20180103.000000                                                                 
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.182000      in sec:     152400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.183000      in sec:     153000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.184000      in sec:     153600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.185000      in sec:     154200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.190000      in sec:     154800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.191000      in sec:     155400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.192000      in sec:     156000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.193000      in sec:     156600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.194000      in sec:     157200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.195000      in sec:     157800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.200000      in sec:     158400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.201000      in sec:     159000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.202000      in sec:     159600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.203000      in sec:     160200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.204000      in sec:     160800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.205000      in sec:     161400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.210000      in sec:     162000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.211000      in sec:     162600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.212000      in sec:     163200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.213000      in sec:     163800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.214000      in sec:     164400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.215000      in sec:     165000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.220000      in sec:     165600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.221000      in sec:     166200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.222000      in sec:     166800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.223000      in sec:     167400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.224000      in sec:     168000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.225000      in sec:     168600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.230000      in sec:     169200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.231000      in sec:     169800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.232000      in sec:     170400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.233000      in sec:     171000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.234000      in sec:     171600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180102.235000      in sec:     172200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.000000      in sec:     172800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.001000      in sec:     173400.
+ **  Heading lines  **
+ -> 20180103.060000                                                                 
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.002000      in sec:     174000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.003000      in sec:     174600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.004000      in sec:     175200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.005000      in sec:     175800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.010000      in sec:     176400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.011000      in sec:     177000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.012000      in sec:     177600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.013000      in sec:     178200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.014000      in sec:     178800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.015000      in sec:     179400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.020000      in sec:     180000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.021000      in sec:     180600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.022000      in sec:     181200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.023000      in sec:     181800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.024000      in sec:     182400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.025000      in sec:     183000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.030000      in sec:     183600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.031000      in sec:     184200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.032000      in sec:     184800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.033000      in sec:     185400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.034000      in sec:     186000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.035000      in sec:     186600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.040000      in sec:     187200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.041000      in sec:     187800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.042000      in sec:     188400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.043000      in sec:     189000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.044000      in sec:     189600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.045000      in sec:     190200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.050000      in sec:     190800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.051000      in sec:     191400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.052000      in sec:     192000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.053000      in sec:     192600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.054000      in sec:     193200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.055000      in sec:     193800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.060000      in sec:     194400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.061000      in sec:     195000.
+ **  Heading lines  **
+ -> 20180103.120000                                                                 
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.062000      in sec:     195600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.063000      in sec:     196200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.064000      in sec:     196800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.065000      in sec:     197400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.070000      in sec:     198000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.071000      in sec:     198600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.072000      in sec:     199200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.073000      in sec:     199800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.074000      in sec:     200400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.075000      in sec:     201000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.080000      in sec:     201600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.081000      in sec:     202200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.082000      in sec:     202800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.083000      in sec:     203400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.084000      in sec:     204000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.085000      in sec:     204600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.090000      in sec:     205200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.091000      in sec:     205800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.092000      in sec:     206400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.093000      in sec:     207000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.094000      in sec:     207600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.095000      in sec:     208200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.100000      in sec:     208800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.101000      in sec:     209400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.102000      in sec:     210000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.103000      in sec:     210600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.104000      in sec:     211200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.105000      in sec:     211800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.110000      in sec:     212400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.111000      in sec:     213000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.112000      in sec:     213600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.113000      in sec:     214200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.114000      in sec:     214800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.115000      in sec:     215400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.120000      in sec:     216000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.121000      in sec:     216600.
+ **  Heading lines  **
+ -> 20180103.180000                                                                 
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.122000      in sec:     217200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.123000      in sec:     217800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.124000      in sec:     218400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.125000      in sec:     219000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.130000      in sec:     219600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.131000      in sec:     220200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.132000      in sec:     220800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.133000      in sec:     221400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.134000      in sec:     222000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.135000      in sec:     222600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.140000      in sec:     223200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.141000      in sec:     223800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.142000      in sec:     224400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.143000      in sec:     225000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.144000      in sec:     225600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.145000      in sec:     226200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.150000      in sec:     226800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.151000      in sec:     227400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.152000      in sec:     228000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.153000      in sec:     228600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.154000      in sec:     229200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.155000      in sec:     229800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.160000      in sec:     230400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.161000      in sec:     231000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.162000      in sec:     231600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.163000      in sec:     232200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.164000      in sec:     232800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.165000      in sec:     233400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.170000      in sec:     234000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.171000      in sec:     234600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.172000      in sec:     235200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.173000      in sec:     235800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.174000      in sec:     236400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.175000      in sec:     237000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.180000      in sec:     237600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.181000      in sec:     238200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.182000      in sec:     238800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.183000      in sec:     239400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.184000      in sec:     240000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.185000      in sec:     240600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.190000      in sec:     241200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.191000      in sec:     241800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.192000      in sec:     242400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.193000      in sec:     243000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.194000      in sec:     243600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.195000      in sec:     244200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.200000      in sec:     244800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.201000      in sec:     245400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.202000      in sec:     246000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.203000      in sec:     246600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.204000      in sec:     247200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.205000      in sec:     247800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.210000      in sec:     248400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.211000      in sec:     249000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.212000      in sec:     249600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.213000      in sec:     250200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.214000      in sec:     250800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.215000      in sec:     251400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.220000      in sec:     252000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.221000      in sec:     252600.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.222000      in sec:     253200.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.223000      in sec:     253800.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.224000      in sec:     254400.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.225000      in sec:     255000.
+ not possible to compute, first iteration
+
+ 
+ Time of computation ->  20180103.230000      in sec:     255600.
+ not possible to compute, first iteration
+
+ 
+    
+ 
+    
+ STOP
