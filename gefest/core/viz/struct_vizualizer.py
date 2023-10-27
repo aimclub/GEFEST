@@ -99,7 +99,7 @@ class GIFMaker(StructVizualizer):
         # imgs = [Image.fromarray(img) for img in self.frames]
         # imgs[0].save(f"./{gifname}.fig", save_all=True, append_images=imgs[1:], duration=duration, loop=0)
         # clip = mp.VideoFileClip("mygif.gif")
-        clip = mp.ImageSequenceClip(self.frames, durations=[1500] * len(self.frames), fps=0.66)
+        clip = mp.ImageSequenceClip(self.frames, durations=[duration] * len(self.frames), fps=1000/duration)
         clip.write_videofile(f'./{gifname}.mp4')
         self.frames = []
         self.counter = 0
