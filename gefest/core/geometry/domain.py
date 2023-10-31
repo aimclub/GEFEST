@@ -1,17 +1,12 @@
-from pathlib import Path
 from typing import Optional, Union
 
-import yaml
-from pydantic import Field, computed_field, field_validator
-from pydantic.dataclasses import dataclass
-from pydantic_yaml import parse_yaml_raw_as
+from pydantic import BaseModel, Field, computed_field, field_validator, model_validator
 
 from gefest.core.geometry import Point, Polygon, Structure
-from gefest.core.geometry.geometry_2d import Geometry2D
+from gefest.core.geometry.geometry_2d import Geometry, Geometry2D
 
 
-@dataclass
-class Domain:
+class Domain(BaseModel):
     allowed_area: Union[Polygon, list[list[float]]]
     name: str = 'main'
     min_poly_num: int = 2
@@ -22,17 +17,9 @@ class Domain:
     min_dist_from_boundary: float = 0.0001
     prohibited_area: Optional[Structure] = Field(default=Structure([]))
     fixed_points: Optional[Union[Polygon, list[list[float]]]] = Field(default_factory=list)
-    geometry: Optional[Geometry2D] = Geometry2D()
-
-    def parse_raw(self, cfg_file: Path):
-
-        with open(cfg_file) as f:
-            cfg = yaml.safe_load(f)
-
-        if 'domain' not in cfg:
-            raise AttributeError("No 'domain' section {cfg_file} config file.")
-
-        return parse_yaml_raw_as(Domain, yaml.dump(cfg['domain']))
+    geometry_is_convex: bool = True
+    geometry_is_closed: bool = True
+    geometry: Optional[Union[Geometry, str]] = '2D'
 
     def __contains__(self, point: Point):
         """Checking :obj:`Domain` contains :obj:`point`
@@ -44,20 +31,27 @@ class Domain:
         """
         return self.geometry.is_contain_point(self.allowed_area, point)
 
-    def __post_init__(self):
+    @model_validator(mode='after')
+    def create_classes_instances(self):
         if self.min_poly_num > self.max_poly_num:
             raise ValueError('Invalid points number interval.')
         if self.min_points_num > self.max_points_num:
             raise ValueError('Invalid points number interval.')
+        if self.geometry == '2D':
+            self.geometry = Geometry2D(
+                is_closed=self.geometry_is_closed,
+                is_convex=self.geometry_is_convex,
+            )
+        return self
 
     @field_validator('fixed_points')
-    def parse_allowed_area(cls, data: Union[Polygon, list[list[float]]]):
+    def validate_allowed_area(cls, data: Union[Polygon, list[list[float]]]):
         if isinstance(data, Polygon):
             return data
         return Polygon([Point(*coords) for coords in data])
 
     @field_validator('allowed_area')
-    def parse_allowed_area(cls, data: Union[Polygon, list[list[float]]]):
+    def validate_allowed_area(cls, data: Union[Polygon, list[list[float]]]):
         if data is None or len(data) <= 2:
             raise ValueError('Not enough points for allowed_area.')
         return Polygon([Point(*coords) for coords in data])

@@ -13,6 +13,7 @@ from gefest.tools.optimizers.optimizer import Optimizer
 class StandardOptimizer(Optimizer):
     def __init__(self, opt_params: OptimizationParams, **kwargs) -> None:
         super().__init__(opt_params.log_dispatcher, **kwargs)
+        self.opt_params = opt_params
         self.objective = Objective(
             quality_metrics={obj.__class__.__name__: obj for obj in opt_params.objectives},
             is_multi_objective=len(opt_params.objectives) > 1,
@@ -32,4 +33,6 @@ class StandardOptimizer(Optimizer):
         )
 
     def optimize(self):
-        return self.__standard_opt.optimise(self.objective)
+        optimized_graphs = self.__standard_opt.optimise(self.objective)
+        optimized_pop = list(map(self.opt_params.golem_adapter.restore, optimized_graphs))
+        return optimized_pop

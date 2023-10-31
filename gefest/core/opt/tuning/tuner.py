@@ -15,7 +15,7 @@ from gefest.core.algs.postproc.resolve_errors import validate
 from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.geometry import Structure
 from gefest.core.geometry.domain import Domain
-from gefest.core.opt.tuning.uitls import (
+from gefest.core.opt.tuning.utils import (
     GolemObjectiveWithPreValidation,
     VarianceGeneratorType,
 )

@@ -1,7 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Callable, Optional
-
-from loguru import logger
+from typing import Optional
 
 from gefest.core.geometry import Structure
 from gefest.core.geometry.domain import Domain
