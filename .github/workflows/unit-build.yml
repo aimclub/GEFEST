@@ -2,9 +2,9 @@ name: unit tests
 
 on:
   push:
-    branches: [ main, refactoring, refactoring_ci]
+    branches: [ main, refactoring ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, refactoring ]
 
 jobs:
   build:
