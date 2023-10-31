@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, computed_field, field_validator, model_va
 
 from gefest.core.geometry import Point, Polygon, Structure
 from gefest.core.geometry.geometry_2d import Geometry, Geometry2D
+from gefest.core.utils.functions import parse_structs
 
 
 class Domain(BaseModel):
@@ -15,7 +16,7 @@ class Domain(BaseModel):
     max_points_num: int = 50
     polygon_side: float = 0.0001
     min_dist_from_boundary: float = 0.0001
-    prohibited_area: Optional[Structure] = Field(default=Structure([]))
+    prohibited_area: Optional[Union[Structure, str]] = Field(default=Structure([]))
     fixed_points: Optional[Union[Polygon, list[list[float]]]] = Field(default_factory=list)
     geometry_is_convex: bool = True
     geometry_is_closed: bool = True
@@ -34,9 +35,14 @@ class Domain(BaseModel):
     @model_validator(mode='after')
     def create_classes_instances(self):
         if self.min_poly_num > self.max_poly_num:
-            raise ValueError('Invalid points number interval.')
+            raise ValueError('Invalid polygons number interval.')
         if self.min_points_num > self.max_points_num:
             raise ValueError('Invalid points number interval.')
+        if self.min_poly_num < 1 or self.max_poly_num < 1:
+            raise ValueError('Number of polygons must be positive value.')
+        min_points_in_poly = 1 + int(self.geometry_is_closed)
+        if self.min_points_num <= min_points_in_poly or self.max_points_num <= min_points_in_poly:
+            raise ValueError('Number of points must be >2/>1 for closed/non closed geometies.')
         if self.geometry == '2D':
             self.geometry = Geometry2D(
                 is_closed=self.geometry_is_closed,
@@ -44,11 +50,42 @@ class Domain(BaseModel):
             )
         return self
 
+    @field_validator('min_poly_num')
+    def validate_min_poly_num(cls, data: int):
+        if data < 1:
+            raise ValueError('Min number of polygons must be positive value.')
+        return data
+
+    @field_validator('max_poly_num')
+    def validate_max_poly_num(cls, data: int):
+        if data < 1:
+            raise ValueError('Max number of polygons must be positive value.')
+        return data
+
+    @field_validator('min_points_num')
+    def validate_min_points_num(cls, data: int):
+        if data < 1:
+            raise ValueError('Max number of polygons must be positive value.')
+        return data
+
     @field_validator('fixed_points')
-    def validate_allowed_area(cls, data: Union[Polygon, list[list[float]]]):
+    def validate_fixed_points(cls, data: Union[Polygon, list[tuple[float, float]]]):
         if isinstance(data, Polygon):
             return data
         return Polygon([Point(*coords) for coords in data])
+
+    @field_validator('prohibited_area')
+    def validate_prohibited_area(cls, data: Optional[Union[Structure, str]]):
+        if isinstance(data, Structure):
+            return data
+        if isinstance(data, str):
+            structs_from_file = parse_structs(data)
+            num_records = len(structs_from_file)
+            if num_records != 1:
+                raise ValueError(f'{num_records} structures found in {data} file, expected 1.')
+            else:
+                return structs_from_file[0]
+        raise TypeError(f'Invalid argument {data}.')
 
     @field_validator('allowed_area')
     def validate_allowed_area(cls, data: Union[Polygon, list[list[float]]]):

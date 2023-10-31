@@ -15,9 +15,11 @@ class GA(BaseGA):
         self._pop = sorted(selected, key=lambda x: x.fitness)
 
         un_pop = set()
-        self._pop = \
-            [un_pop.add(str(ind.genotype)) or ind for ind in self._pop
-             if str(ind.genotype) not in un_pop]
+        self._pop = [
+            un_pop.add(str(ind.genotype)) or ind
+            for ind in self._pop
+            if str(ind.genotype) not in un_pop
+        ]
 
         self._pop.extend(self.reproduce(self._pop))
 

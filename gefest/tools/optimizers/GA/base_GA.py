@@ -5,8 +5,7 @@ from tqdm import tqdm
 
 from gefest.core.geometry import Structure
 from gefest.core.opt import strategies
-from gefest.core.utils.logger import LogDispatcher
-from gefest.tools.objective import ObjectivesEvaluator
+from gefest.core.opt.objective.objective_eval import ObjectivesEvaluator
 from gefest.tools.optimizers.optimizer import Optimizer
 
 

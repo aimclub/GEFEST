@@ -8,7 +8,7 @@ from hyperopt import hp
 from gefest.core.geometry import Structure
 from gefest.core.geometry.domain import Domain
 from gefest.core.opt.adapters.structure import StructureAdapter
-from gefest.tools.objective import Objective
+from gefest.core.opt.objective.objective import Objective
 
 VarianceGeneratorType = Callable[[Structure], list[float]]
 

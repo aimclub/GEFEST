@@ -36,7 +36,7 @@ def map_into_graph_generation_params(
         adapter=opt_params.golem_adapter,
         rules_for_constraint=[
             partial(
-                validate, 
+                validate,
                 rules=opt_params.postprocess_rules,
                 domain=opt_params.domain,
             ),
@@ -50,7 +50,10 @@ def map_into_gpa(
 ) -> GPAlgorithmParameters:
     return GPAlgorithmParameters(
         multi_objective=False,
-        genetic_scheme_type=getattr(GeneticSchemeTypesEnum, opt_params.golem_genetic_scheme_type.name),
+        genetic_scheme_type=getattr(
+            GeneticSchemeTypesEnum,
+            opt_params.golem_genetic_scheme_type.name,
+        ),
         mutation_types=[
             OperationWrap(
                 executor=mutate_structure,
@@ -82,6 +85,7 @@ def map_into_gpa(
         crossover_prob=opt_params.crossover_prob,
         mutation_prob=1,
         adaptive_mutation_type=getattr(
-            MutationAgentTypeEnum, opt_params.golem_adaptive_mutation_type
+            MutationAgentTypeEnum,
+            opt_params.golem_adaptive_mutation_type,
         ),
     )

@@ -1,6 +1,6 @@
 import math
-from functools import partial
 from enum import Enum
+from functools import partial
 from random import randint
 
 import numpy as np
@@ -66,6 +66,7 @@ def tournament_selection(
             rnd = pop[randint(0, len(pop) - 1)]
             chosen.append(rnd)
     return chosen
+
 
 class SelectionTypes(Enum):
     roulette_selection = partial(roulette_selection)

@@ -1,9 +1,9 @@
 import copy
-from functools import partial
 import random
+from enum import Enum
+from functools import partial
 from itertools import product
 from typing import Callable
-from enum import Enum
 
 import numpy as np
 from loguru import logger

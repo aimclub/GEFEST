@@ -1,6 +1,6 @@
+import inspect
 from ctypes import Structure
 from typing import Callable, Union
-import inspect
 
 from hyperopt import hp
 from pydantic import BaseModel, ConfigDict, field_validator
@@ -49,7 +49,7 @@ class TunerParams(BaseModel):
 
     @field_validator('variacne_generator')
     def variacne_generator_fun_validate(cls, value):
-        fun_names = ["average_edge_variance"]
+        fun_names = ['average_edge_variance']
         if isinstance(value, str):
             if value in fun_names:
                 return getattr(utils, value)

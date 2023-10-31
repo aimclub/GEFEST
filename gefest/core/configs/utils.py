@@ -8,7 +8,7 @@ import yaml
 from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.configs.tuner_params import TunerParams
 from gefest.core.geometry.domain import Domain
-from gefest.tools.objective import Objective
+from gefest.core.opt.objective.objective import Objective
 
 
 class ParseMetricsError(Exception):
@@ -23,11 +23,13 @@ class ParseMetricsError(Exception):
 
 def dynamic_import(name):
     import __main__
+
     path = inspect.getfile(__main__)
     components = name.split('.')
-    module = __import__(".".join(components[:-1]), fromlist=[components[-1]])
+    module = __import__('.'.join(components[:-1]), fromlist=[components[-1]])
     import_item = getattr(module, components[-1])
     return import_item
+
 
 def load_config(
     cfg_file_path: str,

@@ -1,7 +1,8 @@
 import copy
+from enum import Enum
 from functools import partial
 from typing import Callable
-from enum import Enum
+
 import numpy as np
 from loguru import logger
 from shapely.geometry import LineString, MultiPoint
