@@ -1,15 +1,11 @@
-import numpy as np
-from gefest.core.geometry.datastructs.structure import Structure
-
-from gefest.core.geometry.domain import Domain
-from gefest.tools.estimators.estimator import Estimator
-from gefest.core.opt.objective.objective import Objective
-
-from pathlib import Path
 import __main__
-import inspect
-def pth():
-    print(inspect.getfile(__main__))
+import numpy as np
+
+from gefest.core.geometry.datastructs.structure import Structure
+from gefest.core.geometry.domain import Domain
+from gefest.core.opt.objective.objective import Objective
+from gefest.tools.estimators.estimator import Estimator
+
 
 class Area(Objective):
     def __init__(self, domain: Domain, estimator: Estimator = None) -> None:
@@ -28,6 +24,7 @@ class Area(Objective):
         else:
             norms.append(1)
         return area
+
 
 class SideCoef(Objective):
     def __init__(self, domain: Domain, estimator: Estimator = None) -> None:
