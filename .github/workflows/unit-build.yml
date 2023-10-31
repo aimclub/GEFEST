@@ -2,9 +2,9 @@ name: unit tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, refactoring ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, refactoring ]
 
 jobs:
   build:
@@ -27,6 +27,9 @@ jobs:
         pip install pytest
         pip install -r requirements.txt
         pip install pytest-cov
+    - name: Run flake8 checks
+      run: |
+        flake8 . --count --statistics
     - name: Test with pytest
       run: |
         pytest --cov=GEFEST -s test/
