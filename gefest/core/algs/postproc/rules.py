@@ -274,7 +274,7 @@ class PolygonNotSelfIntersects(PolygonRule):
             len(poly) > 2
             and _forbidden_validity(
                 explain_validity(
-                    ShapelyPolygon([ShapelyPoint(pt.x, pt.y) for pt in poly]).boundary,
+                    ShapelyPolygon([ShapelyPoint(pt.x, pt.y) for pt in poly]),
                 ),
             )
         )

@@ -19,6 +19,7 @@ pydantic-yaml==1.1.1
 PyYAML==6.0.1
 moviepy==1.0.3
 joblib==1.3.2
+loguru==0.7.2
 
 polygenerator
 
