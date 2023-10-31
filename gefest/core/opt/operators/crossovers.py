@@ -1,5 +1,7 @@
 import copy
 import random
+from enum import Enum
+from functools import partial
 from itertools import product
 from typing import Callable
 
@@ -85,7 +87,6 @@ def structure_level_crossover(
     return (new_structure,)
 
 
-@logger.catch
 def polygon_level_crossover(
     s1: Structure,
     s2: Structure,
@@ -138,3 +139,8 @@ def polygon_level_crossover(
     idx_ = where(s1.polygons, lambda p: p == poly_1)[0]
     s1[idx_] = new_poly
     return s1
+
+
+class CrossoverTypes(Enum):
+    structure_level = partial(structure_level_crossover)
+    polygon_level = partial(polygon_level_crossover)

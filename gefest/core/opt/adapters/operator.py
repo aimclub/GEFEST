@@ -1,6 +1,10 @@
 from functools import partial
+from typing import Any
+
+from golem.serializers.serializer import register_serializable
 
 
+@register_serializable
 class OperationWrap:
     def __init__(
         self,
@@ -41,3 +45,10 @@ class OperationWrap:
         if executor.func.__name__ == 'mutate_structure':
             corrected = corrected[0]
         return corrected
+
+    def __str__(self):
+        return f'{self.operations[0].__name__}'
+
+    def to_json(self) -> dict[str, Any]:
+        """Serializes object and ignores unrelevant fields."""
+        return {'Name': f'{self.operations[0].__name__}'}

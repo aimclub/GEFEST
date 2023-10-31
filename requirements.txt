@@ -10,7 +10,7 @@ shapely==2.0.1
 pytest==7.4.2
 autodocsumm==0.2.11
 tqdm==4.65.2
-thegolem==0.3.3
+thegolem==0.4.0
 scipy==1.9.3
 scikit-image==0.19.3
 scikit-learn==1.3.0
@@ -19,6 +19,7 @@ pydantic-yaml==1.1.1
 PyYAML==6.0.1
 moviepy==1.0.3
 joblib==1.3.2
+loguru==0.7.2
 
 polygenerator
 

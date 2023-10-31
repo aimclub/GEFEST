@@ -1,4 +1,4 @@
-from golem.core.optimisers.meta.surrogate_optimizer import SurrogateEachNgenOptimizer
+from golem.core.optimisers.genetic.gp_optimizer import EvoGraphOptimizer
 from golem.core.optimisers.objective import Objective
 
 from gefest.core.configs.optimization_params import OptimizationParams
@@ -10,7 +10,7 @@ from gefest.core.opt.adapters.configuration_mapping import (
 from gefest.tools.optimizers.optimizer import Optimizer
 
 
-class SurrogateOptimizer(Optimizer):
+class StandardOptimizer(Optimizer):
     def __init__(self, opt_params: OptimizationParams, **kwargs) -> None:
         super().__init__(opt_params.log_dispatcher, **kwargs)
         self.opt_params = opt_params
@@ -24,16 +24,15 @@ class SurrogateOptimizer(Optimizer):
         self.initial_pop = list(
             map(opt_params.golem_adapter.adapt, opt_params.sampler(opt_params.pop_size)),
         )
-        self.__surrogate_opt = SurrogateEachNgenOptimizer(
+        self.__standard_opt = EvoGraphOptimizer(
             objective=self.objective,
             initial_graphs=self.initial_pop,
             requirements=self.requirements,
             graph_generation_params=self.ggp,
             graph_optimizer_params=self.gpa,
-            surrogate_each_n_gen=self.opt_params.golem_surrogate_each_n_gen,
         )
 
     def optimize(self):
-        optimized_graphs = self.__surrogate_opt.optimise(self.objective)
+        optimized_graphs = self.__standard_opt.optimise(self.objective)
         optimized_pop = list(map(self.opt_params.golem_adapter.restore, optimized_graphs))
         return optimized_pop

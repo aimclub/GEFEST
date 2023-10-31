@@ -1,4 +1,6 @@
 import copy
+from enum import Enum
+from functools import partial
 from typing import Callable
 
 import numpy as np
@@ -51,7 +53,7 @@ def mutate_structure(
 
 
 @logger.catch
-def rotate_poly(
+def rotate_poly_mutation(
     new_structure: Structure,
     domain: Domain,
     idx_: int = None,
@@ -66,7 +68,7 @@ def rotate_poly(
 
 
 @logger.catch
-def drop_poly(
+def drop_poly_mutation(
     new_structure: Structure,
     domain: Domain,
     idx_: int = None,
@@ -81,7 +83,7 @@ def drop_poly(
 
 
 @logger.catch
-def add_poly(
+def add_poly_mutation(
     new_structure: Structure,
     domain: Domain,
     idx_: int = None,
@@ -95,7 +97,7 @@ def add_poly(
 
 
 @logger.catch
-def resize_poly(
+def resize_poly_mutation(
     new_structure: Structure,
     domain: Domain,
     idx_: int = None,
@@ -313,7 +315,7 @@ def pos_change_point_mutation(
 
 
 @logger.catch
-def add_point(
+def add_point_mutation(
     new_structure: Structure,
     domain: Domain,
     idx_: int = None,
@@ -406,7 +408,7 @@ def add_point(
 
 
 @logger.catch
-def drop_point(
+def drop_point_mutation(
     new_structure: Structure,
     domain: Domain,
     idx_: int = None,
@@ -435,3 +437,13 @@ def drop_point(
 
     new_structure[idx_] = polygon_to_mutate
     return new_structure
+
+
+class MutationTypes(Enum):
+    rotate_poly = partial(rotate_poly_mutation)
+    resize_poly = partial(resize_poly_mutation)
+    add_point = partial(add_point_mutation)
+    drop_point = partial(drop_point_mutation)
+    add_poly = partial(add_poly_mutation)
+    drop_poly = partial(drop_poly_mutation)
+    pos_change_point = partial(pos_change_point_mutation)

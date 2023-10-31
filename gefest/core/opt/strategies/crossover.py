@@ -58,5 +58,4 @@ class CrossoverStrategy(Strategy):
             for enum_id, idx in enumerate(idx_failed):
                 new_generation[idx] = generated[enum_id]
 
-        pop.extend(new_generation)
-        return pop
+        return new_generation

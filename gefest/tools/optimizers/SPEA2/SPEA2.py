@@ -146,46 +146,13 @@ class SPEA2(BaseGA):
             if step == self.n_steps:
                 return self.archive
             self._pop = self.selector(self._pop, self.opt_params.pop_size)
-            self._pop = self.crossover(self._pop)
-            self._pop = self.mutation(self._pop)
-            self._pop.extend(self.sampler(5))
+            children = self.crossover(self._pop)
+            mutated_children = self.mutation(children)
+            extras = self.sampler(self.opt_params.extra)
+            self._pop.extend(mutated_children + extras)
             self._pop = self.estimator(self._pop)
             self.calculate_sepa2_fitness()
-            self.logger.log_pop(self._pop, step)
+            self.log_dispatcher.log_pop(self._pop, str(step + 1))
 
         self._pop = sorted(self._pop, key=lambda x: x.fitness)
         return self._pop
-
-    def step(self, population, performance, n_step, is_last=False):
-        """
-        One step of optimization procedure
-        :param population: (List[Structure]) population of structures
-        :param performance: (List[List]) multi dimension performance
-        :param n_step: (Int) number of step
-        :param is_last: (Optional(Bool)) check for last step in generative design procedure
-        :return: (List[Structure]) optimized population
-        """
-        self.n_criteria = 2
-
-        # Step 1, fitness assignment
-        self.calculate_sepa2_fitness()
-
-        # Step 2, environmental selection
-        self.environmental_selection()
-
-        self._save_archive(n_step)
-
-        # Step 3, check for last step (termination)
-        if is_last:
-            return self.archive
-
-        # Step 4, mating selection
-        self._pop = self.selector()
-
-        # Step 5, variation (genetic operators step)
-        self._pop = self.crossover(self._pop)
-        self._pop = self.mutation(self._pop)
-        self._pop.extend(self.sampler(1))
-        self._pop = self.estimator(self._pop)
-
-        return population

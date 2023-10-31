@@ -3,6 +3,7 @@ from functools import partial
 from golem.core.optimisers.adaptive.operator_agent import MutationAgentTypeEnum
 from golem.core.optimisers.genetic.gp_params import GPAlgorithmParameters
 from golem.core.optimisers.genetic.operators.inheritance import GeneticSchemeTypesEnum
+from golem.core.optimisers.genetic.operators.selection import SelectionTypesEnum
 from golem.core.optimisers.optimization_parameters import GraphRequirements
 from golem.core.optimisers.optimizer import GraphGenerationParams
 
@@ -21,7 +22,7 @@ def map_into_graph_requirements(
         early_stopping_timeout=opt_params.early_stopping_timeout,
         early_stopping_iterations=opt_params.early_stopping_iterations,
         keep_n_best=opt_params.pop_size,
-        keep_history=False,
+        keep_history=opt_params.golem_keep_histoy,
         num_of_generations=opt_params.n_steps,
         n_jobs=opt_params.n_jobs,
         history_dir=opt_params.log_dir,
@@ -34,7 +35,11 @@ def map_into_graph_generation_params(
     return GraphGenerationParams(
         adapter=opt_params.golem_adapter,
         rules_for_constraint=[
-            partial(validate, rules=opt_params.postprocess_rules, domain=opt_params.domain),
+            partial(
+                validate,
+                rules=opt_params.postprocess_rules,
+                domain=opt_params.domain,
+            ),
         ],
         random_graph_factory=StructureFactory(opt_params.sampler, opt_params.golem_adapter),
     )
@@ -45,7 +50,10 @@ def map_into_gpa(
 ) -> GPAlgorithmParameters:
     return GPAlgorithmParameters(
         multi_objective=False,
-        genetic_scheme_type=GeneticSchemeTypesEnum.steady_state,
+        genetic_scheme_type=getattr(
+            GeneticSchemeTypesEnum,
+            opt_params.golem_genetic_scheme_type.name,
+        ),
         mutation_types=[
             OperationWrap(
                 executor=mutate_structure,
@@ -71,9 +79,13 @@ def map_into_gpa(
                 attempts=opt_params.postprocess_attempts,
             ),
         ],
+        selection_types=[getattr(SelectionTypesEnum, opt_params.golem_selection_type)],
         pop_size=opt_params.pop_size,
-        max_pop_size=int(opt_params.pop_size * 1.5),
+        max_pop_size=opt_params.pop_size,
         crossover_prob=opt_params.crossover_prob,
         mutation_prob=1,
-        adaptive_mutation_type=MutationAgentTypeEnum.default,
+        adaptive_mutation_type=getattr(
+            MutationAgentTypeEnum,
+            opt_params.golem_adaptive_mutation_type,
+        ),
     )

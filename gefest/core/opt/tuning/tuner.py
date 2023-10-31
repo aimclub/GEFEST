@@ -15,7 +15,10 @@ from gefest.core.algs.postproc.resolve_errors import validate
 from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.geometry import Structure
 from gefest.core.geometry.domain import Domain
-from gefest.core.opt.tuning.uitls import VarianceGeneratorType, fitness_validation_wrap
+from gefest.core.opt.tuning.utils import (
+    GolemObjectiveWithPreValidation,
+    VarianceGeneratorType,
+)
 
 GolemTunerType = Union[IOptTuner, OptunaTuner, SequentialTuner, SimultaneousTuner]
 
@@ -42,21 +45,17 @@ class GolemTuner:
     ) -> None:
         self.log_dispatcher = opt_params.log_dispatcher
         self.domain: Domain = opt_params.domain
-        validator = partial(validate, rules=opt_params.postprocess_rules, domain=self.domain)
-        estimator_with_validaion = partial(
-            fitness_validation_wrap,
-            fitness_fun=opt_params.estimator,
-            validator=validator,
-        )
-        objective = Objective(
-            quality_metrics={
-                type(opt_params.estimator).__name__: estimator_with_validaion,
-            },
-        )
+        self.validator = partial(validate, rules=opt_params.postprocess_rules, domain=self.domain)
         self.tuner_type: str = opt_params.tuner_cfg.tuner_type
-        self.eval_n_jobs: int = 1 if opt_params.estimator.estimator else -1
-        self.objective_evaluate: ObjectiveEvaluate = ObjectiveEvaluate(objective, self.eval_n_jobs)
+        self.eval_n_jobs: int = 1
+        # self.objective_evaluate: ObjectiveEvaluate = ObjectiveEvaluate(objective, self.eval_n_jobs)
         self.adapter: Callable = opt_params.golem_adapter
+        self.objective = GolemObjectiveWithPreValidation(
+            quality_metrics={obj.__class__.__name__: obj for obj in opt_params.objectives},
+            validator=self.validator,
+            adapter=self.adapter,
+            is_multi_objective=len(opt_params.objectives) > 1,
+        )
         self.hyperopt_distrib: Union[Callable, str] = opt_params.tuner_cfg.hyperopt_dist
         self.n_steps_tune: int = opt_params.tuner_cfg.n_steps_tune
         self.verbose: bool = opt_params.tuner_cfg.verbose
@@ -68,14 +67,17 @@ class GolemTuner:
         graph: OptGraph,
         search_space: SearchSpace,
     ) -> GolemTunerType:
-        return getattr(TunerType, self.tuner_type).value(
-            objective_evaluate=self.objective_evaluate,
-            search_space=search_space,
-            adapter=self.adapter,
-            iterations=self.n_steps_tune,
-            n_jobs=self.eval_n_jobs,
-            timeout=self.timeout,
-        )
+        kwargs = {
+            'objective_evaluate': self.objective,
+            'search_space': search_space,
+            'adapter': self.adapter,
+            'iterations': self.n_steps_tune,
+            'n_jobs': self.eval_n_jobs,
+            'timeout': self.timeout,
+        }
+        if self.tuner_type == 'optuna':
+            kwargs['objectives_number'] = len(self.objective.metrics)
+        return getattr(TunerType, self.tuner_type).value(**kwargs)
 
     def _generate_search_space(
         self,
@@ -121,10 +123,14 @@ class GolemTuner:
                 self.generate_variances(struct, self.domain, self.hyperopt_distrib),
             )
             tuner = self._get_tuner(graph, SearchSpace(search_space))
-            tuned_structure = tuner.tune(graph)
-            metric = tuner.obtained_metric
-            tuned_structure.fitness = [metric] if not isinstance(metric, list) else metric
-            tuned_objects.append(tuned_structure)
+            tuned_structures = tuner.tune(graph)
+            metrics = tuner.obtained_metric
+            if isinstance(tuned_structures, Structure):
+                tuned_structures = [tuned_structures]
+                metrics = [tuner.obtained_metric]
+            for idx_, _ in enumerate(tuned_structures):
+                tuned_structures[idx_].fitness = metrics[idx_]
+        tuned_objects.extend(tuned_structures)
         tuned_objects = sorted(tuned_objects, key=lambda x: x.fitness)
         self.log_dispatcher.log_pop(tuned_objects, 'tuned')
         return tuned_objects
