@@ -12,6 +12,8 @@ INPgrid BOTtom REGular xpinp=74.70350703505787  ypinp=67.88206697110601 &
                 dxinp=0.0071370458 dyinp=0.0026897599 EXCeption -9
 READinp BOTtom fac=1 'data\bathy.bot' idla=1 0 FREE
 
+WIND 19.1 225
+
 INPgrid WIND  REGular xpinp=74.70350703505787  ypinp=67.88206697110601 & 
                 alpinp=0. mxinp=17 myinp=31 &
                 dxinp=0.0071370458 dyinp=0.0026897599  &

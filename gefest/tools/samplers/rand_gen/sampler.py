@@ -35,16 +35,19 @@ border = [
             (max(coord_X), min(coord_Y)),
             (min(coord_X), min(coord_Y)),
         ]
+len_x =max(coord_X)- min(coord_X)
+len_y =max(coord_Y)- min(coord_Y)
 geometry = Geometry2D()
 
 path_=f"{root}/cases/synthetic/syn_gen/Comsol_points/lightning.txt"
-#best_poly = poly_from_comsol_txt(path=path_).polygons[0]
-best_poly = random_star_shaped_polygon(num_points=14)
+best_poly = poly_from_comsol_txt(path=path_).polygons[0]
 
-len_x =max(coord_X)- min(coord_X)
-len_y =max(coord_Y)- min(coord_Y)
+#best_poly = random_star_shaped_polygon(num_points=48)
+#best_poly = Polygon([Point(p[0]*min(coord_X)+len_x/2,p[1]*min(coord_Y)+len_y/2) for p in best_poly])
+
+
 #Setup a reference poly
-best_poly = Polygon([Point(p[0]*min(coord_X)+len_x/2,p[1]*min(coord_Y)+len_y/2) for p in best_poly])
+
 best_poly.points.append(best_poly.points[0])
 #Just for self-intersect rule
 domain = Domain(
@@ -66,7 +69,7 @@ domain = Domain(
 
 def noise_coords(poly,scale=1.0,domain=None):
     new_poly = Polygon([])
-    angle = np.random.randint(-100, 100)
+    angle = np.random.randint(-180, 180)
 
     #poly = [p.coords for p in poly.points]
     sigma_max_x = max(p.coords[0] for p in poly.points)
@@ -88,21 +91,20 @@ def noise_coords(poly,scale=1.0,domain=None):
             x_noise = np.random.uniform(-sigma,sigma)
             y_noise = np.random.uniform(-sigma, sigma)
             new_poly.points.append(Point(point.coords[0] + x_noise, point.coords[1] + y_noise))
+    # if np.random.uniform(0, 1) < 0.75:
+    #     if len(new_poly.points)//4>=1:
+    #         max_to_del = len(new_poly.points)//4
+    #     else:
+    #         max_to_del = 1
+    #     for i in range(0,max_to_del):
+    #         pnt_to_del = np.random.randint(1, len(new_poly.points)-1)
+    #         new_poly.points.remove(new_poly.points[pnt_to_del])
     if np.random.uniform(0, 1) < 0.75:
-        if len(new_poly.points)//4>=1:
-            max_to_del = len(new_poly.points)//4
-        else:
-            max_to_del = 1
-
-        for i in range(0,max_to_del):
-            pnt_to_del = np.random.randint(1, len(new_poly.points)-1)
-            new_poly.points.remove(new_poly.points[pnt_to_del])
-    # if np.random.uniform(0, 1) < 0.75:
-    #     x_scale= np.random.uniform(0.5, 2)
-    #     y_scale = np.random.uniform(0.5, 2)
-    #     new_poly=geometry.resize_poly(new_poly,x_scale,y_scale)
-    # if np.random.uniform(0, 1) < 0.75:
-    #     new_poly = geometry.rotate_poly(new_poly,angle)
+        x_scale= np.random.uniform(0.75, 1.5)
+        y_scale = np.random.uniform(0.75, 1.5)
+        new_poly=geometry.resize_poly(new_poly,x_scale,y_scale)
+    if np.random.uniform(0, 1) < 0.75:
+        new_poly = geometry.rotate_poly(new_poly,angle)
     rule = PolygonNotSelfIntersects()
     struct = Structure(polygons=([new_poly]))
     while not rule.validate(struct,0,domain):

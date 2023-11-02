@@ -141,7 +141,7 @@ if __name__ == '__main__':
                 length =domain.geometry.get_length(poly)
                 total_lenght+=length
             fitness = self.estimator(ind)
-            return [fitness,length]
+            return [fitness,total_lenght/domain.max_x]
 
     #  fitness estimator
     estimator = SoundFieldFitness(
