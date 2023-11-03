@@ -2,9 +2,7 @@ import pytest
 import numpy as np
 
 from gefest.core.geometry.geometry_2d import Geometry2D
-from gefest.core.structure.point import Point
-from gefest.core.structure.polygon import Polygon
-from gefest.core.structure.structure import Structure
+from gefest.core.geometry import Point, Polygon, Structure
 from gefest.core.algs.geom.validation import self_intersection
 
 geometry = Geometry2D(is_closed=True)
@@ -19,13 +17,11 @@ rectangle_points = [
     (poly_width, poly_length),
     (poly_width, 0),
 ]
-rectangle_poly = Polygon(
-    "rectangle", points=[Point(*coords) for coords in rectangle_points]
+rectangle_poly = Polygon(points=[Point(*coords) for coords in rectangle_points]
 )
 
 triangle_points = [(0, 0), (poly_width, poly_length), (0, poly_length)]
-triangle_poly = Polygon(
-    "triangle", points=[Point(*coords) for coords in triangle_points]
+triangle_poly = Polygon(points=[Point(*coords) for coords in triangle_points]
 )
 
 incorrect_points = [
@@ -36,8 +32,7 @@ incorrect_points = [
     (-poly_width, -poly_length),
     (0, 0),
 ]
-incorrect_poly = Polygon(
-    "incorrect_poly", points=[Point(*coords) for coords in incorrect_points]
+incorrect_poly = Polygon(points=[Point(*coords) for coords in incorrect_points]
 )
 
 # creating an expected rotated polygon for testing rotate_poly() function
@@ -47,8 +42,7 @@ exp_coords = [
     (poly_length - poly_width / 2, poly_length - poly_width / 2),
     (poly_length - poly_width / 2, poly_width / 2),
 ]
-exp_rectangle_poly = Polygon(
-    polygon_id="expected", points=[Point(*coords) for coords in exp_coords]
+exp_rectangle_poly = Polygon(points=[Point(*coords) for coords in exp_coords]
 )
 
 
@@ -81,8 +75,8 @@ def test_rotate_poly(angle, expected_poly):
 
     rotate_poly = geometry.rotate_poly(rectangle_poly, angle=angle)
 
-    rotated_coords = [tuple(coords.coords()) for coords in rotate_poly.points]
-    expected_coords = [tuple(coords.coords()) for coords in expected_poly.points]
+    rotated_coords = [tuple(coords.coords) for coords in rotate_poly.points]
+    expected_coords = [tuple(coords.coords) for coords in expected_poly.points]
 
     assert set(rotated_coords).issubset(expected_coords) and len(rotated_coords) == len(
         expected_coords
@@ -123,7 +117,7 @@ def test_nearest_point(figure_1, figure_2, expected_point):
     """Test for nearest_point function from Geometry2D class"""
     observed_point = geometry.nearest_point(figure_1, figure_2)
 
-    assert observed_point.coords() == expected_point.coords()
+    assert observed_point.coords == expected_point.coords
 
 
 def test_get_convex():
