@@ -1,6 +1,6 @@
 from random import randint
 from typing import Callable
-
+from gefest.core.opt.operators import selections
 from tqdm import tqdm
 
 from gefest.core.geometry import Structure
@@ -21,7 +21,7 @@ class BaseGA(Optimizer):
         self.mutation = getattr(strategies, opt_params.mutation_strategy)(opt_params=opt_params)
         self.sampler: Callable = opt_params.sampler
         self.objectives_evaluator: ObjectivesEvaluator = ObjectivesEvaluator(opt_params.objectives)
-        self.selector: Callable = opt_params.selector
+        self.selector: Callable = getattr(selections, opt_params.selector.name)
         self.pop_size = opt_params.pop_size
         self.n_steps = opt_params.n_steps
         self.domain = self.opt_params.domain
