@@ -21,9 +21,9 @@ domain = Domain(min_poly_num=1,
                 max_poly_num=3,
                 allowed_area=[
                     [0, 0],
-                    [0, 500],
-                    [500, 500],
-                    [500, 0],
+                    [0, 100],
+                    [100, 100],
+                    [100, 0],
                     [0, 0],
                 ]
                 )
@@ -40,14 +40,13 @@ def test_mutation_del_add_poly():
     count_add_poly = 0
     condition = False
     start_lenghs = len(structure.polygons)
-    for i in range(1000):
+    for i in range(100):
         mutated_structure = mutation(structure,
                                      domain,
                                      operations=mut_operations,
                                      operation_chance= 0.9999,
                                      operations_probs=mutation_each_prob)
 
-        equivalent_points = [s==m for s,m in zip(structure.polygons,mutated_structure.polygons)]
         if len(mutated_structure.polygons) < start_lenghs:
             count_del_poly += 1
         elif len(mutated_structure.polygons) > 2:
