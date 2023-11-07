@@ -18,7 +18,7 @@ def mutate_structure(
     domain: Domain,
     operations: list[Callable],
     operation_chance: float,
-    operations_probs: list[int],
+    operations_probs: list[float],
     **kwargs,
 ) -> Structure:
     """Apply mutation random mutation from list
@@ -77,8 +77,8 @@ def drop_poly_mutation(
     if len(new_structure.polygons) > (domain.min_poly_num + 1):
         idx_ = idx_ if idx_ else int(np.random.randint(0, len(new_structure)))
         polygon_to_remove = new_structure.polygons[idx_]
-        if any([p in polygon_to_remove for p in domain.fixed_points]):
-            new_structure.polygons.remove(polygon_to_remove)
+        if not any([p in polygon_to_remove for p in domain.fixed_points]):
+            new_structure.remove(polygon_to_remove)
     return new_structure
 
 

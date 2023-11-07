@@ -47,3 +47,11 @@ class Structure:
         polygons = list(self.polygons)
         polygons.append(value)
         self.polygons = tuple(polygons)
+
+    def remove(self, value):
+        polygons = list(self.polygons)
+        polygons.remove(value)
+        self.polygons = tuple(polygons)
+
+
+
