@@ -111,7 +111,6 @@ def test_nearest_point(figure_1, figure_2, expected_point):
 
 def test_intersects():
     """Test for intersects function from Geometry2D class."""
-
     assert geometry.intersects(Structure([rectangle_poly]))
 
 
