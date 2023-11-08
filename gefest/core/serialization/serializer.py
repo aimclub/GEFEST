@@ -117,7 +117,7 @@ class Serializer(JSONEncoder, JSONDecoder):
         return obj_cls
 
     def object_hook(self, json_obj: Dict[str, Any]) -> Union[INSTANCE_OR_CALLABLE, dict]:
-        """Decodes every JSON-object to python class/func object or just returns dict
+        """Decodes every JSON-object to python class/func object or just returns dict.
 
         Args:
             json_obj: dict to be decoded into Python class, function or
@@ -125,6 +125,7 @@ class Serializer(JSONEncoder, JSONDecoder):
 
         Returns:
             Python class, function or method object OR input if it's just a regular dict
+
         """
 
         if CLASS_PATH_KEY in json_obj:
@@ -138,5 +139,7 @@ class Serializer(JSONEncoder, JSONDecoder):
                 )
             elif isfunction(obj_cls) or ismethod(obj_cls):
                 return obj_cls
+
             raise TypeError(f'Parsed obj_cls={obj_cls} is not serializable, but should be')
+
         return json_obj

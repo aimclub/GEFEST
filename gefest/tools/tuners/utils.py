@@ -15,6 +15,7 @@ def objective_validation_wrap(
     validator: Callable,
 ) -> float:
     """Applys validation rules to structure.
+
     Used for GOLEM tuner as objective to filter out
     invalid cases in tuning process.
 
@@ -42,6 +43,7 @@ def average_edge_variance(
     distrib: Callable,
 ) -> list[float]:
     """Generates tuning variance for each point.
+
     Variance is equal to half the average edge length of the polygon.
 
     Returns:
@@ -55,6 +57,7 @@ def average_edge_variance(
         raise ValueError(
             f'Invalin distribution function: {distrib}, only hp.uniform and hp.normal allowed.'
         )
+
     geom = domain.geometry
     variances = []
     for poly in structure:
@@ -62,4 +65,5 @@ def average_edge_variance(
         for point in poly:
             for coord in point.coords:
                 variances.append(get_args(coord, avg))
+
     return variances

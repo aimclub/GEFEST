@@ -10,6 +10,14 @@ from gefest.tools.optimizers.optimizer import Optimizer
 
 
 class BaseGA(Optimizer):
+    """Implemets default genetic optimization algorithm steps.
+
+    Can be used as base class for others GA based optimizers.
+    Can be configured using modules with different realization of operations,
+    e.g. crossover, mutation, selection operations or crossover, mutation strategies.
+
+    """
+
     def __init__(
         self,
         opt_params,
@@ -30,6 +38,11 @@ class BaseGA(Optimizer):
         self.log_dispatcher.log_pop(self._pop, '00000_init')
 
     def optimize(self) -> list[Structure]:
+        """Optimizes population.
+
+        Returns:
+            list[Structure]: Optimized population.
+        """
         for step in tqdm(range(self.n_steps)):
             self._pop = self.crossover(self._pop)
             self._pop = self.mutation(self._pop)
@@ -37,4 +50,5 @@ class BaseGA(Optimizer):
             self._pop = self.objectives_evaluator(self._pop)
             self._pop = self.selector(self._pop, self.opt_params.pop_size)
             self.log_dispatcher.log_pop(self._pop, str(step + 1))
+
         return self._pop

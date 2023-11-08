@@ -1,3 +1,4 @@
+from typing import Union
 from uuid import uuid4
 
 import numpy as np
@@ -23,7 +24,9 @@ from .geometry import Geometry
 
 class Geometry2D(Geometry):
     """Overriding the geometry base class for 2D structures.
-    The input receives information about the closeness of the polygon
+
+    The input receives information about the closeness of the polygon.
+
     Args:
         is_closed: ``True`` if the :obj:`Polygon` must have close borders
             (first Point is equal to the last one), otherwise ``False``.
@@ -34,6 +37,7 @@ class Geometry2D(Geometry):
     is_convex: bool = True
 
     def get_length(self, polygon: Polygon):
+        """Returns polygon perimeter."""
         if len(polygon.points) < 1:
             return 0
 
@@ -42,19 +46,23 @@ class Geometry2D(Geometry):
         return geom_polygon.length
 
     def shapely_to_gefest(self, geom_in):
+        """Converts any shapely object to GEFEST polygon."""
         if isinstance(geom_in, ShapelyPolygon):
             return Polygon(self.get_coords(geom_in))
+        # add other shapely objects
 
     def get_coords(self, poly) -> list[Point]:
-        """The function for getting points
+        """The function for getting points.
+
         Args:
             poly: :obj:`Polygon` for processing
+
         Returns:
             all :obj:`Point` that :obj:`poly`contains
         """
-
         if isinstance(poly, ShapelyPolygon):
             poly = poly.exterior
+
         points = [
             Point(x, y)
             for x, y in zip(
@@ -70,12 +78,14 @@ class Geometry2D(Geometry):
         prohibited_area: Structure,
         buffer_size: float = 0.001,
     ) -> GeometryCollection:
+        """Generates Shapely GeometryCollection from pohibited structure."""
         geom_collection = []
         for poly in prohibited_area.polygons:
             if poly[0] == poly[-1]:
                 geom_collection.append(self._poly_to_shapely_poly(poly).buffer(buffer_size))
             else:
                 geom_collection.append(self._poly_to_shapely_line(poly).buffer(buffer_size))
+
         return GeometryCollection(geom_collection)
 
     def resize_poly(
@@ -85,11 +95,14 @@ class Geometry2D(Geometry):
         y_scale: float,
     ) -> Polygon:
         """The function for rescaling polygons along each axis.
-        Scaling occurs relative to the center of mass of the polygon
+
+        Scaling occurs relative to the center of mass of the polygon.
+
         Args:
             poly: :obj:`Polygon` for processing
             x_scale: scale value for **x** axis
             y_scale: scale value for **y** axis
+
         Returns:
             scaled :obj:`poly` by ``(x,y)`` axes
         """
@@ -116,6 +129,7 @@ class Geometry2D(Geometry):
         vector1: tuple[Point, Point],
         vector2: tuple[Point, Point],
     ) -> float:
+        """Finds angle betwen two bectors."""
         v1 = np.array([vector1[1].x - vector1[0].x, vector1[1].y - vector1[0].y])
         v2 = np.array([vector2[1].x - vector2[0].x, vector2[1].y - vector2[0].y])
         v1_u = v1 / np.linalg.norm(v1)
@@ -128,6 +142,7 @@ class Geometry2D(Geometry):
         origin: Point,
         angle: float,
     ) -> Polygon:
+        """Rotates polygon by given angle."""
         rotated = affinity.rotate(
             ShapelyPoint(point.x, point.y),
             angle,
@@ -140,14 +155,15 @@ class Geometry2D(Geometry):
         poly: Polygon,
         angle: float,
     ) -> Polygon:
-        """Rotating polygon relative to the center of mass by a given angle
-        Args:
-            poly: :obj:`Polygon` for processing
-            angle: value of degree rotation
-        Returns:
-            rotated :obj:`poly`
-        """
+        """Rotating polygon relative to the center of mass by a given angle.
 
+        Args:
+            poly: :obj:`Polygon` for processing.
+            angle: value of degree rotation.
+
+        Returns:
+            rotated :obj:`poly`.
+        """
         geom_polygon = self._poly_to_shapely_line(poly)
 
         rotated_geom_polygon = affinity.rotate(
@@ -165,13 +181,14 @@ class Geometry2D(Geometry):
         return rotated_poly
 
     def get_square(self, polygon: Polygon) -> float:
-        """Recieving value of the area
-        Args:
-            polygon: :obj:`Polygon` for processing
-        Returns:
-            value of the :obj:`polygon` area
-        """
+        """Recieving value of the area.
 
+        Args:
+            polygon: :obj:`Polygon` for processing.
+
+        Returns:
+            value of the :obj:`polygon` area.
+        """
         if len(polygon.points) <= 1:
             return 0
 
@@ -180,12 +197,14 @@ class Geometry2D(Geometry):
         return geom_polygon.area
 
     def is_contain_point(self, poly: Polygon, point: Point) -> bool:
-        """Checking if a point is inside a polygon
+        """Checking if a point is inside a polygon.
+
         Args:
             poly: :obj:`Polygon` that explore
-            point: :obj:`Point` for checking presence inside the :obj:`Polygon`
+            point: :obj:`Point` for checking presence inside the :obj:`Polygon`.
+
         Returns:
-            ``True`` if :obj:`point` is into :obj:`poly`, otherwise ``False``
+            ``True`` if :obj:`point` is into :obj:`poly`, otherwise ``False``.
         """
         geom_poly_allowed = ShapelyPolygon([self._pt_to_shapely_pt(pt) for pt in poly])
         geom_pt = ShapelyPoint(point.x, point.y)
@@ -194,9 +213,11 @@ class Geometry2D(Geometry):
 
     def nearest_point(self, point: Point, poly: Polygon) -> Point:
         """Calculating closest point between input point and polygon.
+
         Args:
             point: the :obj:`Point` that explore
             poly: the :obj:`Polygon` that explore
+
         Returns:
             nearest_correct_position :obj:`Point` from ``point`` among all points in the ``poly``
         """
@@ -206,10 +227,12 @@ class Geometry2D(Geometry):
         return Point(nearest_correct_position.x, nearest_correct_position.y)
 
     def nearest_points(self, poly_1: Polygon, poly_2: Polygon) -> list[Point]:
-        """Calculating closest point between two polygons
+        """Calculating closest point between two polygons.
+
         Args:
             poly_1: the first :obj:`Polygon` that explore
             poly_2: the second :obj:`Polygon` that explore
+
         Returns:
             the couple of :obj:`Point` where the first one from :obj:`poly_1`
             and the second one from :obj:`poly_2`
@@ -224,14 +247,17 @@ class Geometry2D(Geometry):
         return nearest_correct_position
 
     def get_convex(self, poly: Polygon) -> Polygon:
-        """Obtaining a convex polygon to avoid intersections
+        """Obtaining a convex polygon to avoid intersections.
+
         Args:
             poly: :obj:`Polygon` for processing
+
         Returns:
             convex :obj:`Polygon`
         """
         if len(poly.points) < 3:
             return poly
+
         geom_poly = self._poly_to_shapely_line(poly).convex_hull
         points = self.get_coords(geom_poly)
         polygon = Polygon(polygon_id='tmp', points=points)
@@ -239,6 +265,7 @@ class Geometry2D(Geometry):
         return polygon
 
     def intersection_line_line(self, points1, points2, scale1, scale2):
+        """Returns point of two lines intersection."""
         a = scale(LineString([(p.x, p.y) for p in points1]), scale1, scale1)
         b = scale(LineString([(p.x, p.y) for p in points2]), scale2, scale2)
         intersection_point = a.intersection(b)
@@ -250,14 +277,17 @@ class Geometry2D(Geometry):
                 intersection_point = Point(intersection_point.x, intersection_point.y)
         else:
             intersection_point = None
+
         return intersection_point
 
     def intersection_poly_line(self, figure: Polygon, points: list[Point], scale_factor):
-
+        """Returns points where line intersects polygon."""
         if self.is_closed:
             figure = self._poly_to_shapely_poly(figure)
+
         else:
             figure = self._poly_to_shapely_line(figure)
+
         minx, miny, maxx, maxy = figure.bounds
         line = LineString([(p.x, p.y) for p in points])
         line = scale(line, scale_factor)
@@ -297,44 +327,40 @@ class Geometry2D(Geometry):
             return None
 
     def simplify(self, poly: Polygon, tolerance: float) -> Polygon:
-        from matplotlib import pyplot as plt
-        from shapely.plotting import plot_polygon
-
+        """Simplifies polyon."""
         inp = poly
         if len(poly) < 3:
             return poly
+
         if self._poly_to_shapely_line(poly).is_simple:
 
             poly = self._poly_to_shapely_poly(inp)
             compressed = poly.buffer(-tolerance, join_style='mitre')
             if not compressed.is_empty:
                 poly = compressed.buffer(tolerance * 1.05, join_style='mitre')
+
             simplified = poly.simplify(tolerance)
 
             if isinstance(simplified, MultiPolygon):
                 simplified = max(simplified.geoms, key=lambda p: p.area)
+
             if simplified.is_empty:
                 poly = self._poly_to_shapely_poly(inp)
-                plot_polygon(poly, color='r')
-                plt.show()
                 compressed = poly.buffer(-tolerance, join_style='mitre')
-                plot_polygon(compressed, color='r')
-                plt.show()
                 decompressed = compressed.buffer(tolerance * 1.1, join_style='mitre')
-                plot_polygon(decompressed, color='g')
-                plt.show()
                 intersected = decompressed.intersection(poly)
-                plot_polygon(intersected, color='b')
-                plt.show()
                 simplified = intersected.simplify(tolerance)
                 if isinstance(simplified, MultiPolygon):
                     simplified = max(simplified.geoms, lambda p: p.area)
+
                 raise ValueError('Empty polygon produced 1')
+
             out = Polygon([Point(p[0], p[1]) for p in simplified.exterior.coords])
         else:
             simplified = self._poly_to_shapely_line(poly).convex_hull.simplify(tolerance)
             if simplified.is_empty:
                 raise ValueError('Empty polygon produced 2')
+
             out = Polygon([Point(p[0], p[1]) for p in simplified.exterior.coords])
         # plot_polygon(simplified, color='b')
         # plt.show()
@@ -342,16 +368,21 @@ class Geometry2D(Geometry):
         return out
 
     def is_simple(self, poly: Polygon) -> bool:
+        """Checks if poly is simple."""
         return self._poly_to_shapely_poly(poly).is_simple
 
     def get_random_point_in_shapey_geom(self, fig):
+        """Returns random point from polygon of arbitrary shape shapely geometry."""
         if fig.is_empty:
             raise ValueError('Unable to pick a point from an empty polygon.')
+
         if isinstance(fig, MultiPolygon):
             bds = []
             for bound in list(fig.geoms):
                 bds.extend(list(bound.exterior.coords))
+
             minx, miny, maxx, maxy = LineString(bds).bounds
+
         else:
             minx, miny, maxx, maxy = fig.bounds
 
@@ -363,10 +394,10 @@ class Geometry2D(Geometry):
 
         return Point(x, y)
 
-    # utils
-    def get_random_point_in_poly(self, poly) -> Point:
+    def get_random_point_in_poly(self, poly) -> Union[Point, None]:
+        """Returns random point from polygon of arbitrary shape."""
         minx, miny, maxx, maxy = poly.bounds
-        if any([b != b for b in poly.bounds]):
+        if any(b != b for b in poly.bounds):
             raise ValueError('Unable to pick a point from empty an polygon.')
 
         #  also can be used polar cords generator within circumscribed circle
@@ -383,25 +414,31 @@ class Geometry2D(Geometry):
         return point
 
     def get_centroid(self, poly: Polygon) -> Point:
-        """Getting a point that is the center of mass of the polygon
+        """Getting a point that is the center of mass of the polygon.
+
         Args:
             poly: the :obj:`Polygon` that explore
+
         Returns:
             central :obj:`Point` of :obj:`poly`
         """
-        points = [pt for pt in poly.points]
+        points = poly.points
         if len(points) < 3:
             points.append(points[0])
+
         geom_poly = ShapelyPolygon([self._pt_to_shapely_pt(pt) for pt in points])
         geom_point = geom_poly.centroid
         point = Point(geom_point.x, geom_point.y)
         return point
 
     def intersects(self, structure: Structure) -> bool:
-        """Function to check for any intersection in structure of polygons
+        """Function to check for any intersection in structure of polygons.
+
         Whole structure appears like shapely MultiLineString for which uses method is simple.
+
         Args:
             structure: the :obj:`Structure` that explore
+
         Returns:
             ``True`` if any :obj:`Polygon` in :obj:`structure` intersects with another one,
                otherwise - ``False``
@@ -412,6 +449,7 @@ class Geometry2D(Geometry):
         return multi_geom.is_simple
 
     def contains(self, poly1: Polygon, poly2: Polygon) -> bool:
+        """Checks if poly2 contains poly1."""
         geom_polygon1 = self._poly_to_shapely_line(poly1)
         geom_polygon2 = ShapelyPolygon([self._pt_to_shapely_pt(pt) for pt in poly2])
 
@@ -419,9 +457,11 @@ class Geometry2D(Geometry):
         return is_contain
 
     def difference_polys(self, base_poly: Polygon, diff_polys: list[Polygon]):
+        """Returns area of base_poly difference with diff_polys polygons."""
         base_poly = self._poly_to_shapely_poly(base_poly)
         if isinstance(diff_polys, Polygon):
             diff_polys = [diff_polys]
+
         diff_polys = [self._poly_to_shapely_poly for poly in diff_polys]
 
         for poly in diff_polys:
@@ -433,9 +473,11 @@ class Geometry2D(Geometry):
         return Polygon([Point(p[0], p[1]) for p in base_poly.exterior.coords])
 
     def intersection_polys(self, base_poly: Polygon, diff_polys: list[Polygon]):
+        """Returns area of base_poly intersection with diff_polys polygons."""
         base_poly = self._poly_to_shapely_poly(base_poly).convex_hull
         if isinstance(diff_polys, Polygon):
             diff_polys = [diff_polys]
+
         diff_polys = [self._poly_to_shapely_poly(poly).convex_hull for poly in diff_polys]
 
         for poly in diff_polys:
@@ -447,7 +489,8 @@ class Geometry2D(Geometry):
         return Polygon([Point(p[0], p[1]) for p in base_poly.exterior.coords])
 
     def intersects_poly(self, poly_1: Polygon, poly_2: Polygon) -> bool:
-        """Intersection between two polygons
+        """Intersection between two polygons.
+
         Args:
             poly_1: the first :obj:`Polygon` that explore
             poly_2: the second :obj:`Polygon` that explore
@@ -461,6 +504,7 @@ class Geometry2D(Geometry):
 
     def _poly_to_shapely_line(self, poly: Polygon) -> LineString:
         """Transform GEFEST Polygon to shapely non cycled  LineString.
+
         Args:
             poly: Polygon
         Returns:
@@ -470,6 +514,7 @@ class Geometry2D(Geometry):
 
     def _poly_to_shapely_poly(self, poly: Polygon) -> ShapelyPolygon:
         """Transform GEFEST Polygon to shapely Polygon.
+
         Args:
             poly: Polygon
         Returns:
@@ -479,14 +524,21 @@ class Geometry2D(Geometry):
 
     def _pt_to_shapely_pt(self, pt: Point) -> ShapelyPoint:
         """Transform GEFEST Polygon to shapely Polygon.
+
         Args:
             poly: Point
+
         Returns:
             ShapelyPoint
         """
         return ShapelyPoint(pt.x, pt.y)
 
-    def split_polygon(self, poly, line: tuple[Point, Point], scale_factor=1000):
+    def split_polygon(self, poly, line: tuple[Point, Point], scale_factor=1000) -> list:
+        """Splits polygon by line.
+
+        Returns:
+            list: Produced parts.
+        """
         poly = ShapelyPolygon([(p.x, p.y) for p in poly])
         line = LineString(
             [
@@ -500,32 +552,35 @@ class Geometry2D(Geometry):
             scale_factor,
         )
         parts = get_parts(split(poly, line)).tolist()
-        parts = list(map(lambda p: list(mapping(p)['coordinates'][0][:-1]), parts))
+        parts = [lambda p: list(mapping(p)['coordinates'][0][:-1]) for p in parts]
         return parts
 
     def min_distance(self, obj_1, obj_2) -> float:
-        """Smallest distance between two objects
+        """Finds smallest distance between two objects.
+
         Args:
             obj_1: the first :obj:`obj_1` that explore
             obj_2: the second :obj:`obj_2` that explore
+
         Returns:
             value of distance between the nearest points of the explored objects
         """
-
         if isinstance(obj_1, Polygon):
             obj_1 = self._poly_to_shapely_line(obj_1)
         elif isinstance(obj_1, Point):
             obj_1 = self._pt_to_shapely_pt(obj_1)
+
         if isinstance(obj_2, Polygon):
             obj_2 = self._poly_to_shapely_line(obj_2)
         elif isinstance(obj_2, Point):
             obj_2 = self._pt_to_shapely_pt(obj_2)
+
         distance = obj_1.distance(obj_2)
 
         return distance
 
     def centroid_distance(self, point: Point, poly: Polygon) -> Point:
-        # Distance from point to polygon
+        """Finds distance from point to polygon."""
         geom_point = self._pt_to_shapely_pt(point)
         geom_poly = self._poly_to_shapely_line(poly)
         dist = geom_point.distance(geom_poly)
@@ -533,8 +588,8 @@ class Geometry2D(Geometry):
         return dist
 
 
-# Function to create a circle, needed for one of the synthetic examples
 def create_circle(struct: Structure) -> Structure:
+    """Creates circle."""
     geom = Geometry2D(is_closed=False)
     poly = struct.polygons[0]
 

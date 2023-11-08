@@ -12,6 +12,8 @@ from .strategy import Strategy
 
 
 class CrossoverStrategy(Strategy):
+    """Default crossover strategy."""
+
     def __init__(self, opt_params: OptimizationParams):
 
         self.prob = opt_params.crossover_prob
@@ -26,10 +28,11 @@ class CrossoverStrategy(Strategy):
         self._pm = BaseParallelDispatcher(opt_params.n_jobs)
 
     def __call__(self, pop: list[Structure]) -> list[Structure]:
+        """Calls crossover method."""
         return self.crossover(pop=pop)
 
     def crossover(self, pop: list[Structure]):
-
+        """Executes crossover for provided population."""
         crossover = partial(
             crossover_structures,
             domain=self.domain,

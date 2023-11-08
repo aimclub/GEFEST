@@ -21,6 +21,8 @@ GolemTunerType = Union[IOptTuner, OptunaTuner, SequentialTuner, SimultaneousTune
 
 
 class TunerType(Enum):
+    """Enumeration of all GOLEM tuner classes."""
+
     iopt = IOptTuner
     optuna = OptunaTuner
     sequential = SequentialTuner
@@ -29,6 +31,7 @@ class TunerType(Enum):
 
 class GolemTuner:
     """Wrap for GOLEM tuners.
+
     Provides interface for tuning stucture points coordinates.
     For more details about tuners see:
         https://thegolem.readthedocs.io/en/latest/api/tuning.html
@@ -73,6 +76,7 @@ class GolemTuner:
         }
         if self.tuner_type == 'optuna':
             kwargs['objectives_number'] = len(self.objective.metrics)
+
         return getattr(TunerType, self.tuner_type).value(**kwargs)
 
     def _generate_search_space(
@@ -111,6 +115,7 @@ class GolemTuner:
         """
         if isinstance(objects_for_tune, Structure):
             objects_for_tune = [objects_for_tune]
+
         tuned_objects = []
         for struct in objects_for_tune:
             graph = self.adapter.adapt(struct)
@@ -124,8 +129,10 @@ class GolemTuner:
             if isinstance(tuned_structures, Structure):
                 tuned_structures = [tuned_structures]
                 metrics = [tuner.obtained_metric]
+
             for idx_, _ in enumerate(tuned_structures):
                 tuned_structures[idx_].fitness = metrics[idx_]
+
         tuned_objects.extend(tuned_structures)
         tuned_objects = sorted(tuned_objects, key=lambda x: x.fitness)
         self.log_dispatcher.log_pop(tuned_objects, 'tuned')

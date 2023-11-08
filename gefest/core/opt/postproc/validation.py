@@ -12,9 +12,20 @@ def validate(
     rules: list[Union[StructureRule, PolygonRule]],
     domain: Domain,
 ) -> bool:
+    """Validates single structure.
+
+    Args:
+        structure (Structure): Structure.
+        rules (list[Union[StructureRule, PolygonRule]]): Validation rules.
+        domain (Domain): Task domain.
+
+    Returns:
+        bool: True if valid else False
+    """
     if structure is None:
         return False
-    if any((not poly or len(poly) == 0 or any([not p for p in poly])) for poly in structure):
+
+    if any((not poly or len(poly) == 0 or any(not p for p in poly)) for poly in structure):
         logger.error('Wrong structure - problems with points')
         return False
 

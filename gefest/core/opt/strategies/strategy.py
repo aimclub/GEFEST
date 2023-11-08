@@ -14,5 +14,5 @@ class Strategy(metaclass=ABCMeta):
         *args: Any,
         **kwds: Any,
     ) -> list[Structure]:
-        """Code"""
+        """Must implement logic of any genetic algorithm step."""
         ...

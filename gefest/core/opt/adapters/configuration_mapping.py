@@ -18,6 +18,7 @@ from gefest.core.opt.postproc.resolve_errors import validate
 def map_into_graph_requirements(
     opt_params: OptimizationParams,
 ) -> GraphRequirements:
+    """Translates OptimizationParams into GraphRequirements."""
     return GraphRequirements(
         early_stopping_timeout=opt_params.early_stopping_timeout,
         early_stopping_iterations=opt_params.early_stopping_iterations,
@@ -32,6 +33,7 @@ def map_into_graph_requirements(
 def map_into_graph_generation_params(
     opt_params: OptimizationParams,
 ) -> GraphGenerationParams:
+    """Translates OptimizationParams into GraphGenerationParams."""
     return GraphGenerationParams(
         adapter=opt_params.golem_adapter,
         rules_for_constraint=[
@@ -48,6 +50,7 @@ def map_into_graph_generation_params(
 def map_into_gpa(
     opt_params: OptimizationParams,
 ) -> GPAlgorithmParameters:
+    """Translates OptimizationParams into GPAlgorithmParameters."""
     return GPAlgorithmParameters(
         multi_objective=False,
         genetic_scheme_type=getattr(

@@ -18,7 +18,7 @@ class PolygonRule(metaclass=ABCMeta):
         idx_poly_with_error: int,
         domain: Domain,
     ) -> bool:
-        """Check if there is no error in the spicific polygon in structure.
+        """Checks if there is no error in the spicific polygon in structure.
 
         Args:
             structure (Structure): Structure with error.
@@ -37,7 +37,7 @@ class PolygonRule(metaclass=ABCMeta):
         idx_poly_with_error: int,
         domain: Domain,
     ) -> Polygon:
-        """Try to fix spicific error.
+        """Trys to fix spicific error.
 
         The method does not guarantee error correction.
 
@@ -64,7 +64,7 @@ class StructureRule(metaclass=ABCMeta):
         structure: Structure,
         domain: Domain,
     ) -> bool:
-        """Check if there is no error in the structure.
+        """Checks if there is no error in the structure.
 
         Args:
             structure (Structure): Structure for validation.
@@ -81,7 +81,8 @@ class StructureRule(metaclass=ABCMeta):
         structure: Structure,
         domain: Domain,
     ) -> Structure:
-        """Try to fix spicific error.
+        """Trys to fix spicific error.
+
         The method does not guarantee error correction.
 
         Args:

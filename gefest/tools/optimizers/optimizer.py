@@ -4,6 +4,8 @@ from gefest.core.geometry import Structure
 
 
 class Optimizer(metaclass=ABCMeta):
+    """Interface for optimizers."""
+
     def __init__(
         self,
         log_dispatcher=None,
@@ -17,4 +19,12 @@ class Optimizer(metaclass=ABCMeta):
         n_steps: int,
         **kwargs,
     ) -> list[Structure]:
+        """Must implement optimization logic.
+
+        Args:
+            n_steps (int): Number of optimization steps.
+
+        Returns:
+            list[Structure]: Optimized population.
+        """
         ...

@@ -10,6 +10,8 @@ from gefest.core.opt.postproc.validation import validate
 
 
 class Postrocessor:
+    """Implements logic of structures postprocessing."""
+
     @staticmethod
     def apply_postprocess(
         structures: Union[Structure, list[Structure]],
@@ -17,8 +19,10 @@ class Postrocessor:
         domain: Domain,
         attempts: int = 3,
     ) -> list[Union[Structure, None]]:
+        """Applys postprocessing rules over all provided structures."""
         if not isinstance(structures, (list, tuple)):
             structures = [structures]
+
         post_processed = [
             Postrocessor.postprocess_structure(struct, rules, domain, attempts)
             for struct in structures
@@ -31,6 +35,7 @@ class Postrocessor:
             for _ in range(attempts):
                 if structure[idx_].points is None:
                     logger.warning('bruh')
+
                 if not rule.validate(structure, idx_, domain):
                     structure[idx_] = rule.correct(structure, idx_, domain)
                     if structure[idx_].points is None:
@@ -41,6 +46,7 @@ class Postrocessor:
                 if not rule.validate(structure, idx_, domain):
                     logger.info(f'{rule.__class__.__name__} fail')
                     return None
+
         return structure
 
     @staticmethod
@@ -53,6 +59,7 @@ class Postrocessor:
         else:
             if not rule.validate(structure, domain):
                 return None
+
         return structure
 
     @staticmethod
@@ -82,10 +89,8 @@ class Postrocessor:
             return None
 
         if any(
-            [
-                (not poly or len(poly) == 0 or any([not pt for pt in poly]))
-                for poly in structure.polygons
-            ],
+            (not poly or len(poly) == 0 or any(not pt for pt in poly))
+            for poly in structure.polygons
         ):
             logger.error('Wrong structure - problems with points')
             return None

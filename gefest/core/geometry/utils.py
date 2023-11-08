@@ -24,14 +24,18 @@ from .domain import Domain
 
 
 def random_polar(origin: Point, radius_scale: float) -> Point:
+    """Generates random point in circe.
+
+    The distribution density is shifted to the center.
+    https://habrastorage.org/r/w1560/webt/sn/xx/ow/snxxowuhnuqnr8dp4sadmyswqu0.png
+    """
     theta = np.random.random() * 2 * np.pi
     r = np.random.random() * radius_scale
     return Point((r * np.cos(theta)) + origin.x, (r * np.sin(theta)) + origin.y)
 
 
 def get_random_structure(domain: Domain, **kwargs) -> Structure:
-    # Creating structure with random number of polygons
-
+    """Generates random structure."""
     structure = Structure(polygons=())
     num_pols = randint(domain.min_poly_num, domain.max_poly_num)
 
@@ -41,10 +45,12 @@ def get_random_structure(domain: Domain, **kwargs) -> Structure:
             structure.append(polygon)
         else:
             continue
+
     return structure
 
 
 def get_random_poly(parent_structure: Optional[Structure], domain: Domain) -> Optional[Polygon]:
+    """Generates random polygon."""
     geometry = domain.geometry
     try:
         """
@@ -55,9 +61,7 @@ def get_random_poly(parent_structure: Optional[Structure], domain: Domain) -> Op
         After setting the neighborhood, polygons are created around the centroid inside it.
         This approach is less demanding on postprocessing than random creation
         """
-
-        # Centroid with it neighborhood called occupied area
-        occupied_area = create_area(domain, parent_structure, geometry)
+        occupied_area = _create_area(domain, parent_structure, geometry)
         if occupied_area is None:
             # If it was not possible to find the occupied area then returns None
             return None
@@ -78,22 +82,25 @@ def get_random_poly(parent_structure: Optional[Structure], domain: Domain) -> Op
 
 
 def get_random_point(polygon: Polygon, structure: Structure, domain: Domain) -> Optional[Point]:
-    # Creating a point to fill the polygon
-
+    """Generatres random point for polygon."""
     centroid = domain.geometry.get_centroid(polygon)
-    sigma = distance(centroid, structure, domain.geometry) / 3
+    sigma = _distance(centroid, structure, domain.geometry) / 3
     point = create_polygon_point(centroid, sigma)
     max_attempts = 20  # Number of attempts to create in bound point
-    while not in_bound(point, domain):
+    while not _in_bound(point, domain):
         point = create_polygon_point(centroid, sigma)
         max_attempts -= 1
         if max_attempts == 0:
             return None
+
     return point
 
 
 def create_poly(centroid: Point, sigma: int, domain: Domain, geometry: Geometry2D) -> Polygon:
+    """Generates random polygon using poltgenerator lib.
 
+    For details see: https://github.com/bast/polygenerator
+    """
     num_points = randint(
         domain.min_points_num,
         domain.max_points_num,
@@ -109,6 +116,7 @@ def create_poly(centroid: Point, sigma: int, domain: Domain, geometry: Geometry2
                 random_polygon,
             ],
         )
+
     new_poly = generator(num_points)
     if not geometry.is_closed:
         start = np.random.choice(range(num_points), 1)[0]
@@ -127,10 +135,11 @@ def create_poly(centroid: Point, sigma: int, domain: Domain, geometry: Geometry2
     )
     if domain.geometry.is_closed:
         new_poly.points.append(new_poly[0])
+
     return new_poly
 
 
-def get_sigma_max(poly, init_max):
+def _get_sigma_max(poly, init_max):
     sigma_max = init_max
     left_bound = 0
     right_bound = init_max
@@ -141,12 +150,15 @@ def get_sigma_max(poly, init_max):
         else:
             left_bound = sigma_max
             sigma_max += (right_bound - left_bound) / 2
+
         if sigma_max < 0.02:
             break
+
     return sigma_max
 
 
-def create_area(domain: Domain, structure: Structure, geometry: Geometry2D) -> (Point, float):
+def _create_area(domain: Domain, structure: Structure, geometry: Geometry2D) -> (Point, float):
+    """Finds free area for new polygon."""
     geom = domain.geometry
     area = geom._poly_to_shapely_poly(domain.bound_poly).buffer(-(domain.min_dist_from_boundary), 1)
     prohibs = geom.get_prohibited_geom(
@@ -159,12 +171,13 @@ def create_area(domain: Domain, structure: Structure, geometry: Geometry2D) -> (
                 domain.min_dist_from_boundary,
             ),
         )
+
     for poly in structure.polygons:
         area = area.difference(
             geom._poly_to_shapely_poly(poly).convex_hull.buffer(domain.dist_between_polygons, 1),
         ).intersection(area)
 
-    sigma_max = 0.95 * get_sigma_max(area, (min(domain.max_x, domain.max_y) / 2) * 1.01)
+    sigma_max = 0.95 * _get_sigma_max(area, (min(domain.max_x, domain.max_y) / 2) * 1.01)
     sigma_min = max(domain.max_x - domain.min_x, domain.max_y - domain.min_y) * 0.05
 
     sigma = np.random.uniform(sigma_min, sigma_max)
@@ -174,11 +187,12 @@ def create_area(domain: Domain, structure: Structure, geometry: Geometry2D) -> (
 
 
 def create_random_point(domain: Domain) -> Point:
+    """Returns random point from domain."""
     point = Point(
         np.random.uniform(low=domain.min_x, high=domain.max_x),
         np.random.uniform(low=domain.min_y, high=domain.max_y),
     )
-    while not in_bound(point, domain):
+    while not _in_bound(point, domain):
         point = Point(
             np.random.uniform(low=domain.min_x, high=domain.max_x),
             np.random.uniform(low=domain.min_y, high=domain.max_y),
@@ -188,7 +202,7 @@ def create_random_point(domain: Domain) -> Point:
 
 
 def create_polygon_point(centroid: Point, sigma: int) -> Point:
-    # Creating polygon point inside the neighborhood defined by the centroid
+    """Generates point."""
     point = Point(
         np.random.normal(centroid.x, sigma, 1)[0],
         np.random.normal(centroid.y, sigma, 1)[0],
@@ -197,11 +211,11 @@ def create_polygon_point(centroid: Point, sigma: int) -> Point:
     return point
 
 
-def in_bound(point: Point, domain: Domain) -> bool:
+def _in_bound(point: Point, domain: Domain) -> bool:
     return domain.geometry.is_contain_point(domain.allowed_area, point)
 
 
-def distance(point: Point, structure: Structure, geometry: Geometry2D) -> float:
+def _distance(point: Point, structure: Structure, geometry: Geometry2D) -> float:
     polygons = structure.polygons
     distances = []
     for poly in polygons:
@@ -217,7 +231,7 @@ def get_selfintersection_safe_point(
     point_left_idx: int,
     point_right_idx: int,
 ) -> Polygon:
-    'for non convex geometry'
+    """Finds a new point for the polygon that does not generate self-intersections."""
     geom = domain.geometry
 
     if geom.is_closed:
@@ -235,6 +249,7 @@ def get_selfintersection_safe_point(
             ]
             if len(part) != 1
         ]
+
     border = MultiLineString(
         [scale(line, xfact=0.99, yfact=0.99) for line in border if not line.is_empty],
     )
@@ -265,7 +280,7 @@ def get_selfintersection_safe_point(
             (
                 not new_segment.intersects(border),
                 not new_segment.intersects(geom._poly_to_shapely_line(domain.allowed_area)),
-                not any([g.intersects(new_segment) for g in p_area.geoms]),
+                not any(g.intersects(new_segment) for g in p_area.geoms),
             ),
         ):
             break
@@ -284,6 +299,7 @@ def get_convex_safe_area(
     poly_idx: int,
     **kwargs,
 ) -> Polygon:
+    """Finds an area from which a new point can be selected without breaking the convexity."""
     geom = domain.geometry
     movment_area = None
 
@@ -346,6 +362,7 @@ def get_convex_safe_area(
                     geom.intersection_line_line(left_cut, slice_line, scale_factor, scale_factor),
                     geom.intersection_line_line(right_cut, slice_line, scale_factor, scale_factor),
                 ]
+
             slice_points = geom.intersection_poly_line(
                 Polygon(
                     [
@@ -394,6 +411,7 @@ def get_convex_safe_area(
                 left_cut[1].coords,
                 right_cut[1].coords,
             )
+
     return movment_area
 
 
@@ -421,7 +439,7 @@ def _substract_oссupied_area(
             ),
         )
 
-    for idx in [idx for idx in range(len(structure))]:
+    for idx in range(len(structure)):
         movment_area = movment_area.difference(
             geom._poly_to_shapely_poly(structure[idx]).buffer(
                 domain.dist_between_polygons,

@@ -21,20 +21,19 @@ def crossover_structures(
     operation_chance: float,
     operations_probs: list[int],
     **kwargs,
-) -> Structure:
-    """Apply mutation random mutation from list
-        for each polygons in structure.
+) -> tuple[Structure]:
+    """Appls random crossover from given list for each pair.
 
     Args:
-        structure (Structure): Structure to mutate.
+        structure1 (Structure): First parent.
+        structure1 (Structure): Second parent.
         domain (Domain): Task domain.
-        mutations (list[Callable]): List of mutation operations to choose.
-        mutation_chance (float): Chance to mutate polygon.
-        mutations_probs (list[int]): Probablilites of each mutation operation.
+        operations (list[Callable]): List of mutation operations to choose.
+        operation_chance (float): Chance to mutate polygon.
+        operations_probs (list[int]): Probablilites of each mutation operation.
 
     Returns:
-        Structure: Mutated structure. It is not guaranteed
-            that the resulting structure will be valid or changed.
+        tuple[Structure]: Сhildren.
     """
     s1, s2 = copy.deepcopy(structure1), copy.deepcopy(structure2)
 
@@ -52,6 +51,7 @@ def crossover_structures(
 
 # pairs for crossover selection
 def panmixis(pop: list[Structure]) -> list[tuple[Structure, Structure]]:
+    """Default pair selection strategy."""
     np.random.shuffle(list(pop))
     return [(pop[idx], pop[idx + 1]) for idx in range(len(pop) - 1)]
 
@@ -63,6 +63,7 @@ def structure_level_crossover(
     domain: Domain,
     **kwargs,
 ):
+    """Exchanges points of two polygons."""
     s1, s2 = copy.deepcopy(s1), copy.deepcopy(s2)
     polygons1 = s1.polygons
     polygons2 = s2.polygons
@@ -75,6 +76,7 @@ def structure_level_crossover(
     part_1 = polygons1[0:crossover_point]
     if not isinstance(part_1, tuple):
         part_1 = part_1
+
     part_2 = polygons2[crossover_point : len(s1.polygons)]
     if not isinstance(part_2, tuple):
         part_2 = part_2
@@ -93,6 +95,7 @@ def polygon_level_crossover(
     domain: Domain,
     **kwargs,
 ):
+    """Exchanges polygons of two structure."""
     geom = domain.geometry
     s1, s2 = copy.deepcopy(s1), copy.deepcopy(s2)
     intersected = False
@@ -110,9 +113,11 @@ def polygon_level_crossover(
             (p[0], geom.min_distance(geom.get_centroid(p[0][0]), geom.get_centroid(p[0][1])))
             for p in pairs_dists
         ]
+
     pairs_dists = sorted(pairs_dists, key=lambda p_d: p_d[1])
     if len(pairs_dists) == 0:
         return (s1,)
+
     poly_1 = pairs_dists[0][0][0]
     poly_2 = pairs_dists[0][0][1]
     if intersected:
@@ -142,5 +147,7 @@ def polygon_level_crossover(
 
 
 class CrossoverTypes(Enum):
+    """Enumerates all crossover functions."""
+
     structure_level = partial(structure_level_crossover)
     polygon_level = partial(polygon_level_crossover)

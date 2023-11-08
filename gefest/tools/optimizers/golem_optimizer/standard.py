@@ -11,6 +11,12 @@ from gefest.tools.optimizers.optimizer import Optimizer
 
 
 class StandardOptimizer(Optimizer):
+    """Wrapper for GOLEM EvoGraphOptimizer.
+
+    All GOLEM optimization features can be setted up with native GEFEST configuration file.
+
+    """
+
     def __init__(self, opt_params: OptimizationParams, **kwargs) -> None:
         super().__init__(opt_params.log_dispatcher, **kwargs)
         self.opt_params = opt_params
@@ -33,6 +39,7 @@ class StandardOptimizer(Optimizer):
         )
 
     def optimize(self):
+        """Optimizes population."""
         optimized_graphs = self.__standard_opt.optimise(self.objective)
         optimized_pop = list(map(self.opt_params.golem_adapter.restore, optimized_graphs))
         return optimized_pop

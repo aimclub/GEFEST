@@ -7,8 +7,8 @@ from gefest.tools.optimizers.GA.GA import BaseGA
 
 
 class SPEA2(BaseGA):
-    """
-    SPEA2 algorithm realization
+    """SPEA2 algorithm realization.
+
     In this algorithm performance is multi-dimension
     """
 
@@ -20,8 +20,7 @@ class SPEA2(BaseGA):
         self.calculate_sepa2_fitness()
 
     def dominate(self, idx_1: int, idx_2: int) -> bool:
-        """Check if one indivdial not worse than other
-            by all fitness components.
+        """Checks if one indivdial not worse than other by all fitness components.
 
         Args:
             idx_1 (int): Index of first individual.
@@ -30,21 +29,19 @@ class SPEA2(BaseGA):
         Returns:
         bool: True if self._pop[idx_1] dominate self._pop[idx_2] else False
         """
-
         return all(
-            [
-                ind1 <= ind2
-                for ind1, ind2 in zip(
-                    self._pop[idx_1].fitness,
-                    self._pop[idx_2].fitness,
-                )
-            ],
+            ind1 <= ind2
+            for ind1, ind2 in zip(
+                self._pop[idx_1].fitness,
+                self._pop[idx_2].fitness,
+            )
         )
 
-    def strength(self):
-        """
-        Calculating strength for each individ in pop and arch
-        :return: (List(Int)) strength of each individ
+    def strength(self) -> list[int]:
+        """Calculates strength for each individ in pop and arch.
+
+        Returns:
+            list[int]: strength of each individ
         """
         strength = []
 
@@ -53,16 +50,19 @@ class SPEA2(BaseGA):
             for j in range(len(self._pop)):
                 if j == i:
                     continue
+
                 if self.dominate(i, j):
                     count += 1
+
             strength.append(count)
 
         return strength
 
-    def raw(self):
-        """
-        Calculating raw for pop and arch
-        :return: (List(Int)) raw of each individ
+    def raw(self) -> list[int]:
+        """Calculates raw for pop and arch.
+
+        Returns:
+            list[int]: Raw of each individ.
         """
         raw = []
         strength = self.strength()
@@ -72,16 +72,19 @@ class SPEA2(BaseGA):
             for j in range(len(self._pop)):
                 if j == i:
                     continue
+
                 if self.dominate(j, i):
                     count += strength[j]
+
             raw.append(count)
 
         return raw
 
-    def density(self):
-        """
-        Calculating density
-        :return: (List(float)) density of each individ in pop + arch
+    def density(self) -> list[float]:
+        """Calculates density.
+
+        Returns:
+            list[float]: Density of each individ in pop and arch.
         """
         density = []
         k = 0
@@ -92,19 +95,17 @@ class SPEA2(BaseGA):
             for j in range(len(self._pop)):
                 if j == i:
                     continue
+
                 second_point = np.array(self._pop[j].fitness)
                 distance.append(np.linalg.norm(first_point - second_point))
+
             sorted_dist = np.sort(distance)
             density.append(1 / (sorted_dist[k] + 2))
 
         return density
 
-    def calculate_sepa2_fitness(self):
-        """
-        Calculating SPEA2 fitness function
-        fitness = raw + density
-        :return: None
-        """
+    def calculate_sepa2_fitness(self) -> None:
+        """Calulates SPEA2 fitness function."""
         self._pop = self._pop + self.archive
 
         raw = self.raw()
@@ -112,11 +113,8 @@ class SPEA2(BaseGA):
         for idx, _ in enumerate(self._pop):
             self._pop[idx].extra_characteristics['SEPA2_fitness'] = raw[idx] + density[idx]
 
-    def environmental_selection(self):
-        """
-        Updating archive population via environmental selection procedure
-        :return: (None)
-        """
+    def environmental_selection(self) -> None:
+        """Updates archive population via environmental selection procedure."""
         self.archive = [ind for ind in self._pop if ind.extra_characteristics['SEPA2_fitness'] < 1]
 
         # First case, adding remaining best individs
@@ -126,6 +124,7 @@ class SPEA2(BaseGA):
             while len(self.archive) != self.arch_size:
                 if sorted_pop[idx].extra_characteristics['SEPA2_fitness'] >= 1:
                     self.archive.append(sorted_pop[idx])
+
                 idx += 1
 
         # Second case, deleting using truncation procedure
@@ -140,11 +139,13 @@ class SPEA2(BaseGA):
             pickle.dump(self.archive, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     def optimize(self):
+        """Optimizes population."""
         for step in tqdm(range(self.n_steps)):
             # self._pop = self.selector(self._pop, self.opt_params.pop_size)
             self.environmental_selection()
             if step == self.n_steps:
                 return self.archive
+
             self._pop = self.selector(self._pop, self.opt_params.pop_size)
             children = self.crossover(self._pop)
             mutated_children = self.mutation(children)

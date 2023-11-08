@@ -9,16 +9,6 @@ from gefest.core.geometry.domain import Domain
 from gefest.core.opt.objective.objective import Objective
 
 
-class ParseMetricsError(Exception):
-    def __init__(self, message=None, *args):
-        if args:
-            self.message = message
-
-    def __str__(self):
-        if self.message:
-            return f'ParseMetricsError. {self.message}'
-
-
 def load_config(
     cfg_py_path: str,
     cfg_yaml_path: str = None,
@@ -34,7 +24,6 @@ def load_config(
     Returns:
         OptimizationParams: GEFEST unified configuretion file.
     """
-
     module_ = __import__(Path(cfg_py_path).stem)
     if cfg_yaml_path:
         user_metrics = []
@@ -44,7 +33,7 @@ def load_config(
                     user_metrics.append(name)
 
         if not user_metrics:
-            raise ParseMetricsError('No Objective class has been loaded.')
+            raise ValueError(f'No Objective class has been found in {cfg_py_path}.')
 
         config_dict = yaml.safe_load(Path(cfg_yaml_path).read_text())
         domain_cfg = Domain.model_validate(config_dict['domain'])
@@ -58,4 +47,5 @@ def load_config(
         opt_params = OptimizationParams.model_validate(config_dict['opt_params'])
     else:
         opt_params = module_.opt_params
+
     return opt_params

@@ -9,7 +9,8 @@ from gefest.tools.tuners import utils
 
 
 class TunerParams(BaseModel):
-    """Dataclass for 'GolemTuner' parameters aggreagtion.
+    """Dataclass for GolemTuner parameters aggreagtion.
+
     Provides easy configuration for tuner
     with built-in validation and serialization.
     """
@@ -24,6 +25,7 @@ class TunerParams(BaseModel):
     @field_validator('tuner_type')
     @classmethod
     def tuner_type_validate(cls, value):
+        """Checks if specified tuner exists."""
         if isinstance(value, str):
             opt_names = ['iopt', 'optuna', 'sequential', 'simulataneous']
             if value in opt_names:
@@ -36,6 +38,7 @@ class TunerParams(BaseModel):
     @field_validator('hyperopt_dist')
     @classmethod
     def hyperopt_fun_validate(cls, value):
+        """Checks if hyperopt distribution function exists."""
         if isinstance(value, str):
             r_ = inspect.getmembers(hp, inspect.isfunction)
             fun_names = [i[0] for i in r_]
@@ -52,6 +55,7 @@ class TunerParams(BaseModel):
     @field_validator('variacne_generator')
     @classmethod
     def variacne_generator_fun_validate(cls, value):
+        """Checks if specified variance generation function exists."""
         fun_names = ['average_edge_variance']
         if isinstance(value, str):
             if value in fun_names:

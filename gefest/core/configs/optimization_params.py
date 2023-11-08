@@ -45,6 +45,8 @@ ValidSelection = Enum(
 
 
 class OptimizationParams(BaseModel):
+    """GEFEST configuration dataclass."""
+
     n_steps: int
     pop_size: int
     domain: Domain
@@ -80,6 +82,7 @@ class OptimizationParams(BaseModel):
 
     @model_validator(mode='after')
     def create_classes_instances(self):
+        """Selects and initializes specified modules."""
         if isinstance(self.postprocess_rules[0], str):
             self.postprocess_rules = [getattr(Rules, name).value for name in self.postprocess_rules]
 

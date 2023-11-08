@@ -1,3 +1,5 @@
+from ctypes import Structure
+
 from golem.core.optimisers.meta.surrogate_optimizer import SurrogateEachNgenOptimizer
 from golem.core.optimisers.objective import Objective
 
@@ -11,6 +13,12 @@ from gefest.tools.optimizers.optimizer import Optimizer
 
 
 class SurrogateOptimizer(Optimizer):
+    """Wrapper for GOLEM SurrogateEachNgenOptimizer.
+
+    Provides optimization strategy using both physical simulator and surrogate model.
+
+    """
+
     def __init__(self, opt_params: OptimizationParams, **kwargs) -> None:
         super().__init__(opt_params.log_dispatcher, **kwargs)
         self.opt_params = opt_params
@@ -33,7 +41,12 @@ class SurrogateOptimizer(Optimizer):
             surrogate_each_n_gen=self.opt_params.golem_surrogate_each_n_gen,
         )
 
-    def optimize(self):
+    def optimize(self) -> list[Structure]:
+        """Optimizes population.
+
+        Returns:
+            list[Structure]: Optimized population.
+        """
         optimized_graphs = self.__surrogate_opt.optimise(self.objective)
         optimized_pop = list(map(self.opt_params.golem_adapter.restore, optimized_graphs))
         return optimized_pop

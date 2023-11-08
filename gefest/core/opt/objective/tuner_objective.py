@@ -8,6 +8,8 @@ from gefest.core.opt.adapters.structure import StructureAdapter
 
 
 class GolemObjectiveWithPreValidation(GolemObjective):
+    """GOLEM objective with GEFEST validation filtering."""
+
     def __init__(
         self,
         quality_metrics: Union[Callable, Dict[Any, Callable]],
@@ -21,6 +23,12 @@ class GolemObjectiveWithPreValidation(GolemObjective):
         self.adapter = adapter
 
     def __call__(self, graph: Graph, **metrics_kwargs: Any) -> Fitness:
+        """Evaluates objective for GOLEM graph representtion of GEFEST structure.
+
+        If structure invalid, fintes will be set to high value.
+        This class allows filter out invalid variants on tuning.
+
+        """
         if self.validator(self.adapter.restore(graph)):
             res = super().__call__(graph, **metrics_kwargs)
             return res

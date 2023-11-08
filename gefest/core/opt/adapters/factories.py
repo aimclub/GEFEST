@@ -17,5 +17,6 @@ class StructureFactory(RandomGraphFactory):
         self.adapter = adapter
 
     def __call__(self, *args, **kwargs) -> OptGraph:
+        """Generates ranom GOLEM graph."""
         samples = self.sampler(1)
         return self.adapter(samples[0])

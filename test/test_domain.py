@@ -6,6 +6,7 @@ from gefest.core.geometry.domain import Domain
 
 
 class TestDomain:
+    """Domain class tests collection."""
     @pytest.mark.parametrize(
         ', '.join(
             [
@@ -47,6 +48,7 @@ class TestDomain:
         geometry_is_closed,
         expectation,
     ):
+        """Test doamin init fails on invalid configurations."""
         with expectation:
             domain = Domain(
                 allowed_area=allowed_area,

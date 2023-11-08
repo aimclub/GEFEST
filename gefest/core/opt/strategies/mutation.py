@@ -12,6 +12,8 @@ from .strategy import Strategy
 
 
 class MutationStrategy(Strategy):
+    """Default mutation strategy."""
+
     def __init__(self, opt_params: OptimizationParams):
 
         self.domain = opt_params.domain
@@ -24,10 +26,18 @@ class MutationStrategy(Strategy):
         self._pm = BaseParallelDispatcher(opt_params.n_jobs)
 
     def __call__(self, pop: list[Structure]) -> list[Structure]:
+        """Calls mutate method."""
         return self.mutate(pop=pop)
 
-    def mutate(self, pop: list[Structure]):
+    def mutate(self, pop: list[Structure]) -> list[Structure]:
+        """Mutates provided population.
 
+        Args:
+            pop (list[Structure]): Given population.
+
+        Returns:
+            list[Structure]: Mutated population.
+        """
         mutator = partial(
             mutate_structure,
             domain=self.domain,

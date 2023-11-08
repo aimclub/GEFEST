@@ -12,14 +12,17 @@ def create_prohibited(
     fixed_points: Optional[list[list]] = None,
     fixed_area: Optional[list[list]] = None,
 ) -> Structure:
-    """
-    Creation of fixed, prohibited structures. Polygons cannot cross them
+    """Creation of fixed, prohibited structures. Polygons cannot cross them.
 
-    :param targets: (Optional[List[List]]), fixed targets inside domain
-    :param fixed_points: (Optional[List[List]]), fixed lines inside domain
-    :param fixed_area: (Optional[List[List]]), fixed areas inside domain
-    :return: Structure, structure of all prohibited polygons (targets, lines, areas)
-    ::TODO:: change buffer to something more interpretable
+    Args:
+        points_radius (_type_): _description_
+        targets (Optional[list[list]], optional): Fixed targets inside domain. Defaults to None.
+        fixed_points (Optional[list[list]], optional): Fixed lines inside domain. Defaults to None.
+        fixed_area (Optional[list[list]], optional): Fixed areas inside domain. Defaults to None.
+
+    Returns:
+        Structure: Compilation of imputs as GEFEST Structure.
+
     """
     prohibited_area = []
     if targets is not None:

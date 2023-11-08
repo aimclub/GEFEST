@@ -7,7 +7,7 @@ import numpy as np
 from loguru import logger
 from shapely.geometry import LineString
 
-from gefest.core.geometry import Point, Polygon, Structure
+from gefest.core.geometry import Structure
 from gefest.core.geometry.domain import Domain
 from gefest.core.geometry.utils import (
     get_convex_safe_area,
@@ -24,8 +24,7 @@ def mutate_structure(
     operations_probs: list[float],
     **kwargs,
 ) -> Structure:
-    """Apply mutation random mutation from list
-        for each polygons in structure.
+    """Applys random mutation from given list for each polygon in structure.
 
     Args:
         structure (Structure): Structure to mutate.
@@ -62,6 +61,7 @@ def rotate_poly_mutation(
     idx_: int = None,
     **kwargs,
 ) -> Structure:
+    """Rotares polygon for random angle."""
     angle = float(np.random.randint(-120, 120))
     new_structure[idx_] = domain.geometry.rotate_poly(
         new_structure[idx_],
@@ -77,11 +77,13 @@ def drop_poly_mutation(
     idx_: int = None,
     **kwargs,
 ) -> Structure:
+    """Drops random polygon from structure."""
     if len(new_structure.polygons) > (domain.min_poly_num + 1):
         idx_ = idx_ if idx_ else int(np.random.randint(0, len(new_structure)))
         polygon_to_remove = new_structure.polygons[idx_]
-        if not any([p in polygon_to_remove for p in domain.fixed_points]):
+        if not any(p in polygon_to_remove for p in domain.fixed_points):
             new_structure.remove(polygon_to_remove)
+
     return new_structure
 
 
@@ -92,10 +94,12 @@ def add_poly_mutation(
     idx_: int = None,
     **kwargs,
 ) -> Structure:
+    """Adds random polygon into structure using standard generator."""
     if len(new_structure) < (domain.max_poly_num - 1):
         new_poly = get_random_poly(new_structure, domain)
         if new_poly is not None:
             new_structure.append(new_poly)
+
     return new_structure
 
 
@@ -106,44 +110,13 @@ def resize_poly_mutation(
     idx_: int = None,
     **kwargs,
 ) -> Structure:
+    """Randomly resizes polygon."""
     new_structure[idx_] = domain.geometry.resize_poly(
         new_structure[idx_],
         x_scale=np.random.uniform(0.25, 3, 1)[0],
         y_scale=np.random.uniform(0.25, 3, 1)[0],
     )
     return new_structure
-
-
-def _get_new_point_between(
-    poly: Polygon,
-    domain: Domain,
-    left_point_idx: int,
-    right_point_idx: int,
-) -> Point:
-    geom = domain.geometry
-    if not geom.is_convex or len(poly) == 3:
-        point, _ = get_selfintersection_safe_point(
-            poly,
-            domain,
-            left_point_idx,
-            right_point_idx,
-        )
-
-    else:
-        shaply_poly = geom._poly_to_shapely_poly(poly)
-        movment_area = get_convex_safe_area(
-            poly,
-            domain,
-            left_point_idx,
-            right_point_idx,
-        )
-        movment_area = geom._poly_to_shapely_poly(movment_area)
-        if not shaply_poly.is_simple:
-            logger.warning('Got non convex polygon. Convex hull will be used.', backtrace=True)
-
-        point = geom.get_random_point_in_poly(movment_area)
-
-    return point
 
 
 @logger.catch
@@ -153,10 +126,12 @@ def pos_change_point_mutation(
     idx_: int = None,
     **kwargs,
 ) -> Structure:
+    """Moves a random point without violating the geometry type specified in the domain."""
     geom = domain.geometry
     poly = copy.deepcopy(new_structure[idx_])
     if poly[0] == poly[-1]:
         poly = poly[:-1]
+
     mutate_point_idx = int(np.random.randint(0, len(poly)))
     new_point = None
     if not geom.is_convex or (len(poly) in (2, 3)):
@@ -192,6 +167,7 @@ def pos_change_point_mutation(
 
     if geom.is_closed:
         poly.points.append(poly[0])
+
     new_structure[idx_] = poly
     return new_structure
 
@@ -203,11 +179,13 @@ def add_point_mutation(
     idx_: int = None,
     **kwargs,
 ):
+    """Adds a random point without violating the geometry type specified in the domain."""
     geom = domain.geometry
     poly = copy.deepcopy(new_structure[idx_])
 
     if poly[0] == poly[-1]:
         poly = poly[:-1]
+
     mutate_point_idx = int(np.random.randint(0, len(poly)))
     new_point = None
     if not geom.is_convex or len(poly) == 3:
@@ -237,6 +215,7 @@ def add_point_mutation(
 
     else:
         logger.warning('Strange case')
+
     if new_point:
         poly.points.insert(
             (mutate_point_idx + 1) % len(poly),
@@ -257,7 +236,7 @@ def drop_point_mutation(
     idx_: int = None,
     **kwargs,
 ):
-
+    """Drops random point from polygon."""
     polygon_to_mutate = new_structure[idx_]
     if domain.geometry.is_closed:
         if polygon_to_mutate[0] == polygon_to_mutate[-1]:
@@ -283,6 +262,8 @@ def drop_point_mutation(
 
 
 class MutationTypes(Enum):
+    """enumerates all mutation functions."""
+
     rotate_poly = partial(rotate_poly_mutation)
     resize_poly = partial(resize_poly_mutation)
     add_point = partial(add_point_mutation)

@@ -7,10 +7,9 @@ from gefest.core.geometry.domain import Domain
 
 
 class StructureAdapter(BaseOptimizationAdapter):
+    """Adapter for GOLEM."""
+
     def __init__(self, domain: Domain) -> None:
-        """
-        Optimization adapter for Pipeline class
-        """
         super().__init__(base_graph_class=Structure)
         self.domain = domain
 
@@ -35,11 +34,13 @@ class StructureAdapter(BaseOptimizationAdapter):
         for polygon in adaptee.polygons:
             if polygon[-1] == polygon[0]:
                 polygon = polygon[:-1]
+
             prev_node = None
             for point_id in range(len(polygon.points)):
                 node = self._point_to_node(polygon.points[point_id])
                 if prev_node:
                     node.nodes_from = [prev_node]
+
                 prev_node = node
                 nodes.append(node)
 
@@ -65,8 +66,10 @@ class StructureAdapter(BaseOptimizationAdapter):
             if not len(node.nodes_from):
                 if self.domain.geometry.is_closed:
                     poly.points.append(poly[0])
+
                 structure.append(poly)
                 poly = Polygon()
+
             poly.points.append(
                 Point(
                     node.content['params']['x'],
@@ -77,6 +80,7 @@ class StructureAdapter(BaseOptimizationAdapter):
         if poly not in structure:
             if self.domain.geometry.is_closed:
                 poly.points.append(poly[0])
+
             structure.append(poly)
 
         return Structure(structure)

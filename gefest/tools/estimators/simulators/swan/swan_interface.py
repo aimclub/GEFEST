@@ -8,6 +8,8 @@ from gefest.tools import Estimator
 
 
 class Swan(Estimator):
+    """Swan waves simulator wrapper."""
+
     def __init__(
         self,
         path,
@@ -26,7 +28,6 @@ class Swan(Estimator):
         self._grid_configuration()
 
     def _grid_configuration(self):
-
         file_to_read = open(self.path_to_input, 'r')
         content_read = file_to_read.read()
 
@@ -50,13 +51,22 @@ class Swan(Estimator):
                 content_to_replace,
             )
             new_content = content_write
+
         file_to_read.close()
 
         file_to_write = open(self.path_to_input, 'w')
         file_to_write.writelines(new_content)
         file_to_write.close()
 
-    def estimate(self, struct: 'Structure'):
+    def estimate(self, struct: Structure) -> tuple:
+        """Estimates waves height for given structure.
+
+        Args:
+            struct (Structure): GEFEST Structure.
+
+        Returns:
+            tuple: Waves height matrix and sum of wave heights in target areas.
+        """
         polygons = struct.polygons
         file_to_read = open(self.path_to_input, 'r')
         content_read = file_to_read.read()

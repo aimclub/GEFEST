@@ -3,7 +3,6 @@ from enum import Enum
 from itertools import combinations
 
 import numpy as np
-from loguru import logger
 from shapely.geometry import GeometryCollection, LineString, MultiPoint
 from shapely.geometry import Point as ShapelyPoint
 from shapely.geometry import Polygon as ShapelyPolygon
@@ -16,8 +15,11 @@ from gefest.core.opt.postproc.rules_base import PolygonRule, StructureRule
 
 
 class PolygonsNotTooClose(StructureRule):
+    """Validated distance between polygons."""
+
     @staticmethod
     def validate(struct: Structure, domain: Domain) -> bool:
+        """Checks distances between polgons."""
         pairs = tuple(combinations(struct.polygons, 2))
         is_too_close = [False] * len(pairs)
 
@@ -29,12 +31,8 @@ class PolygonsNotTooClose(StructureRule):
         return not any(is_too_close)
 
     @staticmethod
-    @logger.catch
     def correct(struct: Structure, domain: Domain) -> Structure:
-        """
-        For polygons that are closer than the specified threshold,
-        one of them will be removed
-        """
+        """Removes one of polygons that are closer than the specified threshold."""
         polygons = struct.polygons
         num_poly = len(polygons)
         to_delete = []
@@ -58,33 +56,37 @@ class PolygonsNotTooClose(StructureRule):
 
 
 def _pairwise_dist(poly_1: Polygon, poly_2: Polygon, domain: Domain):
-    """
-    ::TODO:: find the answer for the question: why return 0 gives infinite computation
-    """
+
+    # return 0 gives infinite computation
     if poly_1 is poly_2 or len(poly_1.points) == 0 or len(poly_2.points) == 0:
         return 9999
 
-    # nearest_pts = domain.geometry.nearest_points(poly_1, poly_2) ??? why return only 1 point
+    # nearest_pts = domain.geometry.nearest_points(poly_1, poly_2) ??? why returns only 1 point
     return domain.geometry.min_distance(poly_1, poly_2)
 
 
 class PointsNotTooClose(PolygonRule):
+    """Validated length of polygon edges."""
+
     @staticmethod
     def validate(
         structure: Structure,
         idx_poly_with_error: int,
         domain: Domain,
     ) -> bool:
-        """The method indicates that any :obj:`Point` in each :obj:`Polygon` of :obj:`Structure`
-        is placed in correct distance by previous point
+        """Checks if each :obj:`Point` in :obj:`Polygon` are placed in valid distance by previous.
+
         Args:
             structure: the :obj:`Structure` that explore
+
         Returns:
             ``True`` if any side of poly have incorrect lenght, otherwise - ``False``
+
         """
         poly = copy.deepcopy(structure[idx_poly_with_error])
         if poly[0] != poly[-1] and domain.geometry.is_closed:
             poly.points = poly.points.append(poly[0])
+
         lenght = domain.dist_between_points
         check, norms = [[None] * (len(poly) - 1)] * 2
         for idx, pair in enumerate(
@@ -96,6 +98,7 @@ class PointsNotTooClose(PolygonRule):
             norm = np.linalg.norm(np.array(pair[1].coords) - np.array(pair[0].coords))
             norms[idx] = norm
             check[idx] = norm > lenght
+
         return all(check)
 
     @staticmethod
@@ -104,24 +107,29 @@ class PointsNotTooClose(PolygonRule):
         idx_poly_with_error: int,
         domain: Domain,
     ) -> Polygon:
+        """Corrects polygon."""
         poly = copy.deepcopy(structure[idx_poly_with_error])
         poly = domain.geometry.simplify(poly, domain.dist_between_points * 1.05)
 
         if poly[0] != poly[-1] and domain.geometry.is_closed:
             poly.points.append(poly[0])
+
         elif poly[0] == poly[-1] and not domain.geometry.is_closed:
             poly.points = poly.points[:-1]
+
         return poly
 
 
 class PolygonNotOverlapsProhibited(PolygonRule):
+    """Validates polygon overlapping other objects."""
+
     @staticmethod
     def validate(
         structure: Structure,
         idx_poly_with_error: int,
         domain: Domain,
     ) -> bool:
-
+        """Checks if polygon overlaps other polygons or prohibits."""
         geom = domain.geometry
         if domain.geometry.is_closed:
             pass
@@ -142,6 +150,7 @@ class PolygonNotOverlapsProhibited(PolygonRule):
         idx_poly_with_error: int,
         domain: Domain,
     ) -> Polygon:
+        """Corrects polygon overlaps."""
         geom = domain.geometry
         if domain.geometry.is_closed:
             raise NotImplementedError()
@@ -157,7 +166,8 @@ class PolygonNotOverlapsProhibited(PolygonRule):
 
                 if isinstance(res, (MultiPoint, LineString)):
                     res = GeometryCollection(res)
-                parts = [g for g in res.geoms]
+
+                parts = res.geoms
                 parts = [g for g in parts if not g.intersects(prohib)]
                 poly = np.random.choice(parts)
                 return Polygon([Point(p[0], p[1]) for p in poly.coords])
@@ -166,17 +176,25 @@ class PolygonNotOverlapsProhibited(PolygonRule):
 
 
 class PolygonGeometryIsValid(PolygonRule):
+    """Validates polygon geometry.
+
+    A polygon is invalid if its geometry does not match the geometry of the domain.
+
+    """
+
     @staticmethod
     def validate(
         structure: Structure,
         idx_poly_with_error: int,
         domain: Domain,
     ) -> bool:
+        """Validates polygon geometry."""
         poly = structure[idx_poly_with_error]
         if (domain.geometry.is_closed and (poly[0] == poly[-1])) or (
             not domain.geometry.is_closed and (poly[0] != poly[-1])
         ):
             return True
+
         return False
 
     @staticmethod
@@ -185,21 +203,27 @@ class PolygonGeometryIsValid(PolygonRule):
         idx_poly_with_error: int,
         domain: Domain,
     ) -> Polygon:
+        """Corrects polygon geometry."""
         poly = structure[idx_poly_with_error]
         if domain.geometry.is_closed and (poly[0] != poly[-1]):
             poly.points.append(poly.points[0])
+
         elif not domain.geometry.is_closed and (poly[0] == poly[-1]):
             poly.points = poly.points[:-1]
+
         return poly
 
 
 class PolygonNotOutOfBounds(PolygonRule):
+    """Out of bounds rule. Polygon invalid if it out of bounds."""
+
     @staticmethod
     def validate(
         structure: Structure,
         idx_poly_with_error: int,
         domain: Domain,
     ) -> bool:
+        """Checks if polygon is out of domain bounds."""
         geom_poly_allowed = ShapelyPolygon(
             [ShapelyPoint(pt.x, pt.y) for pt in domain.allowed_area],
         )
@@ -219,11 +243,13 @@ class PolygonNotOutOfBounds(PolygonRule):
         idx_poly_with_error: int,
         domain: Domain,
     ) -> Polygon:
+        """Corrects out of bound polygon."""
         point_moved = False
         poly = structure[idx_poly_with_error]
         for p_id, point in enumerate(poly):
             if point in domain.fixed_points:
                 continue
+
             point.x = max(point.x, domain.min_x + domain.len_x * 0.05)
             point.y = max(point.y, domain.min_y + domain.len_y * 0.05)
             point.x = min(point.x, domain.max_x + domain.len_x * 0.05)
@@ -245,12 +271,15 @@ class PolygonNotOutOfBounds(PolygonRule):
 
 
 class PolygonNotSelfIntersects(PolygonRule):
+    """Selfintersection rule. Polygon invalid if it have selfintersections."""
+
     @staticmethod
     def validate(
         structure: Structure,
         idx_poly_with_error: int,
         domain: Domain,
     ) -> bool:
+        """Validates polygon for selfintersection."""
         poly = structure[idx_poly_with_error]
         return not (
             len(poly) > 2
@@ -267,10 +296,12 @@ class PolygonNotSelfIntersects(PolygonRule):
         idx_poly_with_error: int,
         domain: Domain,
     ) -> Polygon:
+        """Corrects selfintersection in polygon."""
         poly = structure[idx_poly_with_error]
         poly = domain.geometry.get_convex(poly)
         if not domain.geometry.is_closed:
             poly.points = poly.points[:-1]
+
         return poly
 
 
@@ -279,6 +310,8 @@ def _forbidden_validity(validity):
 
 
 class Rules(Enum):
+    """Enumeration of all defined rules."""
+
     not_too_close_polygons = PolygonsNotTooClose()
     valid_polygon_geom = PolygonGeometryIsValid()
     not_out_of_bounds = PolygonNotOutOfBounds()

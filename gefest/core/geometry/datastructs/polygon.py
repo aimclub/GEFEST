@@ -9,6 +9,8 @@ from .point import Point
 
 
 class PolyID(Enum):
+    """Enumeration of special polygons ids."""
+
     TEMP = 'tmp'
     CONSTR = 'constraint'
     FIXED_AREA = 'fixed_area'
@@ -20,6 +22,8 @@ class PolyID(Enum):
 
 @dataclass
 class Polygon:
+    """Polygon dataclass."""
+
     points: list[Point] = Field(default_factory=list)
     id_: Optional[Union[UUID, PolyID]] = Field(default_factory=uuid4)
 
@@ -30,6 +34,7 @@ class Polygon:
         if isinstance(key, slice):
             indices = range(*key.indices(len(self.points)))
             return Polygon([self.points[i] for i in indices])
+
         return self.points[key]
 
     def __setitem__(self, key: int, value: Point):

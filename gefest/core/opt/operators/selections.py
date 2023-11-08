@@ -30,6 +30,7 @@ def roulette_selection(
 
     while len(chosen) < pop_size:
         chosen.append(pop[np.random.choice(a=range(len(pop)), p=probability)])
+
     return chosen
 
 
@@ -49,7 +50,6 @@ def tournament_selection(
         list[Structure]: The best individuals from given population.
             Their number is equal to ``'initial_number' * fraction``
     """
-
     group_size = math.ceil(len(pop) * fraction)
     min_group_size = 2 if len(pop) > 1 else 1
     group_size = max(group_size, min_group_size)
@@ -65,9 +65,12 @@ def tournament_selection(
             n_iter = 0
             rnd = pop[randint(0, len(pop) - 1)]
             chosen.append(rnd)
+
     return chosen
 
 
 class SelectionTypes(Enum):
+    """Enumerates all GEFEST selection functions."""
+
     roulette_selection = partial(roulette_selection)
     tournament_selection = partial(tournament_selection)

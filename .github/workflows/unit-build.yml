@@ -29,7 +29,7 @@ jobs:
         pip install pytest-cov
     - name: Run flake8 checks
       run: |
-        flake8 gefest --count --statistics
+        flake8 gefest test --count --statistics
     - name: Test with pytest
       run: |
         pytest --cov=GEFEST -s test/

@@ -4,9 +4,8 @@ import cv2 as cv
 import numpy as np
 import torch
 
-from gefest.core.structure.domain import Domain
-from gefest.core.structure.polygon import Point, Polygon
-from gefest.core.structure.structure import Structure
+from gefest.core.geometry import Point, Polygon, Structure
+from gefest.core.geometry.domain import Domain
 from gefest.tools.samplers.DL.microfluid.aae import AAE
 from gefest.tools.samplers.DL.microfluid.backbones import (
     Decoder,
@@ -64,11 +63,18 @@ class DeepSampler:
 
         self.sampler = aae
 
-    def _transform(self, objects, domain):
-        """
-        Transformation from images to polygons using edge detector
+    def _transform(self, objects, domain) -> list[Structure]:
+        """Transforms images to polygons using edge detector.
+
         :param objects: (Array) [n_samples x 1 x 128 x 128]
         :return: List(Structure)
+
+        Args:
+            objects (_type_): _description_
+            domain (_type_): _description_
+
+        Returns:
+            _type_: _description_
         """
         samples = []
 

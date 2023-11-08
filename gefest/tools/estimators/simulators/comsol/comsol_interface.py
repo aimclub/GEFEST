@@ -15,28 +15,23 @@ USE_AVG_CONST = False
 
 
 class Comsol(Estimator):
-    """
-    ::TODO:: make abstract class for further specific realizations
-    """
+    """Comsol wrapper class for microfluidic problem estimation."""
 
-    """
-    Comsol class for microfluidic problem
-    """
+    def __init__(self, path_to_mph: str) -> None:
 
-    def __init__(self, path_to_mph):
-        """
-        :param path_to_mph: (String), path to mph file
-        """
         super(Comsol, self).__init__()
 
         self.client = mph.Client()
         self.path_to_mph = path_to_mph
 
-    def estimate(self, structure: Structure):
-        """
-        Estimation using comsol multiphysics
-        :param structure: (Structure), Structure of polygons
-        :return: (Int), Performance
+    def estimate(self, structure: Structure) -> int:
+        """Estimates  given structure using comsol multiphysics.
+
+        Args:
+            structure (Structure): GEFEST structure.
+
+        Returns:
+            int: Performance.
         """
         gc.collect()
         target, idx = self._load_fitness(structure)
@@ -97,7 +92,7 @@ class Comsol(Estimator):
                 np.mean([abs(float(o) / np.mean(outs[0:4]) - 1) * 100 for o in outs[0:4]]),
             )
             if USE_AVG_CONST and any(
-                [abs(float(o) / np.mean(outs[0:4]) - 1) * 100 > 5.0 for o in outs[0:4]],
+                abs(float(o) / np.mean(outs[0:4]) - 1) * 100 > 5.0 for o in outs[0:4]
             ):
                 print(
                     'Speed equality violated',
@@ -128,6 +123,7 @@ class Comsol(Estimator):
                 model.java.component('comp1').geom('geom1').create('pol' + str(n + 1), 'Polygon')
             except Exception:
                 pass
+
             model.java.component('comp1').geom('geom1').feature('pol' + str(n + 1)).set(
                 'x',
                 poly[0],
@@ -136,11 +132,13 @@ class Comsol(Estimator):
                 'y',
                 poly[1],
             )
+
         return model
 
     def _save_simulation_result(self, configuration, model):
         if not os.path.exists('./models'):
             os.mkdir('./models')
+
         model_uid = str(uuid4())
         model.save(f'./models/{model_uid}.mph')
         db = pickledb.load('comsol_db.saved', False)

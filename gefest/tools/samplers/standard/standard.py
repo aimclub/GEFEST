@@ -11,6 +11,12 @@ from gefest.tools.samplers.sampler import Sampler
 
 
 class StandardSampler(Sampler):
+    """Generator of random structures.
+
+    The get_random_structure utility is used for structure generation.
+    The generated samples satisfy the domain configuration.
+    """
+
     def __init__(self, opt_params) -> None:
         super().__init__(
             samples_generator=get_random_structure,
@@ -22,9 +28,18 @@ class StandardSampler(Sampler):
         self._pm = BaseParallelDispatcher(opt_params.n_jobs)
 
     def __call__(self, n_samples: int) -> list[Structure]:
+        """Calls sample method."""
         return self.sample(n_samples=n_samples)
 
     def sample(self, n_samples: int) -> list[Structure]:
+        """Generates requested number of random samples.
+
+        Args:
+            n_samples (int): Number of samples to generate.
+
+        Returns:
+            list[Structure]: Generated samples.
+        """
         random_pop = self._pm.exec_parallel(
             partial(get_random_structure, domain=self.domain),
             tuple(range(n_samples + 1)),

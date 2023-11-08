@@ -7,6 +7,12 @@ from gefest.tools import Estimator
 
 
 class Objective(metaclass=ABCMeta):
+    """Base objective class.
+
+    Must be used as base class for any user-defuned objetive.
+
+    """
+
     def __init__(
         self,
         domain: Domain,
@@ -20,6 +26,7 @@ class Objective(metaclass=ABCMeta):
         ind: Structure,
         **kwargs,
     ) -> list[Structure]:
+        """Calls evaluate method."""
         return self.evaluate(ind)
 
     @abstractmethod
@@ -27,4 +34,5 @@ class Objective(metaclass=ABCMeta):
         self,
         ind: Structure,
     ) -> float:
+        """Must implement logic spicific objectiv evaluation."""
         ...

@@ -6,6 +6,8 @@ from golem.serializers.serializer import register_serializable
 
 @register_serializable
 class OperationWrap:
+    """GOLEM wrap for GEFEST mutations and crossovers."""
+
     def __init__(
         self,
         executor,
@@ -30,6 +32,7 @@ class OperationWrap:
         return f'{self.operations[0].__name__}'
 
     def __call__(self, *args, **kwargs):
+        """Executes mutation or crossover."""
         executor = partial(
             self.executor,
             operations=self.operations,
@@ -44,6 +47,7 @@ class OperationWrap:
         )
         if executor.func.__name__ == 'mutate_structure':
             corrected = corrected[0]
+
         return corrected
 
     def __str__(self):
