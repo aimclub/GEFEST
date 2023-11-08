@@ -306,7 +306,12 @@ class PolygonNotSelfIntersects(PolygonRule):
 
 
 def _forbidden_validity(validity):
-    return validity != 'Valid Geometry' and 'Ring Self-intersection' not in validity
+    #print(validity,validity != 'Valid Geometry' and 'Self-intersection' not in validity,'Valid Geometry' in validity,'Ring Self-intersection' in validity)
+    if 'Valid Geometry' in validity:
+        return False
+    if 'Self-intersection' in validity:
+        return True
+    #return validity != 'Valid Geometry' and 'Ring Self-intersection' not in validity
 
 
 class Rules(Enum):
