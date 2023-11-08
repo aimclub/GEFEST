@@ -4,14 +4,15 @@ from itertools import combinations
 
 import numpy as np
 from loguru import logger
+from shapely.geometry import GeometryCollection, LineString, MultiPoint
 from shapely.geometry import Point as ShapelyPoint
 from shapely.geometry import Polygon as ShapelyPolygon
 from shapely.ops import unary_union
 from shapely.validation import explain_validity
 
-from gefest.core.algs.postproc.rules_base import PolygonRule, StructureRule
 from gefest.core.geometry import Point, Polygon, Structure
 from gefest.core.geometry.domain import Domain
+from gefest.core.opt.postproc.rules_base import PolygonRule, StructureRule
 
 
 class PolygonsNotTooClose(StructureRule):
@@ -81,9 +82,9 @@ class PointsNotTooClose(PolygonRule):
         Returns:
             ``True`` if any side of poly have incorrect lenght, otherwise - ``False``
         """
-        poly = structure[idx_poly_with_error]
+        poly = copy.deepcopy(structure[idx_poly_with_error])
         if poly[0] != poly[-1] and domain.geometry.is_closed:
-            poly[:-1] = poly[0]
+            poly.points = poly.points.append(poly[0])
         lenght = domain.dist_between_points
         check, norms = [[None] * (len(poly) - 1)] * 2
         for idx, pair in enumerate(
@@ -123,19 +124,13 @@ class PolygonNotOverlapsProhibited(PolygonRule):
 
         geom = domain.geometry
         if domain.geometry.is_closed:
-            # logger.warning("There is no errors if no construction. NotImplemented validation and fix.")
             pass
         else:
-            from matplotlib import pyplot as plt
-            from shapely.plotting import plot_line, plot_polygon
 
             prohib = geom.get_prohibited_geom(domain.prohibited_area, domain.dist_between_polygons)
             prohib = unary_union(prohib)
             poly = geom._poly_to_shapely_line(structure[idx_poly_with_error])
-            # for g in prohib.geoms:
-            #     plot_polygon(g)
-            # plot_line(poly, color='r')
-            # plt.show(block=True)
+
             if poly.intersects(prohib):
                 return False
 
@@ -151,33 +146,20 @@ class PolygonNotOverlapsProhibited(PolygonRule):
         if domain.geometry.is_closed:
             raise NotImplementedError()
         else:
-            from matplotlib import pyplot as plt
-            from shapely.plotting import plot_line, plot_polygon
 
             prohib = geom.get_prohibited_geom(domain.prohibited_area, domain.dist_between_polygons)
-            # for g in prohib.geoms:
-            # plot_polygon(g)
-            # plt.show(block=True)
             prohib = unary_union(prohib)
-            # for g in prohib.geoms:
-            #     plot_polygon(g)
 
             poly = geom._poly_to_shapely_line(structure[idx_poly_with_error])
 
-            # plot_line(poly)
-            # plt.show(block=True)
             if poly.intersects(prohib):
                 res = poly.difference(prohib.buffer(0.001))
-                from shapely.geometry import GeometryCollection, LineString, MultiPoint
 
                 if isinstance(res, (MultiPoint, LineString)):
                     res = GeometryCollection(res)
                 parts = [g for g in res.geoms]
                 parts = [g for g in parts if not g.intersects(prohib)]
                 poly = np.random.choice(parts)
-                # plot_line(poly)
-                # poly = [Point(p[0], p[1]) for p in poly.coords]
-                # plt.show(block=True)
                 return Polygon([Point(p[0], p[1]) for p in poly.coords])
             else:
                 return Polygon([Point(p[0], p[1]) for p in poly.coords])
@@ -204,7 +186,7 @@ class PolygonGeometryIsValid(PolygonRule):
         domain: Domain,
     ) -> Polygon:
         poly = structure[idx_poly_with_error]
-        if domain.geometry.is_closed and domain.geometry.is_convex and (poly[0] != poly[-1]):
+        if domain.geometry.is_closed and (poly[0] != poly[-1]):
             poly.points.append(poly.points[0])
         elif not domain.geometry.is_closed and (poly[0] == poly[-1]):
             poly.points = poly.points[:-1]
@@ -287,6 +269,8 @@ class PolygonNotSelfIntersects(PolygonRule):
     ) -> Polygon:
         poly = structure[idx_poly_with_error]
         poly = domain.geometry.get_convex(poly)
+        if not domain.geometry.is_closed:
+            poly.points = poly.points[:-1]
         return poly
 
 

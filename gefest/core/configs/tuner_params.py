@@ -5,7 +5,7 @@ from typing import Callable, Union
 from hyperopt import hp
 from pydantic import BaseModel, ConfigDict, field_validator
 
-from gefest.core.opt.tuning import utils
+from gefest.tools.tuners import utils
 
 
 class TunerParams(BaseModel):
@@ -22,6 +22,7 @@ class TunerParams(BaseModel):
     timeout_minutes: int = 60
 
     @field_validator('tuner_type')
+    @classmethod
     def tuner_type_validate(cls, value):
         if isinstance(value, str):
             opt_names = ['iopt', 'optuna', 'sequential', 'simulataneous']
@@ -33,6 +34,7 @@ class TunerParams(BaseModel):
             raise ValueError(f'Invalid argument: {value} of type {type(value)}.')
 
     @field_validator('hyperopt_dist')
+    @classmethod
     def hyperopt_fun_validate(cls, value):
         if isinstance(value, str):
             r_ = inspect.getmembers(hp, inspect.isfunction)
@@ -48,6 +50,7 @@ class TunerParams(BaseModel):
             raise ValueError(f'Invalid argument: {value} of type {type(value)}.')
 
     @field_validator('variacne_generator')
+    @classmethod
     def variacne_generator_fun_validate(cls, value):
         fun_names = ['average_edge_variance']
         if isinstance(value, str):

@@ -1,28 +1,40 @@
-from gefest.tools.optimizers.GA.base_GA import BaseGA
+from typing import Callable
+
+from tqdm import tqdm
+
+from gefest.core.geometry import Structure
+from gefest.core.opt import strategies
+from gefest.core.opt.objective.objective_eval import ObjectivesEvaluator
+from gefest.core.opt.operators import selections
+from gefest.tools.optimizers.optimizer import Optimizer
 
 
-class GA(BaseGA):
-    """The class uses genetic algorithm during optimization process.
-    Args:
-        BaseGA (Callable): parent abstract class with main optimization methods
-    """
+class BaseGA(Optimizer):
+    def __init__(
+        self,
+        opt_params,
+        **kwargs,
+    ):
+        super().__init__(opt_params.log_dispatcher)
+        self.opt_params = opt_params
+        self.crossover = getattr(strategies, opt_params.crossover_strategy)(opt_params=opt_params)
+        self.mutation = getattr(strategies, opt_params.mutation_strategy)(opt_params=opt_params)
+        self.sampler: Callable = opt_params.sampler
+        self.objectives_evaluator: ObjectivesEvaluator = ObjectivesEvaluator(opt_params.objectives)
+        self.selector: Callable = getattr(selections, opt_params.selector.name)
+        self.pop_size = opt_params.pop_size
+        self.n_steps = opt_params.n_steps
+        self.domain = self.opt_params.domain
+        self._pop: list[Structure] = self.sampler(self.opt_params.pop_size)
+        self._pop = self.objectives_evaluator(self._pop)
+        self.log_dispatcher.log_pop(self._pop, '00000_init')
 
-    def step(self, population, performance, verbose=True, **kwargs):
-        self.init_populations(population)
-        self.init_fitness(performance)
-
-        selected = self.tournament_selection()
-        self._pop = sorted(selected, key=lambda x: x.fitness)
-
-        un_pop = set()
-        self._pop = [
-            un_pop.add(str(ind.genotype)) or ind
-            for ind in self._pop
-            if str(ind.genotype) not in un_pop
-        ]
-
-        self._pop.extend(self.reproduce(self._pop))
-
-        population = [ind.genotype for ind in self._pop]
-
-        return population
+    def optimize(self) -> list[Structure]:
+        for step in tqdm(range(self.n_steps)):
+            self._pop = self.crossover(self._pop)
+            self._pop = self.mutation(self._pop)
+            self._pop.extend(self.sampler(self.opt_params.extra))
+            self._pop = self.objectives_evaluator(self._pop)
+            self._pop = self.selector(self._pop, self.opt_params.pop_size)
+            self.log_dispatcher.log_pop(self._pop, str(step + 1))
+        return self._pop

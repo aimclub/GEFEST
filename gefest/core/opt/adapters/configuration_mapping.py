@@ -7,12 +7,12 @@ from golem.core.optimisers.genetic.operators.selection import SelectionTypesEnum
 from golem.core.optimisers.optimization_parameters import GraphRequirements
 from golem.core.optimisers.optimizer import GraphGenerationParams
 
-from gefest.core.algs.postproc.resolve_errors import validate
 from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.opt.adapters.factories import StructureFactory
 from gefest.core.opt.adapters.operator import OperationWrap
 from gefest.core.opt.operators.crossovers import crossover_structures
 from gefest.core.opt.operators.mutations import mutate_structure
+from gefest.core.opt.postproc.resolve_errors import validate
 
 
 def map_into_graph_requirements(

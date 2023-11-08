@@ -3,10 +3,10 @@ from typing import Union
 
 from loguru import logger
 
-from gefest.core.algs.postproc.rules_base import PolygonRule, StructureRule
-from gefest.core.algs.postproc.validation import validate
 from gefest.core.geometry import Structure
 from gefest.core.geometry.domain import Domain
+from gefest.core.opt.postproc.rules_base import PolygonRule, StructureRule
+from gefest.core.opt.postproc.validation import validate
 
 
 class Postrocessor:
@@ -29,8 +29,12 @@ class Postrocessor:
     def _apply_polygon_rule(structure, rule, attempts, domain) -> Union[Structure, None]:
         for idx_, _ in enumerate(structure.polygons):
             for _ in range(attempts):
+                if structure[idx_].points is None:
+                    logger.warning('bruh')
                 if not rule.validate(structure, idx_, domain):
                     structure[idx_] = rule.correct(structure, idx_, domain)
+                    if structure[idx_].points is None:
+                        logger.warning('bruh')
                 else:
                     break
             else:

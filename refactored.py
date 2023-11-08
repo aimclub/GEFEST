@@ -1,16 +1,15 @@
 from gefest.core.configs.utils import load_config
-from gefest.core.opt.tuning.tuner import GolemTuner
 from gefest.core.viz.struct_vizualizer import GIFMaker
-from gefest.tools.optimizers.golem_optimizer.standard import StandardOptimizer
+from gefest.tools.optimizers.GA.GA import BaseGA
+from gefest.tools.tuners.tuner import GolemTuner
 
 if __name__ == '__main__':
 
     opt_params = load_config(
-        'F:\\Git_Repositories\\gef_ref\\GEFEST\\zcfg.yaml',
-        'F:\\Git_Repositories\\gef_ref\\GEFEST\\zmetrics.py',
+        'F:\\Git_Repositories\\gef_ref\\GEFEST\\gefest_config.py',
     )
 
-    optimizer = StandardOptimizer(opt_params)
+    optimizer = BaseGA(opt_params)
     optimized_pop = optimizer.optimize()
 
     tuner = GolemTuner(opt_params)

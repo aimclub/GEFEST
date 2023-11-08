@@ -1,36 +1,38 @@
 from functools import partial
+
 import numpy as np
+from golem.core.optimisers.genetic.gp_optimizer import EvoGraphOptimizer
 from scipy.spatial.distance import cdist
 
-from golem.core.optimisers.genetic.gp_optimizer import EvoGraphOptimizer
 from gefest.core.opt.individual import Individual
-
 from gefest.core.opt.operators.operators import default_operators
-from gefest.tools.optimizers.GA.base_GA import BaseGA
+from gefest.tools.optimizers.GA.GA import BaseGA
 
 
-class MOEAD(EvoGraphOptimizer, BaseGA):
+class MOEAD(EvoGraphOptimizer):
     """
     GOLEM based optimizer of GEFEST structures
     """
 
-    def __init__(self,
-                 adapter,
-                 mutation_rate,
-                 crossover_rate,
-                 pop_size,
-                 task_setup,
-                 n_neighbors,
-                 params):
+    def __init__(
+        self,
+        adapter,
+        mutation_rate,
+        crossover_rate,
+        pop_size,
+        task_setup,
+        n_neighbors,
+        params,
+    ):
         EvoGraphOptimizer.__init__(self, **params)
 
-        self.params = BaseGA.Params(pop_size=pop_size,
-                                    crossover_rate=crossover_rate,
-                                    mutation_rate=mutation_rate,
-                                    mutation_value_rate=[])
-        BaseGA.__init__(self, self.params,
-                        default_operators(),
-                        task_setup)
+        self.params = BaseGA.Params(
+            pop_size=pop_size,
+            crossover_rate=crossover_rate,
+            mutation_rate=mutation_rate,
+            mutation_value_rate=[],
+        )
+        BaseGA.__init__(self, self.params, default_operators(), task_setup)
 
         self.num_of_individuals = pop_size
         self.n_neighbors = n_neighbors
@@ -43,7 +45,10 @@ class MOEAD(EvoGraphOptimizer, BaseGA):
         n_obj = len(self._pop[0].objectives)
         self.initUniformWeight(n_obj)
         self.ideal = np.min([ind.objectives for ind in self._pop], axis=0)
-        self.neighbors = np.argsort(cdist(self.ref_dirs, self.ref_dirs), axis=1, kind='quicksort')[:, :self.n_neighbors]
+        self.neighbors = np.argsort(cdist(self.ref_dirs, self.ref_dirs), axis=1, kind='quicksort')[
+            :,
+            : self.n_neighbors,
+        ]
         _ = 1
 
     def step(self, population, performance, n_step):
@@ -69,7 +74,7 @@ class MOEAD(EvoGraphOptimizer, BaseGA):
         return population
 
     def _evolve_population(self, **kwargs):
-        """ Method realizing full evolution cycle """
+        """Method realizing full evolution cycle"""
         self.calculate_fitness()
         self._pop = self.tournament_selection()
         self._pop.extend(self.reproduce(self._pop))
@@ -78,7 +83,7 @@ class MOEAD(EvoGraphOptimizer, BaseGA):
 
     def calculate_fitness(self):
         for j, ind in enumerate(self._pop):
-            maxFun = -1.0e+30
+            max_fun = -1.0e30
             for n in range(len(ind.objectives)):
                 diff = abs(ind.objectives[n] - self.ideal[n])
                 if self.ref_dirs[j][n] == 0:
@@ -86,10 +91,10 @@ class MOEAD(EvoGraphOptimizer, BaseGA):
                 else:
                     feval = diff * self.ref_dirs[j][n]
 
-                if feval > maxFun:
-                    maxFun = feval
+                if feval > max_fun:
+                    max_fun = feval
 
-            ind.fitness = maxFun + len(self.neighbors[j])
+            ind.fitness = max_fun + len(self.neighbors[j])
 
     def initUniformWeight(self, n_obj):
         """
@@ -108,7 +113,7 @@ class MOEAD(EvoGraphOptimizer, BaseGA):
                 self.ref_dirs[n][1] = 1 - a
         elif n_obj == 3:
             """
-            Ported from Java code written by Wudong Liu 
+            Ported from Java code written by Wudong Liu
             (Source: http://dces.essex.ac.uk/staff/qzhang/moead/moead-java-source.zip)
             """
             m = len(self._pop)

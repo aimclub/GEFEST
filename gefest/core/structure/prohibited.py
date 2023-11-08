@@ -4,7 +4,6 @@ from shapely.geometry.point import Point
 
 from gefest.core.geometry import Point as G_Point
 from gefest.core.geometry import Polygon, PolyID, Structure
-from gefest.core.geometry.domain import Domain
 
 
 def create_prohibited(

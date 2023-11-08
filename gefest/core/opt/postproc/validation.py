@@ -2,9 +2,9 @@ from typing import Union
 
 from loguru import logger
 
-from gefest.core.algs.postproc.rules_base import PolygonRule, StructureRule
-from gefest.core.geometry import Point, Polygon, Structure
+from gefest.core.geometry import Structure
 from gefest.core.geometry.domain import Domain
+from gefest.core.opt.postproc.rules_base import PolygonRule, StructureRule
 
 
 def validate(

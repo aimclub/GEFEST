@@ -1,12 +1,21 @@
-import json
-from dataclasses import dataclass
-from functools import partial
 from random import randint
 from typing import Optional
 
 import numpy as np
 from loguru import logger
+from polygenerator import (
+    random_convex_polygon,
+    random_polygon,
+    random_star_shaped_polygon,
+)
 from shapely.affinity import scale
+from shapely.geometry import (
+    GeometryCollection,
+    LineString,
+    MultiLineString,
+    MultiPolygon,
+)
+from shapely.geometry import Point as SPoint
 
 from gefest.core.geometry import Point, Polygon, Structure
 from gefest.core.geometry.geometry_2d import Geometry2D
@@ -43,7 +52,7 @@ def get_random_poly(parent_structure: Optional[Structure], domain: Domain) -> Op
         The main idea is to create centroids along with a neighborhood to locate the polygon.
         Neighborhood sizes range from small to large.
         The main condition for creating a neighborhood is the absence of other polygons in it.
-        After setting the neighborhood, polygons are created around the centroid inside the given neighborhood.
+        After setting the neighborhood, polygons are created around the centroid inside it.
         This approach is less demanding on postprocessing than random creation
         """
 
@@ -83,13 +92,6 @@ def get_random_point(polygon: Polygon, structure: Structure, domain: Domain) -> 
     return point
 
 
-from polygenerator import (
-    random_convex_polygon,
-    random_polygon,
-    random_star_shaped_polygon,
-)
-
-
 def create_poly(centroid: Point, sigma: int, domain: Domain, geometry: Geometry2D) -> Polygon:
 
     num_points = randint(
@@ -110,8 +112,6 @@ def create_poly(centroid: Point, sigma: int, domain: Domain, geometry: Geometry2
     new_poly = generator(num_points)
     if not geometry.is_closed:
         start = np.random.choice(range(num_points), 1)[0]
-        # slice_length = np.random.choice(range(3, len(poly_points)), 1)[0]
-        # logger.info(slice_length)
         new_poly = [new_poly[((start + i) % len(new_poly))] for i in range(num_points)]
 
     scale_factor = 2 * (sigma / (1 ** 0.5))
@@ -128,51 +128,6 @@ def create_poly(centroid: Point, sigma: int, domain: Domain, geometry: Geometry2
     if domain.geometry.is_closed:
         new_poly.points.append(new_poly[0])
     return new_poly
-
-
-# def create_poly(centroid: Point, sigma: int, domain: Domain, geometry: Geometry2D) -> Polygon:
-#     # Creating polygon in the neighborhood of the centroid
-#     # sigma defines neighborhood
-#     num_points = randint(
-#         domain.min_points_num,
-#         domain.max_points_num,
-#     )  # Number of points in a polygon
-#     points = []
-#     cntr = 0
-#     while len(points) < num_points:
-#         cntr += 1
-
-#         point = create_polygon_point(centroid, sigma)
-#         while not in_bound(point, domain):
-#             point = create_polygon_point(centroid, sigma)
-#         points.append(point)
-#         ind = len(points) - 1
-#         if ind > 0:
-#             if (
-#                 np.linalg.norm(
-#                     np.array(points[ind].coords[:2]) - np.array(points[ind - 1].coords[:2]), ord=1
-#                 )
-#                 < domain.dist_between_points
-#             ):
-#                 del points[ind]
-#         if len(points) == num_points:
-#             if (
-#                 np.linalg.norm(
-#                     np.array(points[-1].coords[:2]) - np.array(points[0].coords[:2]), ord=1
-#                 )
-#                 < domain.dist_between_points
-#             ):
-#                 del points[-1]
-#         if len(points) == num_points:
-#             if domain.geometry.is_closed:
-#                 points.append(points[0])
-#             poly = geometry.get_convex(Polygon(points=points))
-#             points = poly.points
-#             if cntr > 5000 and len(points) > 4:
-#                 break
-
-#     # logger.info(f'Create poly finish, {cntr} iterations.')
-#     return poly
 
 
 def get_sigma_max(poly, init_max):
@@ -256,11 +211,6 @@ def distance(point: Point, structure: Structure, geometry: Geometry2D) -> float:
     return min(distances)
 
 
-from shapely.affinity import scale
-from shapely.geometry import LineString, MultiLineString
-from shapely.geometry import Point as GeomPoint
-
-
 def get_selfintersection_safe_point(
     poly: Polygon,
     domain: Domain,
@@ -269,8 +219,7 @@ def get_selfintersection_safe_point(
 ) -> Polygon:
     'for non convex geometry'
     geom = domain.geometry
-    if len(poly) <= 5:
-        logger.info('special_case')
+
     if geom.is_closed:
         parts = [
             *poly.points[(point_right_idx) % len(poly) : :],
@@ -286,19 +235,18 @@ def get_selfintersection_safe_point(
             ]
             if len(part) != 1
         ]
-    # return border
     border = MultiLineString(
         [scale(line, xfact=0.99, yfact=0.99) for line in border if not line.is_empty],
     )
-    l = poly[point_left_idx % len(poly)]
-    r = poly[point_right_idx % len(poly)]
+    l_ = poly[point_left_idx % len(poly)]
+    r_ = poly[point_right_idx % len(poly)]
 
-    origin = Point((l.x + r.x) / 2, (l.y + l.y) / 2)
+    origin = Point((l_.x + r_.x) / 2, (l_.y + l_.y) / 2)
     scalefactor = (
-        (LineString(((l.x, l.y), (r.x, r.y))).length / 2)
+        (LineString(((l_.x, l_.y), (r_.x, r_.y))).length / 2)
         if len(poly) > 2
         else geom.get_length(poly) * 1.5
-    )  # 1.5 ??
+    )
     points = []
     p_area = geom.get_prohibited_geom(
         domain.prohibited_area,
@@ -307,7 +255,11 @@ def get_selfintersection_safe_point(
     for _ in range(200):
         point = random_polar(origin, scalefactor)
         points.append(point)
-        new_segment = scale(LineString(((l.x, l.y), (point.x, point.y), (r.x, r.y))), 0.99, 0.99)
+        new_segment = scale(
+            LineString(((l_.x, l_.y), (point.x, point.y), (r_.x, r_.y))),
+            0.99,
+            0.99,
+        )
 
         if all(
             (
@@ -321,3 +273,168 @@ def get_selfintersection_safe_point(
         point = None
 
     return point, border
+
+
+def get_convex_safe_area(
+    poly: Polygon,
+    domain: Domain,
+    point_left_idx: int,
+    point_right_idx: int,
+    structure: Structure,
+    poly_idx: int,
+    **kwargs,
+) -> Polygon:
+    geom = domain.geometry
+    movment_area = None
+
+    poly_len = len(poly)
+    if poly_len == 2:
+        p = poly[(point_left_idx + 1) % poly_len]
+        circle = SPoint(p.x, p.y).buffer(geom.get_length(poly) * 1.5)
+        base_area = [Point(p[0], p[1]) for p in list(circle.exterior_.coords)]
+
+    elif poly_len == 3:
+        p = poly[(point_left_idx + 1) % poly_len]
+        circle = SPoint(p.x, p.y).buffer(geom.get_length(poly) / 3)
+        base_area = [Point(p[0], p[1]) for p in list(circle.exterior_.coords)]
+
+    else:
+        left_cut = [
+            poly[((point_left_idx - 1) + poly_len) % poly_len],
+            poly[(point_left_idx) % poly_len],
+        ]
+        right_cut = [
+            poly[(point_right_idx + 1) % poly_len],
+            poly[(point_right_idx) % poly_len],
+        ]
+
+        cut_angles = (
+            geom.get_angle(
+                left_cut,
+                (left_cut[1], right_cut[1]),
+            ),
+            geom.get_angle(
+                right_cut,
+                (right_cut[1], left_cut[1]),
+            ),
+        )
+
+        p1, p2 = left_cut[1], right_cut[1]
+        pad_vector_points = [p1, geom.rotate_point(p2, p1, 90)]
+        pad_vector = (
+            pad_vector_points[1].x - pad_vector_points[0].x,
+            pad_vector_points[1].y - pad_vector_points[0].y,
+        )
+        slice_line = (
+            Point(left_cut[1].x + pad_vector[0], left_cut[1].y + pad_vector[1]),
+            Point(right_cut[1].x + pad_vector[0], right_cut[1].y + pad_vector[1]),
+        )
+        scale_factor = max(domain.max_x, domain.max_y) * 100
+
+        if sum(cut_angles) < 170:
+
+            intersection_point = geom.intersection_line_line(
+                left_cut,
+                right_cut,
+                scale_factor,
+                scale_factor,
+            )
+            if intersection_point is not None:
+                mid_points = [intersection_point]
+            else:
+                mid_points = [
+                    geom.intersection_line_line(left_cut, slice_line, scale_factor, scale_factor),
+                    geom.intersection_line_line(right_cut, slice_line, scale_factor, scale_factor),
+                ]
+            slice_points = geom.intersection_poly_line(
+                Polygon(
+                    [
+                        left_cut[1],
+                        *mid_points,
+                        right_cut[1],
+                    ],
+                ),
+                slice_line,
+                scale_factor,
+            )
+
+            base_area = [
+                left_cut[1],
+                *slice_points,
+                right_cut[1],
+            ]
+            base_area = [
+                Point(p[0], p[1])
+                for p in geom._poly_to_shapely_poly(Polygon(base_area)).convex_hull.exterior_.coords
+            ]
+
+        else:
+            base_area = [
+                left_cut[1],
+                geom.intersection_line_line(left_cut, slice_line, scale_factor, scale_factor),
+                geom.intersection_line_line(right_cut, slice_line, scale_factor, scale_factor),
+                right_cut[1],
+            ]
+            if base_area[1] is None or base_area[2] is None:
+                logger.warning('here')
+
+            if not geom._poly_to_shapely_poly(Polygon(base_area)).is_simple:
+                base_area = [
+                    left_cut[1],
+                    geom.intersection_line_line(left_cut, right_cut, scale_factor, scale_factor),
+                    right_cut[1],
+                ]
+
+        if base_area:
+            other_polygons = Structure([poly for i, poly in enumerate(structure) if i != poly_idx])
+            movment_area = _substract_oссupied_area(
+                Polygon(base_area),
+                other_polygons,
+                domain,
+                left_cut[1].coords,
+                right_cut[1].coords,
+            )
+    return movment_area
+
+
+def _substract_oссupied_area(
+    base_area: Polygon,
+    structure: Structure,
+    domain: Domain,
+    left_point: tuple[float, float],
+    right_point: tuple[float, float],
+):
+    geom = domain.geometry
+    prohibs = geom.get_prohibited_geom(
+        domain.prohibited_area,
+        buffer_size=domain.dist_between_polygons,
+    )
+
+    movment_area = geom._poly_to_shapely_poly(base_area).intersection(
+        geom._poly_to_shapely_poly(domain.allowed_area),
+    )
+
+    for fig in prohibs.geoms:
+        movment_area = movment_area.difference(
+            fig.buffer(
+                domain.min_dist_from_boundary,
+            ),
+        )
+
+    for idx in [idx for idx in range(len(structure))]:
+        movment_area = movment_area.difference(
+            geom._poly_to_shapely_poly(structure[idx]).buffer(
+                domain.dist_between_polygons,
+            ),
+        )
+
+    if movment_area.is_empty:
+        logger.warning('Empty movment area.')
+        movment_area = None
+    elif isinstance(movment_area, (MultiPolygon, GeometryCollection)):
+        for g_ in movment_area.geoms:
+            if g_.intersects(LineString((left_point, right_point))):
+                movment_area = g_
+                break
+
+    return movment_area

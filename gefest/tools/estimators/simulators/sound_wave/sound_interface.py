@@ -129,7 +129,7 @@ class SoundSimulator(Estimator):
         # outflow velocities from each cell
         self._velocities = np.zeros((self.size_y, self.size_x, 4))
 
-    def updateV(self):
+    def update_velocity(self):
         """Update the velocity field based on Komatsuzaki's transition rules."""
         V = self._velocities
         P = self.pressure
@@ -142,15 +142,15 @@ class SoundSimulator(Estimator):
             V[i, j, 2] = V[i, j, 2] + P[i, j] - P[i + 1, j] if i < self.size_y - 1 else P[i, j]
             V[i, j, 3] = V[i, j, 3] + P[i, j] - P[i, j - 1] if j > 0 else P[i, j]
 
-    def updateP(self):
+    def update_perssure(self):
         """Update the pressure field based on Komatsuzaki's transition rules."""
         self.pressure -= CA2 * DAMPING * np.sum(self._velocities, axis=2)
 
     def step(self):
         """Perform a simulation step, upadting the wind an pressure fields."""
         self.pressure[self.s_y, self.s_x] = INITIAL_P * np.sin(self.omega * self.iteration)
-        self.updateV()
-        self.updateP()
+        self.update_velocity()
+        self.update_perssure()
         self.iteration += 1
 
     def spl(self, integration_interval=60):

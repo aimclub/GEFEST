@@ -112,14 +112,14 @@ def polygon_level_crossover(
         ]
     pairs_dists = sorted(pairs_dists, key=lambda p_d: p_d[1])
     if len(pairs_dists) == 0:
-        return s1
+        return (s1,)
     poly_1 = pairs_dists[0][0][0]
     poly_2 = pairs_dists[0][0][1]
     if intersected:
         #  adaptive angle  #
         split_angle = (np.random.rand() * 2 - 1) * (70)
     elif pairs_dists[0][1] > domain.dist_between_polygons:
-        return s1
+        return (s1,)
 
     c1, c2 = geom.get_centroid(poly_1), geom.get_centroid(poly_2)
     vector1 = geom.rotate_point(point=c2, origin=c1, angle=split_angle)
@@ -128,7 +128,7 @@ def polygon_level_crossover(
     parts_1 = geom.split_polygon(poly_1, [c1, vector1], scale_factor)
     parts_2 = geom.split_polygon(poly_2, [c2, vector2], scale_factor)
     if len(parts_1) < 2 or len(parts_2) < 2:
-        return s1
+        return (s1,)
 
     new_parts = (*parts_1[0], *parts_2[1]) if c1.y > c2.y else (*parts_1[1], *parts_2[0])
     new_poly = geom.get_convex(Polygon(points=[Point(*p) for p in list(set(new_parts))]))
@@ -138,7 +138,7 @@ def polygon_level_crossover(
 
     idx_ = where(s1.polygons, lambda p: p == poly_1)[0]
     s1[idx_] = new_poly
-    return s1
+    return (s1,)
 
 
 class CrossoverTypes(Enum):

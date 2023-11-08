@@ -4,21 +4,18 @@ from functools import partial
 from typing import Callable, Union
 
 from golem.core.optimisers.graph import OptGraph
-from golem.core.optimisers.objective import Objective, ObjectiveEvaluate
 from golem.core.tuning.iopt_tuner import IOptTuner
 from golem.core.tuning.optuna_tuner import OptunaTuner
 from golem.core.tuning.search_space import OperationParametersMapping, SearchSpace
 from golem.core.tuning.sequential import SequentialTuner
 from golem.core.tuning.simultaneous import SimultaneousTuner
 
-from gefest.core.algs.postproc.resolve_errors import validate
 from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.geometry import Structure
 from gefest.core.geometry.domain import Domain
-from gefest.core.opt.tuning.utils import (
-    GolemObjectiveWithPreValidation,
-    VarianceGeneratorType,
-)
+from gefest.core.opt.objective.tuner_objective import GolemObjectiveWithPreValidation
+from gefest.core.opt.postproc.resolve_errors import validate
+from gefest.tools.tuners.utils import VarianceGeneratorType
 
 GolemTunerType = Union[IOptTuner, OptunaTuner, SequentialTuner, SimultaneousTuner]
 
@@ -48,7 +45,6 @@ class GolemTuner:
         self.validator = partial(validate, rules=opt_params.postprocess_rules, domain=self.domain)
         self.tuner_type: str = opt_params.tuner_cfg.tuner_type
         self.eval_n_jobs: int = 1
-        # self.objective_evaluate: ObjectiveEvaluate = ObjectiveEvaluate(objective, self.eval_n_jobs)
         self.adapter: Callable = opt_params.golem_adapter
         self.objective = GolemObjectiveWithPreValidation(
             quality_metrics={obj.__class__.__name__: obj for obj in opt_params.objectives},

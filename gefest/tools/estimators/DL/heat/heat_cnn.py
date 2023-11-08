@@ -1,11 +1,11 @@
-import torchvision.models as models
-import torch
-import matplotlib.pyplot as plt
 import os
-from torchvision import transforms
-import PIL
 
+import matplotlib.pyplot as plt
+import PIL
+import torch
+import torchvision.models as models
 from torch import nn
+from torchvision import transforms
 
 
 class HeatCNN:
@@ -21,8 +21,7 @@ class HeatCNN:
         super(HeatCNN, self).__init__()
 
         self.model = EffModel()
-        self.model.load_state_dict(
-            torch.load(path, map_location=torch.device('cpu')))
+        self.model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
 
         self.img_size = 128
 
@@ -51,7 +50,6 @@ class HeatCNN:
 
 
 class EffModel(nn.Module):
-
     def __init__(self):
         super(EffModel, self).__init__()
 
@@ -87,6 +85,6 @@ class EffModel(nn.Module):
 
         return decoded
 
-    def loss(self, pred, true):
-        out = self.mse(torch.flatten(pred.float()), torch.flatten(true.float()))
+    def loss(self, pred_labels, true_labels):
+        out = self.mse(torch.flatten(pred_labels.float()), torch.flatten(true_labels.float()))
         return out
