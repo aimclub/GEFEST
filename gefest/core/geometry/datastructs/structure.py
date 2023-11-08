@@ -37,9 +37,6 @@ class Structure:
 
     def __getitem__(self, key):
         return self.polygons[key]
-        # if isinstance(key, slice):
-        #     indices = range(*key.indices(len(self.points)))
-        #     return Polygon([self.points[i] for i in indices])
 
     def __contains__(self, item: Union[Point, Polygon]):
         if isinstance(item, Polygon):
@@ -56,6 +53,3 @@ class Structure:
         polygons = list(self.polygons)
         polygons.remove(value)
         self.polygons = tuple(polygons)
-
-
-
