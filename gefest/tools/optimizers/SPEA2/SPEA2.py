@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 from tqdm import tqdm
 
-from gefest.tools.optimizers.GA.base_GA import BaseGA
+from gefest.tools.optimizers.GA.GA import BaseGA
 
 
 class SPEA2(BaseGA):

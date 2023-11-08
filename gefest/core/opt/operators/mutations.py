@@ -5,12 +5,15 @@ from typing import Callable
 
 import numpy as np
 from loguru import logger
-from shapely.geometry import LineString, MultiPoint
-from shapely.geometry import Point as SPoint
+from shapely.geometry import LineString
 
 from gefest.core.geometry import Point, Polygon, Structure
 from gefest.core.geometry.domain import Domain
-from gefest.core.geometry.utils import get_random_poly, get_selfintersection_safe_point
+from gefest.core.geometry.utils import (
+    get_convex_safe_area,
+    get_random_poly,
+    get_selfintersection_safe_point,
+)
 
 
 def mutate_structure(
@@ -111,133 +114,36 @@ def resize_poly_mutation(
     return new_structure
 
 
-@logger.catch
-def _get_convex_safe_area(
+def _get_new_point_between(
     poly: Polygon,
     domain: Domain,
-    point_left_idx: int,
-    point_right_idx: int,
-    **kwargs,
-) -> Polygon:
+    left_point_idx: int,
+    right_point_idx: int,
+) -> Point:
     geom = domain.geometry
-    if poly[0] == poly[-1]:
-        poly = poly[:-1]
-    l = len(poly)
-    if l == 2:
-        p = poly[(point_left_idx + 1) % l]
-        circle = SPoint(p.x, p.y).buffer(geom.get_length(poly))
-        base_area = [Point(p[0], p[1]) for p in list(circle.exterior.coords)]
-        return base_area
-
-    left_cut = [
-        poly[(point_left_idx - 1) % l],
-        poly[(point_left_idx) % l],
-    ]
-    right_cut = [
-        poly[(point_right_idx + 1) % l],
-        poly[(point_right_idx) % l],
-    ]
-    cut_angles = (
-        geom.get_angle(
-            left_cut,
-            [
-                left_cut[0],
-                right_cut[0],
-            ],
-        ),
-        geom.get_angle(
-            right_cut,
-            [
-                right_cut[0],
-                left_cut[0],
-            ],
-        ),
-    )
-
-    p1, p2 = left_cut[1], right_cut[1]
-    pad_vector_points = [p1, geom.rotate_point(p2, p1, 90)]
-    pad_vector = (
-        pad_vector_points[1].x - pad_vector_points[0].x,
-        pad_vector_points[1].y - pad_vector_points[0].y,
-    )
-    # pad_vector == len(vector[left_point, right_point])
-    slice_line = (
-        Point(left_cut[1].x + pad_vector[0], left_cut[1].y + pad_vector[1]),
-        Point(right_cut[1].x + pad_vector[0], right_cut[1].y + pad_vector[1]),
-    )
-    scale_factor = max(domain.max_x, domain.max_y) * 100
-
-    if sum(cut_angles) < 170:
-
-        intersection_point = geom.intersection_line_line(
-            left_cut,
-            right_cut,
-            scale_factor,
-            scale_factor,
+    if not geom.is_convex or len(poly) == 3:
+        point, _ = get_selfintersection_safe_point(
+            poly,
+            domain,
+            left_point_idx,
+            right_point_idx,
         )
-        if intersection_point is not None:
-            mid_points = [intersection_point]
-        else:
-            mid_points = [
-                geom.intersection_line_line(left_cut, slice_line, scale_factor, scale_factor),
-                geom.intersection_line_line(right_cut, slice_line, scale_factor, scale_factor),
-            ]
-        try:
-            slice_points = geom.intersection_poly_line(
-                Polygon(
-                    [
-                        left_cut[1],
-                        *mid_points,
-                        right_cut[1],
-                    ],
-                ),
-                slice_line,
-                scale_factor,
-            )
-        except Exception as e:
-            raise Exception(e)
-            # from shapely.plotting import plot_line
-            # from matplotlib import pyplot as plt
-            # plot_line(geom._poly_to_shapely_line(poly))
-            # plot_line(
-            #     LineString(
-            #     [(p.x,p.y) for p in
-            #     [
-            #         left_cut[1],
-            #         *mid_points,
-            #         right_cut[1],
-            #     ]],
-            #     ), color='r',
-            # )
-            # plot_line(LineString([(p.x,p.y) for p in slice_line]), color='g')
-            # plt.show()
-
-        if slice_points:
-            if isinstance(slice_points, SPoint):
-                mid_points = [Point(slice_points.x, slice_points.y)]
-            elif isinstance(slice_points, MultiPoint):
-                mid_points = [Point(p.x, p.y) for p in slice_points.geoms]
-            else:
-                mid_points = [Point(p.x, p.y) for p in slice_points.coords]
-        base_area = [
-            left_cut[1],
-            *mid_points,
-            right_cut[1],
-        ]
-        base_area = [
-            Point(p[0], p[1])
-            for p in geom._poly_to_shapely_poly(Polygon(base_area)).convex_hull.exterior.coords
-        ]
 
     else:
-        base_area = [
-            left_cut[1],
-            geom.intersection_line_line(left_cut, slice_line, scale_factor, scale_factor),
-            geom.intersection_line_line(right_cut, slice_line, scale_factor, scale_factor),
-            right_cut[1],
-        ]
+        shaply_poly = geom._poly_to_shapely_poly(poly)
+        movment_area = get_convex_safe_area(
+            poly,
+            domain,
+            left_point_idx,
+            right_point_idx,
+        )
+        movment_area = geom._poly_to_shapely_poly(movment_area)
+        if not shaply_poly.is_simple:
+            logger.warning('Got non convex polygon. Convex hull will be used.', backtrace=True)
 
-    return Polygon(base_area) if base_area else base_area
+        point = geom.get_random_point_in_poly(movment_area)
+
+    return point
 
 
 @logger.catch
@@ -249,68 +155,44 @@ def pos_change_point_mutation(
 ) -> Structure:
     geom = domain.geometry
     poly = copy.deepcopy(new_structure[idx_])
-
     if poly[0] == poly[-1]:
         poly = poly[:-1]
-    mutate_point_idx = int(np.random.randint(1, len(poly)))  # fix 1 to 0
-
-    if geom.is_convex:
-        poly = geom.get_convex(poly=poly)
-
+    mutate_point_idx = int(np.random.randint(0, len(poly)))
+    new_point = None
     if not geom.is_convex or (len(poly) in (2, 3)):
-        point, _ = get_selfintersection_safe_point(
+        new_point, _ = get_selfintersection_safe_point(
             poly,
             domain,
             mutate_point_idx - 1,
             mutate_point_idx + 1,
         )
-        if point:
-            poly[mutate_point_idx] = point
 
     elif geom.is_convex:
-
-        base_area = _get_convex_safe_area(
+        poly = geom.get_convex(poly=poly)[:-1]
+        movment_area = get_convex_safe_area(
             poly,
             domain,
             mutate_point_idx - 1,
             mutate_point_idx + 1,
+            new_structure,
+            idx_,
         )
 
-        if base_area:
-            movment_area = geom._poly_to_shapely_poly(base_area).intersection(
-                geom._poly_to_shapely_poly(domain.allowed_area),
-            )
-            prohibs = geom.get_prohibited_geom(
-                domain.prohibited_area,
-                buffer_size=domain.dist_between_polygons,
-            )
-            for fig in prohibs.geoms:
-                movment_area = movment_area.difference(
-                    fig.buffer(
-                        domain.min_dist_from_boundary,
-                    ),
-                )
-
-            for idx in [idx for idx in range(len(new_structure)) if idx != idx_]:
-                movment_area = movment_area.difference(
-                    geom._poly_to_shapely_poly(new_structure[idx]).buffer(
-                        domain.dist_between_polygons,
-                    ),
-                )
-            if movment_area.is_empty:
-                logger.warning('Empty movment area.')
+        if movment_area:
+            if not movment_area:
                 return new_structure
+            else:
+                new_point = geom.get_random_point_in_poly(movment_area)
 
-            point = geom.get_random_point_in_poly(movment_area)  # pick in geom collection : todo
-            if point:
-                poly[mutate_point_idx % len(poly)] = point
+    else:
+        logger.warning('Strange case')
+
+    if new_point:
+        poly[mutate_point_idx % len(poly)] = new_point
 
     if geom.is_closed:
         poly.points.append(poly[0])
     new_structure[idx_] = poly
-    if new_structure is None:
-        logger.error('None structure.')
-
     return new_structure
 
 
@@ -321,89 +203,50 @@ def add_point_mutation(
     idx_: int = None,
     **kwargs,
 ):
-
-    if new_structure is None:
-        logger.error('None struct')
-
     geom = domain.geometry
     poly = copy.deepcopy(new_structure[idx_])
-    if geom.is_closed:
-        if poly[0] == poly[-1]:
-            poly = poly[:-1]
-    mutate_point_idx = int(np.random.randint(0, len(poly)))
 
+    if poly[0] == poly[-1]:
+        poly = poly[:-1]
+    mutate_point_idx = int(np.random.randint(0, len(poly)))
+    new_point = None
     if not geom.is_convex or len(poly) == 3:
-        point, _ = get_selfintersection_safe_point(
+        new_point, _ = get_selfintersection_safe_point(
             poly,
             domain,
             mutate_point_idx,
             mutate_point_idx + 1,
         )
-        if point:
-            poly.points.insert(mutate_point_idx, point)
-        else:
-            logger.warning('Failed to add point without self intersection.')
 
     elif geom.is_convex:
-        poly = geom.get_convex(poly=poly)
-        base_area = _get_convex_safe_area(
+        poly = geom.get_convex(poly=poly)[:-1]
+        movment_area = get_convex_safe_area(
             poly,
             domain,
             mutate_point_idx,
             mutate_point_idx + 1,
+            new_structure,
+            idx_,
         )
 
-        if base_area:
-            base_area = geom._poly_to_shapely_poly(Polygon(base_area))
-            if not base_area.is_simple:
-                logger.error('Base area not simple.')
-
-            movment_area = base_area.intersection(
-                geom._poly_to_shapely_poly(domain.allowed_area),
-            )
-
-            prohibs = geom.get_prohibited_geom(
-                domain.prohibited_area,
-                buffer_size=domain.dist_between_polygons,
-            )
-            for fig in prohibs.geoms:
-                movment_area = movment_area.difference(
-                    fig.buffer(
-                        domain.min_dist_from_boundary,
-                    ),
-                )
-
-            for idx in [idx for idx in range(len(new_structure)) if idx != idx_]:
-                movment_area = movment_area.difference(
-                    geom._poly_to_shapely_poly(new_structure[idx]).buffer(
-                        domain.dist_between_polygons,
-                    ),
-                )
-            if movment_area.is_empty:
-                logger.warning('Empty movment area')
+        if movment_area:
+            if not movment_area:
                 return new_structure
             else:
-                pass
-                # logger.warning('Not implemented select adjacent to poly movment_area part.')
-                # logger.warning('Not implemented number of parts check. If there is 1 part - ok.')
-            point = geom.get_random_point_in_poly(movment_area)
-            if point:
-                if mutate_point_idx + 1 < len(poly):
-                    poly.points.insert(
-                        mutate_point_idx + 1,
-                        point,
-                    )
-                else:
-                    poly.points.insert(
-                        mutate_point_idx - 1,
-                        point,
-                    )
+                new_point = geom.get_random_point_in_poly(movment_area)
+
+    else:
+        logger.warning('Strange case')
+    if new_point:
+        poly.points.insert(
+            (mutate_point_idx + 1) % len(poly),
+            new_point,
+        )
 
     if geom.is_closed:
         poly.points.append(poly[0])
+
     new_structure[idx_] = poly
-    if new_structure is None:
-        logger.error('None struct')
     return new_structure
 
 

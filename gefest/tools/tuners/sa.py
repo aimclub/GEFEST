@@ -1,11 +1,12 @@
 import itertools
 import time
 from copy import deepcopy
+
 import matplotlib.pyplot as plt
 
-from gefest.core.structure.structure import Structure
+from gefest.core.algs.geom.validation import intersection, out_of_bound, too_close
 from gefest.core.structure.point import Point
-from gefest.core.algs.geom.validation import out_of_bound, too_close, intersection
+from gefest.core.structure.structure import Structure
 
 
 class SensitivityAnalysisMethods:
@@ -28,9 +29,10 @@ class SensitivityAnalysisMethods:
         structure = self.optimized_structure
         print(structure)
         for poly_num, poly in enumerate(structure.polygons):
-            poly.id = "poly_" + str(poly_num)
+            poly.id = 'poly_' + str(poly_num)
         init_fitness = round(
-            self.cost([structure])[0], 3
+            self.cost([structure])[0],
+            3,
         )  # only high of wave in multicreterial loss
 
         fitness_history = []
@@ -38,14 +40,14 @@ class SensitivityAnalysisMethods:
         polygon_history = []
         fitness_history.append(init_fitness)
         structure_history.append(structure)
-        polygon_history.append(f"init_moving, fitness={init_fitness}")
+        polygon_history.append(f'init_moving, fitness={init_fitness}')
         current_fitness = init_fitness
 
         for poly_num, poly in enumerate(structure.polygons):
             step_fitness = 0
             max_attempts = 3
 
-            if poly.id != "fixed":
+            if poly.id != 'fixed':
                 moving_step = self.input_domain.geometry.get_length(polygon=poly) * 0.2
 
                 while step_fitness <= current_fitness and max_attempts > 0:
@@ -62,18 +64,20 @@ class SensitivityAnalysisMethods:
 
                     if worse_res:
                         fitness_diff = round(
-                            100 * ((worse_res - current_fitness) / current_fitness), 1
+                            100 * ((worse_res - current_fitness) / current_fitness),
+                            1,
                         )
                         polygon_history.append(
-                            f"{str(poly.id)}, step={round(moving_step)},\
-                                                fitness=+{str(fitness_diff)}%"
+                            f'{str(poly.id)}, step={round(moving_step)},\
+                                                fitness=+{str(fitness_diff)}%',
                         )
                     else:
                         fitness_diff = round(
-                            100 * ((step_fitness - current_fitness) / current_fitness), 1
+                            100 * ((step_fitness - current_fitness) / current_fitness),
+                            1,
                         )
                         polygon_history.append(
-                            f"{str(poly.id)}, step={round(moving_step)}, fitness={str(fitness_diff)}%"
+                            f'{str(poly.id)}, step={round(moving_step)}, fitness={str(fitness_diff)}%',
                         )
 
                     if step_fitness >= current_fitness:
@@ -86,10 +90,14 @@ class SensitivityAnalysisMethods:
         return fitness_history, structure_history, polygon_history
 
     def _moving_for_one_step(
-        self, structure: Structure, poly_number: int, moving_step, init_fitness
+        self,
+        structure: Structure,
+        poly_number: int,
+        moving_step,
+        init_fitness,
     ):
         moved_init_poly = structure.polygons[poly_number]
-        directions = ["north", "south", "east", "west", "n-w", "s-w", "n-e", "s-e"]
+        directions = ['north', 'south', 'east', 'west', 'n-w', 's-w', 'n-e', 's-e']
         results = {}
         worse_results = {}
 
@@ -106,7 +114,7 @@ class SensitivityAnalysisMethods:
                     out_of_bound(tmp_structure, self.input_domain),
                     too_close(tmp_structure, self.input_domain),
                     intersection(tmp_structure, self.input_domain),
-                ]
+                ],
             )
             if fitness < init_fitness and non_invalid:
                 results[fitness] = tmp_structure
@@ -125,14 +133,14 @@ class SensitivityAnalysisMethods:
 
     def _moving_point(self, direction: str, point: Point, moving_step) -> Point:
         directions = {
-            "north": Point(point.x + moving_step, point.y),
-            "south": Point(point.x - moving_step, point.y),
-            "east": Point(point.x, point.y + moving_step),
-            "west": Point(point.x, point.y - moving_step),
-            "n-w": Point(point.x + moving_step, point.y - moving_step),
-            "s-w": Point(point.x - moving_step, point.y + moving_step),
-            "n-e": Point(point.x + moving_step, point.y + moving_step),
-            "s-e": Point(point.x - moving_step, point.y - moving_step),
+            'north': Point(point.x + moving_step, point.y),
+            'south': Point(point.x - moving_step, point.y),
+            'east': Point(point.x, point.y + moving_step),
+            'west': Point(point.x, point.y - moving_step),
+            'n-w': Point(point.x + moving_step, point.y - moving_step),
+            's-w': Point(point.x - moving_step, point.y + moving_step),
+            'n-e': Point(point.x + moving_step, point.y + moving_step),
+            's-e': Point(point.x - moving_step, point.y - moving_step),
         }
         return directions[direction]
 
@@ -149,7 +157,7 @@ class SensitivityAnalysisMethods:
 
         fitness_history.append(init_fitness)
         structure_history.append(structure)
-        polygon_history.append(f"init_combinations, fitness={init_fitness}")
+        polygon_history.append(f'init_combinations, fitness={init_fitness}')
         end_step_time = time.time()
         self.sa_time_history.append(end_step_time - self.start_time)
 
@@ -170,13 +178,13 @@ class SensitivityAnalysisMethods:
                     ids = []
                     for polygon in tmp_structure.polygons:
                         ids.append(polygon.id)
-                    polygon_history.append(f"{str(ids)}, fitness={str(fitness_diff)}%")
-                    best_description.append(f"{str(ids)}, fitness={str(fitness_diff)}%")
+                    polygon_history.append(f'{str(ids)}, fitness={str(fitness_diff)}%')
+                    best_description.append(f'{str(ids)}, fitness={str(fitness_diff)}%')
                 else:
                     ids = []
                     for polygon in tmp_structure.polygons:
                         ids.append(polygon.id)
-                    polygon_history.append(f"{str(ids)}, fitness=+{str(fitness_diff)}%")
+                    polygon_history.append(f'{str(ids)}, fitness=+{str(fitness_diff)}%')
 
                 end_step_time = time.time()
                 self.sa_time_history.append(end_step_time - self.start_time)
@@ -187,9 +195,7 @@ class SensitivityAnalysisMethods:
             finish_sample = best_samples[0]
         else:
             length = [len(struct.polygons) for struct in best_structures]
-            best_samples = list(
-                zip(best_fitness, best_structures, best_description, length)
-            )
+            best_samples = list(zip(best_fitness, best_structures, best_description, length))
             best_samples.sort(key=lambda x: x[3])
             finish_sample = best_samples[0][:-1]
 
@@ -206,7 +212,7 @@ class SensitivityAnalysisMethods:
 
         fitness_history.append(init_fitness)
         structure_history.append(structure)
-        polygon_history.append(f"init_removing_points, fitness={init_fitness}")
+        polygon_history.append(f'init_removing_points, fitness={init_fitness}')
         end_step_time = time.time()
         self.sa_time_history.append(end_step_time - self.start_time)
 
@@ -233,7 +239,8 @@ class SensitivityAnalysisMethods:
 
                         fitness = round(self.cost([tmp_structure])[0], 3)
                         fitness_diff = round(
-                            100 * ((fitness - current_fitness) / current_fitness), 1
+                            100 * ((fitness - current_fitness) / current_fitness),
+                            1,
                         )
 
                         structure_history.append(tmp_structure)
@@ -243,14 +250,14 @@ class SensitivityAnalysisMethods:
                             new_polygon = tmp_polygon
                             fitness_history.append(fitness)
                             polygon_history.append(
-                                f"{str(polygon.id)}, del={str(point.coords())},\
-                                                    fitness={str(fitness_diff)}%"
+                                f'{str(polygon.id)}, del={str(point.coords())},\
+                                                    fitness={str(fitness_diff)}%',
                             )
                         else:
                             fitness_history.append(current_fitness)
                             polygon_history.append(
-                                f"{str(polygon.id)}, del={str(point.coords())},\
-                                                    fitness=+{str(fitness_diff)}%"
+                                f'{str(polygon.id)}, del={str(point.coords())},\
+                                                    fitness=+{str(fitness_diff)}%',
                             )
 
                         end_step_time = time.time()
@@ -268,7 +275,8 @@ class SensitivityAnalysisMethods:
 
                         fitness = round(self.cost([tmp_structure])[0], 3)
                         fitness_diff = round(
-                            100 * ((fitness - current_fitness) / current_fitness), 1
+                            100 * ((fitness - current_fitness) / current_fitness),
+                            1,
                         )
 
                         structure_history.append(tmp_structure)
@@ -278,14 +286,14 @@ class SensitivityAnalysisMethods:
                             new_polygon = tmp_polygon
                             fitness_history.append(fitness)
                             polygon_history.append(
-                                f"{str(polygon.id)}, del={str(point.coords())},\
-                                                    fitness={str(fitness_diff)}%"
+                                f'{str(polygon.id)}, del={str(point.coords())},\
+                                                    fitness={str(fitness_diff)}%',
                             )
                         else:
                             fitness_history.append(current_fitness)
                             polygon_history.append(
-                                f"{str(polygon.id)}, del={str(point.coords())},\
-                                                    fitness=+{str(fitness_diff)}%"
+                                f'{str(polygon.id)}, del={str(point.coords())},\
+                                                    fitness=+{str(fitness_diff)}%',
                             )
 
                         end_step_time = time.time()
@@ -303,7 +311,7 @@ class SensitivityAnalysisMethods:
 
         fitness_history.append(init_fitness)
         structure_history.append(structure)
-        polygon_history.append(f"init_rotates, fitness={init_fitness}")
+        polygon_history.append(f'init_rotates, fitness={init_fitness}')
         end_step_time = time.time()
         self.sa_time_history.append(end_step_time - self.start_time)
 
@@ -315,7 +323,7 @@ class SensitivityAnalysisMethods:
 
             angles = list(range(45, 360, 45))
 
-            if poly.id != "fixed":
+            if poly.id != 'fixed':
                 for angle in angles:
                     tmp_structure = deepcopy(structure)
                     rotated_poly = deepcopy(poly)
@@ -330,7 +338,8 @@ class SensitivityAnalysisMethods:
                 best_poly_fit = min(tmp_fit_history)
                 idx_best = tmp_fit_history.index(best_poly_fit)
                 fitness_diff = round(
-                    100 * ((best_poly_fit[0] - curent_fitness) / curent_fitness), 1
+                    100 * ((best_poly_fit[0] - curent_fitness) / curent_fitness),
+                    1,
                 )
 
                 if best_poly_fit[0] < curent_fitness:
@@ -340,13 +349,13 @@ class SensitivityAnalysisMethods:
                     fitness_history.append(best_poly_fit[0])
                     structure_history.append(best_tmp_structure)
                     polygon_history.append(
-                        f"{str(poly.id)}, best_angle={best_poly_fit[1]}, fitnesss={fitness_diff}%"
+                        f'{str(poly.id)}, best_angle={best_poly_fit[1]}, fitnesss={fitness_diff}%',
                     )
                 else:
                     fitness_history.append(curent_fitness)
                     structure_history.append(tmp_str_history[idx_best])
                     polygon_history.append(
-                        f"{str(poly.id)}, best_angle={best_poly_fit[1]}, fitnesss=+{fitness_diff}%"
+                        f'{str(poly.id)}, best_angle={best_poly_fit[1]}, fitnesss=+{fitness_diff}%',
                     )
 
                 end_step_time = time.time()
@@ -358,7 +367,7 @@ class SensitivityAnalysisMethods:
 
         fitness_history.append(best_fitness)
         structure_history.append(best_structure)
-        polygon_history.append("best_structure after rotating polygons")
+        polygon_history.append('best_structure after rotating polygons')
 
         end_step_time = time.time()
         self.sa_time_history.append(end_step_time - self.start_time)
@@ -389,19 +398,20 @@ class SA(SensitivityAnalysisMethods):
 
         mov_fitness, mov_structure, mov_poly = self.moving_position()
         rotated_fitness, rotated_structure, rotated_poly = self.rotate_objects(
-            mov_structure[-1], mov_fitness[-1]
+            mov_structure[-1],
+            mov_fitness[-1],
         )
         del_fitness, del_structure, del_poly = self.exploring_combinations(
-            rotated_structure[-1], rotated_fitness[-1]
+            rotated_structure[-1],
+            rotated_fitness[-1],
         )
         rm_points_fitness, rm_points_structure, rm_points_poly = self.removing_points(
-            del_structure[-1], del_fitness[-1]
+            del_structure[-1],
+            del_fitness[-1],
         )
 
         fitness_history = mov_fitness + rotated_fitness + del_fitness + rm_points_fitness
-        structure_history = (
-            mov_structure + rotated_structure + del_structure + rm_points_structure
-        )
+        structure_history = mov_structure + rotated_structure + del_structure + rm_points_structure
         poly_history = mov_poly + rotated_poly + del_poly + rm_points_poly
 
         time_history = self.get_time_history
@@ -446,32 +456,28 @@ def report_viz(analysis_result):
     fitness_difference = round(100 * (start_fit - end_fit) / start_fit, 1)
 
     fig, axd = plt.subplot_mosaic(
-        [["upper", "upper"], ["lower left", "lower right"]],
+        [['upper', 'upper'], ['lower left', 'lower right']],
         figsize=(15, 8),
         height_ratios=[1, 3],
     )
 
     fig.suptitle(
-        f"Sensitivity-based optimization report, spend={spend_time}sec,\
-                  fitness improved on {fitness_difference}%"
+        f'Sensitivity-based optimization report, spend={spend_time}sec,\
+                  fitness improved on {fitness_difference}%',
     )
 
-    initial_strucutre.plot(color="r", ax=axd["lower left"], legend=True)
-    axd["lower left"].set_title(
-        f"Initial structure, fitness={round(fitness_history[0], 3)}"
-    )
-    optimized_structure.plot(ax=axd["lower right"], legend=True)
-    axd["lower right"].set_title(
-        f"Processed structure, fitness={round(fitness_history[-1], 3)}"
-    )
+    initial_strucutre.plot(color='r', ax=axd['lower left'], legend=True)
+    axd['lower left'].set_title(f'Initial structure, fitness={round(fitness_history[0], 3)}')
+    optimized_structure.plot(ax=axd['lower right'], legend=True)
+    axd['lower right'].set_title(f'Processed structure, fitness={round(fitness_history[-1], 3)}')
 
-    axd["upper"].plot(fitness_history, c="c")
-    axd["upper"].scatter(x, y, marker="o", c="c")
+    axd['upper'].plot(fitness_history, c='c')
+    axd['upper'].scatter(x, y, marker='o', c='c')
     for idx, text in enumerate(descriptions):
-        axd["upper"].annotate(text, (x[idx] + 0.01, y[idx] + 0.01), rotation=45.0)
-    axd["upper"].set_xlabel("iteration of senitivity analysis")
-    axd["upper"].set_ylabel("loss - height of waves")
+        axd['upper'].annotate(text, (x[idx] + 0.01, y[idx] + 0.01), rotation=45.0)
+    axd['upper'].set_xlabel('iteration of senitivity analysis')
+    axd['upper'].set_ylabel('loss - height of waves')
 
     fig.tight_layout()
     plt.legend()
-    fig.savefig("sensitivity_report.png")
+    fig.savefig('sensitivity_report.png')

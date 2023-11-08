@@ -1,10 +1,10 @@
+import random
+from random import randint
+
 from golem.core.optimisers.genetic.gp_optimizer import EvoGraphOptimizer
-from gefest.core.opt.individual import Individual
 
 from gefest.core.opt.operators.operators import default_operators
-from gefest.tools.optimizers.GA.base_GA import BaseGA
-from random import randint
-import random
+from gefest.tools.optimizers.GA.GA import BaseGA
 
 
 class NSGA2(EvoGraphOptimizer, BaseGA):
@@ -12,22 +12,16 @@ class NSGA2(EvoGraphOptimizer, BaseGA):
     GOLEM based optimizer of GEFEST structures
     """
 
-    def __init__(self,
-                 adapter,
-                 mutation_rate,
-                 crossover_rate,
-                 pop_size,
-                 task_setup,
-                 params):
+    def __init__(self, adapter, mutation_rate, crossover_rate, pop_size, task_setup, params):
         EvoGraphOptimizer.__init__(self, **params)
 
-        self.params = BaseGA.Params(pop_size=pop_size,
-                                    crossover_rate=crossover_rate,
-                                    mutation_rate=mutation_rate,
-                                    mutation_value_rate=[])
-        BaseGA.__init__(self, self.params,
-                        default_operators(),
-                        task_setup)
+        self.params = BaseGA.Params(
+            pop_size=pop_size,
+            crossover_rate=crossover_rate,
+            mutation_rate=mutation_rate,
+            mutation_value_rate=[],
+        )
+        BaseGA.__init__(self, self.params, default_operators(), task_setup)
 
         self._pop = None
         self._fronts = None
@@ -61,7 +55,7 @@ class NSGA2(EvoGraphOptimizer, BaseGA):
         return population
 
     def _evolve_population(self, **kwargs):
-        """ Method realizing full evolution cycle """
+        """Method realizing full evolution cycle"""
         self.calculate_fitness()
         self._pop = self.tournament_selection(self._pop)
         self._pop.extend(self.reproduce(self._pop))
@@ -80,7 +74,7 @@ class NSGA2(EvoGraphOptimizer, BaseGA):
         for first, second in zip(ind1.objectives, ind2.objectives):
             and_condition = and_condition and first <= second
             or_condition = or_condition or first < second
-        return (and_condition and or_condition)
+        return and_condition and or_condition
 
     def fast_nondominated_sort(self, population):
         fronts = [[]]
@@ -121,9 +115,12 @@ class NSGA2(EvoGraphOptimizer, BaseGA):
                 front[solutions_num - 1].crowding_distance = 10 ** 9
                 m_values = [individual.objectives[m] for individual in front]
                 scale = max(m_values) - min(m_values)
-                if scale == 0: scale = 1
+                if scale == 0:
+                    scale = 1
                 for i in range(1, solutions_num - 1):
-                    front[i].crowding_distance += (front[i + 1].objectives[m] - front[i - 1].objectives[m]) / scale
+                    front[i].crowding_distance += (
+                        front[i + 1].objectives[m] - front[i - 1].objectives[m]
+                    ) / scale
 
     def tournament_selection(self, population):
         chosen = []
@@ -144,15 +141,17 @@ class NSGA2(EvoGraphOptimizer, BaseGA):
         best = None
         for participant in participants:
             if best is None or (
-                    self.crowding_operator(participant, best) == 1 and self.__choose_with_prob(0.9)):
+                self.crowding_operator(participant, best) == 1 and self.__choose_with_prob(0.9)
+            ):
                 best = participant
 
         return best
 
     def crowding_operator(self, individual, other_individual):
-        if (individual.rank < other_individual.rank) or \
-                ((individual.rank == other_individual.rank) and (
-                        individual.crowding_distance > other_individual.crowding_distance)):
+        if (individual.rank < other_individual.rank) or (
+            (individual.rank == other_individual.rank)
+            and (individual.crowding_distance > other_individual.crowding_distance)
+        ):
             return 1
         else:
             return -1

@@ -78,8 +78,6 @@ class StructVizualizer:
         y_ = [pt.y for pt in poly]
 
         plt.plot(x_, y_, linestyle=linestyle, **kwargs)
-        # for i, p in enumerate(zip(x_, y_)):
-        #     plt.plot(p[0], p[1], marker='${}$'.format(i), color='black')
 
 
 class GIFMaker(StructVizualizer):
@@ -96,10 +94,11 @@ class GIFMaker(StructVizualizer):
 
     def make_gif(self, gifname, duration=1500, loop=-1):
 
-        # imgs = [Image.fromarray(img) for img in self.frames]
-        # imgs[0].save(f"./{gifname}.fig", save_all=True, append_images=imgs[1:], duration=duration, loop=0)
-        # clip = mp.VideoFileClip("mygif.gif")
-        clip = mp.ImageSequenceClip(self.frames, durations=[duration] * len(self.frames), fps=1000/duration)
+        clip = mp.ImageSequenceClip(
+            self.frames,
+            durations=[duration] * len(self.frames),
+            fps=1000 / duration,
+        )
         clip.write_videofile(f'./{gifname}.mp4')
         self.frames = []
         self.counter = 0

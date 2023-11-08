@@ -1,21 +1,18 @@
-from typing import List
 from uuid import uuid4
 
 import numpy as np
 from loguru import logger
-from numpy import arccos, array, clip, dot
-from numpy.linalg import norm
-from pydantic.dataclasses import dataclass
 from shapely import affinity, get_parts
-from shapely.affinity import rotate, scale
+from shapely.affinity import scale
 from shapely.geometry import (
     GeometryCollection,
     LineString,
     MultiLineString,
+    MultiPoint,
     MultiPolygon,
 )
-from shapely.geometry import Point as GeomPoint
-from shapely.geometry import Polygon as GeomPolygon
+from shapely.geometry import Point as ShapelyPoint
+from shapely.geometry import Polygon as ShapelyPolygon
 from shapely.geometry import box, mapping
 from shapely.ops import nearest_points, split
 
@@ -40,11 +37,15 @@ class Geometry2D(Geometry):
         if len(polygon.points) < 1:
             return 0
 
-        geom_polygon = LineString([GeomPoint(pt.x, pt.y) for pt in polygon])
+        geom_polygon = LineString([ShapelyPoint(pt.x, pt.y) for pt in polygon])
 
         return geom_polygon.length
 
-    def get_coords(self, poly) -> List[Point]:
+    def shapely_to_gefest(self, geom_in):
+        if isinstance(geom_in, ShapelyPolygon):
+            return Polygon(self.get_coords(geom_in))
+
+    def get_coords(self, poly) -> list[Point]:
         """The function for getting points
         Args:
             poly: :obj:`Polygon` for processing
@@ -52,8 +53,8 @@ class Geometry2D(Geometry):
             all :obj:`Point` that :obj:`poly`contains
         """
 
-        if isinstance(poly, GeomPolygon):
-            poly = LineString(poly.exterior.coords)
+        if isinstance(poly, ShapelyPolygon):
+            poly = poly.exterior
         points = [
             Point(x, y)
             for x, y in zip(
@@ -77,7 +78,6 @@ class Geometry2D(Geometry):
                 geom_collection.append(self._poly_to_shapely_line(poly).buffer(buffer_size))
         return GeometryCollection(geom_collection)
 
-    ##
     def resize_poly(
         self,
         poly: Polygon,
@@ -116,16 +116,12 @@ class Geometry2D(Geometry):
         vector1: tuple[Point, Point],
         vector2: tuple[Point, Point],
     ) -> float:
-        np.seterr('raise')
-        u = array([vector1[1].x - vector1[0].x, vector1[1].y - vector1[0].y])
-        v = array([vector2[1].x - vector2[0].x, vector2[1].y - vector2[0].y])
-        if norm(v) == 0 or norm(u) == 0:
-            logger.critical(f'invalid vectors: {vector1}, {vector2}')
-        c = dot(u, v) / norm(u) / norm(v)
-        angle = arccos(clip(c, -1, 1))
-        return np.rad2deg(angle)
+        v1 = np.array([vector1[1].x - vector1[0].x, vector1[1].y - vector1[0].y])
+        v2 = np.array([vector2[1].x - vector2[0].x, vector2[1].y - vector2[0].y])
+        v1_u = v1 / np.linalg.norm(v1)
+        v2_u = v2 / np.linalg.norm(v2)
+        return np.rad2deg(np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0)))
 
-    ## hold
     def rotate_point(
         self,
         point: Point,
@@ -133,9 +129,9 @@ class Geometry2D(Geometry):
         angle: float,
     ) -> Polygon:
         rotated = affinity.rotate(
-            GeomPoint(point.x, point.y),
+            ShapelyPoint(point.x, point.y),
             angle,
-            GeomPoint(origin.x, origin.y),
+            ShapelyPoint(origin.x, origin.y),
         )
         return Point(rotated.x, rotated.y)
 
@@ -168,7 +164,6 @@ class Geometry2D(Geometry):
 
         return rotated_poly
 
-    ### property
     def get_square(self, polygon: Polygon) -> float:
         """Recieving value of the area
         Args:
@@ -180,11 +175,10 @@ class Geometry2D(Geometry):
         if len(polygon.points) <= 1:
             return 0
 
-        geom_polygon = GeomPolygon([self._pt_to_shapely_pt(pt) for pt in polygon])
+        geom_polygon = ShapelyPolygon([self._pt_to_shapely_pt(pt) for pt in polygon])
 
         return geom_polygon.area
 
-    ### property
     def is_contain_point(self, poly: Polygon, point: Point) -> bool:
         """Checking if a point is inside a polygon
         Args:
@@ -193,12 +187,11 @@ class Geometry2D(Geometry):
         Returns:
             ``True`` if :obj:`point` is into :obj:`poly`, otherwise ``False``
         """
-        geom_poly_allowed = GeomPolygon([self._pt_to_shapely_pt(pt) for pt in poly])
-        geom_pt = GeomPoint(point.x, point.y)
+        geom_poly_allowed = ShapelyPolygon([self._pt_to_shapely_pt(pt) for pt in poly])
+        geom_pt = ShapelyPoint(point.x, point.y)
 
         return geom_poly_allowed.contains(geom_pt)
 
-    ## hold
     def nearest_point(self, point: Point, poly: Polygon) -> Point:
         """Calculating closest point between input point and polygon.
         Args:
@@ -208,11 +201,11 @@ class Geometry2D(Geometry):
             nearest_correct_position :obj:`Point` from ``point`` among all points in the ``poly``
         """
         geom_poly = self._poly_to_shapely_line(poly)
-        geom_point = GeomPoint(point.x, point.y)
+        geom_point = ShapelyPoint(point.x, point.y)
         _, nearest_correct_position = nearest_points(geom_point, geom_poly)
         return Point(nearest_correct_position.x, nearest_correct_position.y)
 
-    def nearest_points(self, poly_1: Polygon, poly_2: Polygon) -> List[Point]:
+    def nearest_points(self, poly_1: Polygon, poly_2: Polygon) -> list[Point]:
         """Calculating closest point between two polygons
         Args:
             poly_1: the first :obj:`Polygon` that explore
@@ -230,7 +223,6 @@ class Geometry2D(Geometry):
         )
         return nearest_correct_position
 
-    ### property
     def get_convex(self, poly: Polygon) -> Polygon:
         """Obtaining a convex polygon to avoid intersections
         Args:
@@ -246,7 +238,6 @@ class Geometry2D(Geometry):
 
         return polygon
 
-    ## hold
     def intersection_line_line(self, points1, points2, scale1, scale2):
         a = scale(LineString([(p.x, p.y) for p in points1]), scale1, scale1)
         b = scale(LineString([(p.x, p.y) for p in points2]), scale2, scale2)
@@ -271,8 +262,8 @@ class Geometry2D(Geometry):
         line = LineString([(p.x, p.y) for p in points])
         line = scale(line, scale_factor)
         bounding_box = box(minx * 2, miny * 2, maxx * 2, maxy * 2)
-        a = GeomPoint(line.boundary.bounds[:2])
-        b = GeomPoint(line.boundary.bounds[2:])
+        a = ShapelyPoint(line.boundary.bounds[:2])
+        b = ShapelyPoint(line.boundary.bounds[2:])
         if a.x == b.x:  # vertical line
             extended_line = LineString([(a.x, miny), (a.x, maxy)])
         elif a.y == b.y:  # horizonthal line
@@ -286,20 +277,25 @@ class Geometry2D(Geometry):
             x0 = (miny - m) / k
             x1 = (maxy - m) / k
             points_on_boundary_lines = [
-                GeomPoint(minx, y0),
-                GeomPoint(maxx, y1),
-                GeomPoint(x0, miny),
-                GeomPoint(x1, maxy),
+                ShapelyPoint(minx, y0),
+                ShapelyPoint(maxx, y1),
+                ShapelyPoint(x0, miny),
+                ShapelyPoint(x1, maxy),
             ]
             points_sorted_by_distance = sorted(points_on_boundary_lines, key=bounding_box.distance)
             extended_line = LineString(points_sorted_by_distance[:2])
 
-        if extended_line.intersects(figure):
-            extended_line.intersection(figure)
+        interaction = extended_line.intersection(figure)
+        if interaction:
+            if isinstance(interaction, ShapelyPoint):
+                interaction = [Point(interaction.x, interaction.y)]
+            elif isinstance(interaction, MultiPoint):
+                interaction = [Point(p.x, p.y) for p in interaction.geoms]
+            else:
+                interaction = [Point(p.x, p.y) for p in interaction.coords]
         else:
             return None
 
-    ### property
     def simplify(self, poly: Polygon, tolerance: float) -> Polygon:
         from matplotlib import pyplot as plt
         from shapely.plotting import plot_polygon
@@ -345,12 +341,8 @@ class Geometry2D(Geometry):
 
         return out
 
-    ## hold
-    def remove_spikes(self, poly: Polygon, eps: float):
-        poly = self._poly_to_shapely_poly(poly)
-        no_ = poly.buffer(-eps, 1, join_style='mitre').buffer(eps * 1.05, 1, join_style='mitre')
-
-        return Polygon([Point(p[0], p[1]) for p in poly.exterior.coords])
+    def is_simple(self, poly: Polygon) -> bool:
+        return self._poly_to_shapely_poly(poly).is_simple
 
     def get_random_point_in_shapey_geom(self, fig):
         if fig.is_empty:
@@ -365,7 +357,7 @@ class Geometry2D(Geometry):
 
         x = np.random.uniform(minx, maxx, 1)
         y = np.random.uniform(miny, maxy, 1)
-        while not fig.contains(GeomPoint(x, y)):
+        while not fig.contains(ShapelyPoint(x, y)):
             x = np.random.uniform(minx, maxx, 1)
             y = np.random.uniform(miny, maxy, 1)
 
@@ -384,13 +376,12 @@ class Geometry2D(Geometry):
         for _ in range(100):
             x = np.random.uniform(minx, maxx, 1)
             y = np.random.uniform(miny, maxy, 1)
-            if poly.contains(GeomPoint(x, y)):
+            if poly.contains(ShapelyPoint(x, y)):
                 point = Point(x, y)
                 break
 
         return point
 
-    ### propetry
     def get_centroid(self, poly: Polygon) -> Point:
         """Getting a point that is the center of mass of the polygon
         Args:
@@ -401,7 +392,7 @@ class Geometry2D(Geometry):
         points = [pt for pt in poly.points]
         if len(points) < 3:
             points.append(points[0])
-        geom_poly = GeomPolygon([self._pt_to_shapely_pt(pt) for pt in points])
+        geom_poly = ShapelyPolygon([self._pt_to_shapely_pt(pt) for pt in points])
         geom_point = geom_poly.centroid
         point = Point(geom_point.x, geom_point.y)
         return point
@@ -422,7 +413,7 @@ class Geometry2D(Geometry):
 
     def contains(self, poly1: Polygon, poly2: Polygon) -> bool:
         geom_polygon1 = self._poly_to_shapely_line(poly1)
-        geom_polygon2 = GeomPolygon([self._pt_to_shapely_pt(pt) for pt in poly2])
+        geom_polygon2 = ShapelyPolygon([self._pt_to_shapely_pt(pt) for pt in poly2])
 
         is_contain = geom_polygon2.contains(geom_polygon1)
         return is_contain
@@ -477,26 +468,26 @@ class Geometry2D(Geometry):
         """
         return LineString([self._pt_to_shapely_pt(pt) for pt in poly.points])
 
-    def _poly_to_shapely_poly(self, poly: Polygon) -> GeomPolygon:
+    def _poly_to_shapely_poly(self, poly: Polygon) -> ShapelyPolygon:
         """Transform GEFEST Polygon to shapely Polygon.
         Args:
             poly: Polygon
         Returns:
-            GeomPolygon
+            ShapelyPolygon
         """
-        return GeomPolygon([(pt.x, pt.y) for pt in poly.points])
+        return ShapelyPolygon([(pt.x, pt.y) for pt in poly.points])
 
-    def _pt_to_shapely_pt(self, pt: Point) -> GeomPoint:
+    def _pt_to_shapely_pt(self, pt: Point) -> ShapelyPoint:
         """Transform GEFEST Polygon to shapely Polygon.
         Args:
             poly: Point
         Returns:
-            GeomPoint
+            ShapelyPoint
         """
-        return GeomPoint(pt.x, pt.y)
+        return ShapelyPoint(pt.x, pt.y)
 
     def split_polygon(self, poly, line: tuple[Point, Point], scale_factor=1000):
-        poly = GeomPolygon([(p.x, p.y) for p in poly])
+        poly = ShapelyPolygon([(p.x, p.y) for p in poly])
         line = LineString(
             [
                 (line[0].x, line[0].y),

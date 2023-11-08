@@ -7,8 +7,6 @@ from golem.core.optimisers.genetic.operators.inheritance import GeneticSchemeTyp
 from golem.core.optimisers.genetic.operators.selection import SelectionTypesEnum
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from gefest.core.algs.postproc.resolve_errors import Postrocessor
-from gefest.core.algs.postproc.rules import PolygonRule, Rules, StructureRule
 from gefest.core.configs.tuner_params import TunerParams
 from gefest.core.geometry.domain import Domain
 from gefest.core.opt.adapters.structure import StructureAdapter
@@ -16,6 +14,8 @@ from gefest.core.opt.objective.objective import Objective
 from gefest.core.opt.operators.crossovers import CrossoverTypes, panmixis
 from gefest.core.opt.operators.mutations import MutationTypes
 from gefest.core.opt.operators.selections import SelectionTypes
+from gefest.core.opt.postproc.resolve_errors import Postrocessor
+from gefest.core.opt.postproc.rules import PolygonRule, Rules, StructureRule
 from gefest.core.utils.logger import LogDispatcher
 from gefest.tools.samplers.standard.standard import StandardSampler
 

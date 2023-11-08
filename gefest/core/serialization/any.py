@@ -7,16 +7,17 @@ from gefest.core.serialization.serializer import INSTANCE_OR_CALLABLE, Serialize
 
 def any_to_json(obj: INSTANCE_OR_CALLABLE) -> Dict[str, Any]:
     return {
-        **{k: v for k, v in vars(obj).items() if k != "log"},
+        **{k: v for k, v in vars(obj).items() if k != 'log'},
         **Serializer.dump_path_to_obj(obj),
     }
 
 
 def any_from_json(
-    cls: Type[INSTANCE_OR_CALLABLE], json_obj: Dict[str, Any],
+    cls: Type[INSTANCE_OR_CALLABLE],
+    json_obj: Dict[str, Any],
 ) -> INSTANCE_OR_CALLABLE:
     cls_parameters = signature(cls.__init__).parameters
-    if "kwargs" not in cls_parameters:
+    if 'kwargs' not in cls_parameters:
         init_data = {k: v for k, v in json_obj.items() if k in cls_parameters}
         obj = cls(**init_data)
         vars(obj).update({k: json_obj[k] for k in json_obj.keys() ^ init_data.keys()})

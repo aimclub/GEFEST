@@ -4,12 +4,11 @@ from typing import Optional
 
 import matplotlib
 import matplotlib.pyplot as plt
-
 import tensorflow as tf
 from tensorflow import keras
 
-from gefest.core.structure.structure import Structure
 from gefest.core.structure.domain import Domain
+from gefest.core.structure.structure import Structure
 
 matplotlib.use('agg')
 
@@ -18,6 +17,7 @@ class BWCNN:
     """
     ::TODO:: Make abstract version to create own realizations for specific tasks
     """
+
     """
     Surrogate model for breakwaters task
     """
@@ -64,24 +64,16 @@ class BWCNN:
             if poly.id == 'tmp':
                 line_x = [point.x for point in poly.points]
                 line_y = [point.y for point in poly.points]
-                ax.plot(line_x,
-                        line_y,
-                        color='white',
-                        linewidth=3)
+                ax.plot(line_x, line_y, color='white', linewidth=3)
             elif poly.id == 'prohibited_area':
                 line_x = [point.x for point in poly.points]
                 line_y = [point.y for point in poly.points]
-                ax.fill(line_x,
-                        line_y,
-                        color='white')
+                ax.fill(line_x, line_y, color='white')
 
             elif poly.id == 'prohibited_poly' or 'prohibited_targets':
                 line_x = [point.x for point in poly.points]
                 line_y = [point.y for point in poly.points]
-                ax.plot(line_x,
-                        line_y,
-                        color='white',
-                        linewidth=1)
+                ax.plot(line_x, line_y, color='white', linewidth=1)
 
         ax.axis('off')
         ax.axis(xmin=0, xmax=self.domain.max_x)

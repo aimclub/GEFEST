@@ -51,30 +51,35 @@ class Domain(BaseModel):
         return self
 
     @field_validator('min_poly_num')
+    @classmethod
     def validate_min_poly_num(cls, data: int):
         if data < 1:
             raise ValueError('Min number of polygons must be positive value.')
         return data
 
     @field_validator('max_poly_num')
+    @classmethod
     def validate_max_poly_num(cls, data: int):
         if data < 1:
             raise ValueError('Max number of polygons must be positive value.')
         return data
 
     @field_validator('min_points_num')
+    @classmethod
     def validate_min_points_num(cls, data: int):
         if data < 1:
             raise ValueError('Max number of polygons must be positive value.')
         return data
 
     @field_validator('fixed_points')
+    @classmethod
     def validate_fixed_points(cls, data: Union[Polygon, list[tuple[float, float]]]):
         if isinstance(data, Polygon):
             return data
         return Polygon([Point(*coords) for coords in data])
 
     @field_validator('prohibited_area')
+    @classmethod
     def validate_prohibited_area(cls, data: Optional[Union[Structure, str]]):
         if isinstance(data, Structure):
             return data
@@ -88,6 +93,7 @@ class Domain(BaseModel):
         raise TypeError(f'Invalid argument {data}.')
 
     @field_validator('allowed_area')
+    @classmethod
     def validate_allowed_area(cls, data: Union[Polygon, list[list[float]]]):
         if data is None or len(data) <= 2:
             raise ValueError('Not enough points for allowed_area.')

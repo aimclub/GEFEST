@@ -1,6 +1,7 @@
 from typing import Union
 from uuid import UUID, uuid4
 
+from loguru import logger
 from pydantic import Field
 from pydantic.dataclasses import dataclass
 
@@ -21,6 +22,9 @@ class Structure:
     def __setattr__(self, name, value):
         if name in ['polygons']:
             self.fitness = []
+            lens = list(map(len, value))
+            if any(x < 2 for x in lens):
+                logger.trace('bruh')
         super().__setattr__(name, value)
 
     def __setitem__(self, key, value):

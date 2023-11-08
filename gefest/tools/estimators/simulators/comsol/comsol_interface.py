@@ -45,7 +45,7 @@ class Comsol(Estimator):
             if model is None:
                 poly_box = []
                 print('Start COMSOL')
-                for i, pol in enumerate(structure.polygons):
+                for _, pol in enumerate(structure.polygons):
                     poly_repr = []
                     poly_repr.append(' '.join([str(pt.x) for pt in pol.points]))
                     poly_repr.append(' '.join([str(pt.y) for pt in pol.points]))
@@ -62,8 +62,6 @@ class Comsol(Estimator):
                     print(ex)
                     self.client.clear()
                     return 0.0
-
-                idx = self._save_simulation_result(structure, model)
 
             try:
                 outs = [

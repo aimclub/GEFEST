@@ -1,10 +1,9 @@
 import numpy as np
-
 from golem.core.optimisers.genetic.gp_optimizer import EvoGraphOptimizer
 
 from gefest.core.opt.individual import Individual
 from gefest.core.opt.operators.operators import default_operators
-from gefest.tools.optimizers.GA.base_GA import BaseGA
+from gefest.tools.optimizers.GA.GA import BaseGA
 
 
 class AGE(EvoGraphOptimizer, BaseGA):
@@ -12,22 +11,16 @@ class AGE(EvoGraphOptimizer, BaseGA):
     GOLEM based optimizer of GEFEST structures
     """
 
-    def __init__(self,
-                 adapter,
-                 mutation_rate,
-                 crossover_rate,
-                 pop_size,
-                 task_setup,
-                 params):
+    def __init__(self, adapter, mutation_rate, crossover_rate, pop_size, task_setup, params):
         EvoGraphOptimizer.__init__(self, **params)
 
-        self.params = BaseGA.Params(pop_size=pop_size,
-                                    crossover_rate=crossover_rate,
-                                    mutation_rate=mutation_rate,
-                                    mutation_value_rate=[])
-        BaseGA.__init__(self, self.params,
-                        default_operators(),
-                        task_setup)
+        self.params = BaseGA.Params(
+            pop_size=pop_size,
+            crossover_rate=crossover_rate,
+            mutation_rate=mutation_rate,
+            mutation_value_rate=[],
+        )
+        BaseGA.__init__(self, self.params, default_operators(), task_setup)
 
         self._pop = None
         self._fronts = None
@@ -50,7 +43,7 @@ class AGE(EvoGraphOptimizer, BaseGA):
         graph_pop = population
 
         # 1. Initializations
-        #self.__init_operators()
+        # self.__init_operators()
         self.init_populations(graph_pop)
         self.init_performance(performance)
 
@@ -61,7 +54,7 @@ class AGE(EvoGraphOptimizer, BaseGA):
         return population
 
     def _evolve_population(self, **kwargs):
-        """ Method realizing full evolution cycle """
+        """Method realizing full evolution cycle"""
         self._pop = self.calculate_fitness_and_select()
         self._pop.extend(self.reproduce(self._pop))
 
@@ -78,11 +71,14 @@ class AGE(EvoGraphOptimizer, BaseGA):
         crowd_dist[0] = [99999] * len(front1)
 
         _, p, normalization = self.survival_score(front1, ideal_point)
-        for i in range(0, len(self._fronts)):  # skip first front since it is normalized by survival_score
+        for i in range(
+            0,
+            len(self._fronts),
+        ):  # skip first front since it is normalized by survival_score
             front = np.array([ind.objectives for ind in self._fronts[i]])
             m, _ = front.shape
             front = front / normalization
-            dist = 1. / self.minkowski_distances(front, ideal_point[None, :], p=p).squeeze()
+            dist = 1.0 / self.minkowski_distances(front, ideal_point[None, :], p=p).squeeze()
             if isinstance(dist, np.float64):
                 dist = [dist]
             else:
@@ -94,12 +90,9 @@ class AGE(EvoGraphOptimizer, BaseGA):
         ranks = [r for rank in ranks for r in rank]
 
         rank_dist_idx = [(i, r, d) for i, (r, d) in enumerate(zip(ranks, dists))]
-        sorted_list = sorted(
-            rank_dist_idx,
-            key=lambda t: (t[1], t[2])
-        )
+        sorted_list = sorted(rank_dist_idx, key=lambda t: (t[1], t[2]))
 
-        selected = [item[0] for item in sorted_list][:self.num_of_individuals]
+        selected = [item[0] for item in sorted_list][: self.num_of_individuals]
         out_pop = [ind for pop in self._fronts for ind in pop]
 
         self._pop = [ind for i, ind in enumerate(out_pop) if i in selected]
@@ -112,7 +105,7 @@ class AGE(EvoGraphOptimizer, BaseGA):
         for first, second in zip(ind1.objectives, ind2.objectives):
             and_condition = and_condition and first <= second
             or_condition = or_condition or first < second
-        return (and_condition and or_condition)
+        return and_condition and or_condition
 
     def fast_nondominated_sort(self, population):
         fronts = [[]]
@@ -172,8 +165,15 @@ class AGE(EvoGraphOptimizer, BaseGA):
         remaining = np.arange(m)
         remaining = list(remaining[~selected])
         for i in range(m - np.sum(selected)):
-            mg = np.meshgrid(np.arange(selected.shape[0])[selected], remaining, copy=False, sparse=False)
-            D_mg = distances[tuple(mg)]  # avoid Numpy's future deprecation of array special indexing
+            mg = np.meshgrid(
+                np.arange(selected.shape[0])[selected],
+                remaining,
+                copy=False,
+                sparse=False,
+            )
+            D_mg = distances[
+                tuple(mg)
+            ]  # avoid Numpy's future deprecation of array special indexing
 
             if D_mg.shape[1] > 1:
                 # equivalent to mink(distances(remaining, selected),neighbors,2); in Matlab
@@ -276,7 +276,7 @@ class AGE(EvoGraphOptimizer, BaseGA):
             if any(np.isnan(hyperplane)) or any(np.isinf(hyperplane)) or any(hyperplane < 0):
                 normalization = np.max(front, axis=0)
             else:
-                normalization = 1. / hyperplane
+                normalization = 1.0 / hyperplane
                 if any(np.isnan(normalization)) or any(np.isinf(normalization)):
                     normalization = np.max(front, axis=0)
         except np.linalg.LinAlgError:

@@ -1,4 +1,3 @@
-from ctypes import Union
 from typing import Any, Callable
 
 from joblib import Parallel, cpu_count, delayed
@@ -53,5 +52,10 @@ class BaseParallelDispatcher:
             else:
                 result = parallel(delayed(func)() for _ in arguments)
         if flatten:
+            if not all(isinstance(res, (tuple, list)) for res in result):
+                raise ValueError(
+                    f"""Got an unexpected outputs from {func}.
+                    Got: {[type(res) for res in result]}. Expected tuples or lists.""",
+                )
             result = [item for separate_output in result for item in separate_output]
         return result
