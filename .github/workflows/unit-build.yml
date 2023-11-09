@@ -2,7 +2,7 @@ name: unit tests
 
 on:
   push:
-    branches: [ main, refactoring ]
+    branches: [ main, refactoring, refactoring_geometry ]
   pull_request:
     branches: [ main, refactoring ]
 
@@ -13,7 +13,7 @@ jobs:
     timeout-minutes: 5
     strategy:
       matrix:
-        python-version: [ "3.9", "3.10" ]
+        python-version: [ "3.9", "3.10", "3.11", "3.12" ]
 
     steps:
     - uses: actions/checkout@v2
