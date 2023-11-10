@@ -320,9 +320,9 @@ class Geometry2D(Geometry):
             if isinstance(interaction, ShapelyPoint):
                 interaction = [Point(interaction.x, interaction.y)]
             elif isinstance(interaction, MultiPoint):
-                interaction = [Point(p.x, p.y) for p in interaction.geoms]
+                interaction = [Point(p[0], p[1]) for p in interaction.geoms]
             else:
-                interaction = [Point(p.x, p.y) for p in interaction.coords]
+                interaction = [Point(p[0], p[1]) for p in interaction.coords]
         else:
             return None
 

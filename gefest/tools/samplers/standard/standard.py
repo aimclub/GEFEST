@@ -1,3 +1,10 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from gefest.core.configs.optimization_params import OptimizationParams
+
 from functools import partial
 from typing import Callable
 
@@ -17,7 +24,7 @@ class StandardSampler(Sampler):
     The generated samples satisfy the domain configuration.
     """
 
-    def __init__(self, opt_params) -> None:
+    def __init__(self, opt_params: OptimizationParams) -> None:
         super().__init__(
             samples_generator=get_random_structure,
             domain=opt_params.domain,

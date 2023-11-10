@@ -1,7 +1,13 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from gefest.core.configs.optimization_params import OptimizationParams
+
 from golem.core.optimisers.genetic.gp_optimizer import EvoGraphOptimizer
 from golem.core.optimisers.objective import Objective
 
-from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.opt.adapters.configuration_mapping import (
     map_into_gpa,
     map_into_graph_generation_params,

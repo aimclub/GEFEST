@@ -151,7 +151,7 @@ class SPEA2(BaseGA):
             mutated_children = self.mutation(children)
             extras = self.sampler(self.opt_params.extra)
             self._pop.extend(mutated_children + extras)
-            self._pop = self.estimator(self._pop)
+            self._pop = self.objectives_evaluator(self._pop)
             self.calculate_sepa2_fitness()
             self.log_dispatcher.log_pop(self._pop, str(step + 1))
 

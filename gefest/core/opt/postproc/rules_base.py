@@ -52,7 +52,7 @@ class PolygonRule(metaclass=ABCMeta):
 
 
 class StructureRule(metaclass=ABCMeta):
-    """Interface of postprocessing rule for whloe structure.
+    """Interface of postprocessing rule for whole structure.
 
     Provides validation and correction functions for spicific error,
     e.g. 'polygons in structure too close'.

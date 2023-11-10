@@ -39,8 +39,7 @@ class StructVizualizer:
                     [':', '-'])
 
         Returns:
-            |viz_struct|
-        .. |viz_struct| image::https://ibb.co/fN7XCXh
+            matplotlib.pyplot.figure
         """
         if not isinstance(structs, list):
             structs = [structs]
@@ -81,8 +80,6 @@ class StructVizualizer:
             >>> poly = struct.polygons[0]
             >>> viz.plot_poly(poly, '-')
 
-        Returns:
-            .. |viz_poly| image:: https://ibb.co/s31cj3c
         """
         x_ = [pt.x for pt in poly]
         y_ = [pt.y for pt in poly]

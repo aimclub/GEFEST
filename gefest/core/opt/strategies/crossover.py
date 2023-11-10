@@ -1,8 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from gefest.core.configs.optimization_params import OptimizationParams
+
 import copy
 from functools import partial
 from typing import Callable
 
-from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.geometry import Structure
 from gefest.core.opt.operators.crossovers import crossover_structures
 from gefest.core.utils import where

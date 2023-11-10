@@ -1,3 +1,10 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from gefest.core.geometry.domain import Domain
+
 from random import randint
 from typing import Optional
 
@@ -19,8 +26,6 @@ from shapely.geometry import Point as SPoint
 
 from gefest.core.geometry import Point, Polygon, Structure
 from gefest.core.geometry.geometry_2d import Geometry2D
-
-from .domain import Domain
 
 
 def random_polar(origin: Point, radius_scale: float) -> Point:
@@ -307,12 +312,12 @@ def get_convex_safe_area(
     if poly_len == 2:
         p = poly[(point_left_idx + 1) % poly_len]
         circle = SPoint(p.x, p.y).buffer(geom.get_length(poly) * 1.5)
-        base_area = [Point(p[0], p[1]) for p in list(circle.exterior_.coords)]
+        base_area = [Point(p[0], p[1]) for p in list(circle.exterior.coords)]
 
     elif poly_len == 3:
         p = poly[(point_left_idx + 1) % poly_len]
         circle = SPoint(p.x, p.y).buffer(geom.get_length(poly) / 3)
-        base_area = [Point(p[0], p[1]) for p in list(circle.exterior_.coords)]
+        base_area = [Point(p[0], p[1]) for p in list(circle.exterior.coords)]
 
     else:
         left_cut = [
@@ -356,34 +361,48 @@ def get_convex_safe_area(
                 scale_factor,
             )
             if intersection_point is not None:
-                mid_points = [intersection_point]
+                base_area = [
+                    left_cut[1],
+                    intersection_point,
+                    right_cut[1],
+                ]
             else:
-                mid_points = [
+                base_area = [
+                    left_cut[1],
                     geom.intersection_line_line(left_cut, slice_line, scale_factor, scale_factor),
                     geom.intersection_line_line(right_cut, slice_line, scale_factor, scale_factor),
+                    right_cut[1],
                 ]
 
             slice_points = geom.intersection_poly_line(
-                Polygon(
-                    [
-                        left_cut[1],
-                        *mid_points,
-                        right_cut[1],
-                    ],
-                ),
+                Polygon(base_area),
                 slice_line,
                 scale_factor,
             )
-
-            base_area = [
-                left_cut[1],
-                *slice_points,
-                right_cut[1],
-            ]
-            base_area = [
-                Point(p[0], p[1])
-                for p in geom._poly_to_shapely_poly(Polygon(base_area)).convex_hull.exterior_.coords
-            ]
+            # if not slice_points:
+            #     from shapely.geometry import Polygon as SPoly, LineString
+            #     from shapely.plotting import plot_line, plot_polygon
+            #     from matplotlib import pyplot as plt
+            #     plot_polygon(geom._poly_to_shapely_poly(Polygon([
+            #             left_cut[1],
+            #             *mid_points,
+            #             right_cut[1],
+            #         ]))
+            #     )
+            #     plot_line(LineString([(p.x,p.y) for p in slice_line]), color='m')
+            #     plt.show(block=True)
+            if slice_points:
+                base_area = [
+                    left_cut[1],
+                    *slice_points,
+                    right_cut[1],
+                ]
+                base_area = [
+                    Point(p[0], p[1])
+                    for p in geom._poly_to_shapely_poly(
+                        Polygon(base_area),
+                    ).convex_hull.exterior.coords
+                ]
 
         else:
             base_area = [

@@ -40,7 +40,7 @@ Tested on python 3.7
     from gefest.core.opt.operators.operators import default_operators
     from gefest.core.opt.gen_design import design
     from gefest.tools.estimators.simulators.swan import swan_model
-    from gefest.core.structure.prohibited import create_prohibited
+    from gefest.core.configs.utils import create_prohibited
 
 **3. Settings for domain to be researched**
 

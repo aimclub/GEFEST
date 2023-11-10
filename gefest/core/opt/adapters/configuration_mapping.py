@@ -1,3 +1,10 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from gefest.core.configs.optimization_params import OptimizationParams
+
 from functools import partial
 
 from golem.core.optimisers.adaptive.operator_agent import MutationAgentTypeEnum
@@ -7,7 +14,6 @@ from golem.core.optimisers.genetic.operators.selection import SelectionTypesEnum
 from golem.core.optimisers.optimization_parameters import GraphRequirements
 from golem.core.optimisers.optimizer import GraphGenerationParams
 
-from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.opt.adapters.factories import StructureFactory
 from gefest.core.opt.adapters.operator import OperationWrap
 from gefest.core.opt.operators.crossovers import crossover_structures

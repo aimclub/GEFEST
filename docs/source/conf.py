@@ -41,6 +41,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.autodoc.typehints',
     'sphinx.ext.graphviz',
+    'sphinxcontrib.autodoc_pydantic',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

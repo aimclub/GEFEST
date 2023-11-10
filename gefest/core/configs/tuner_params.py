@@ -16,11 +16,35 @@ class TunerParams(BaseModel):
     """
 
     tuner_type: str
+    """Type of GOLEM tuners to use.
+    Available: 'iopt', 'optuna', 'sequential', 'simulataneous'.
+    For tuner details see:
+        https://thegolem.readthedocs.io/en/latest/api/tuning.html
+        https://fedot.readthedocs.io/en/latest/advanced/hyperparameters_tuning.html
+    """
+
     n_steps_tune: int
+    """Number of tuner steps."""
+
+    tune_n_best: int = 1
+    """Top tune_n_best structures from provided population to tune."""
+
     hyperopt_dist: Union[Callable, str] = hp.uniform
+    """Random distribution function."""
+
     verbose: bool = True
+    """GOLEM console info."""
+
     variacne_generator: Union[Callable[[Structure], list[float]], str] = utils.average_edge_variance
+    """The function for generating the search space includes intervals
+    for each component of each point of each polygon in the provided structure.
+
+    Output format should be spicific dict configuration. For details see:
+        https://thegolem.readthedocs.io/en/latest/api/tuning.html
+    """
+
     timeout_minutes: int = 60
+    """GOLEM argument."""
 
     @field_validator('tuner_type')
     @classmethod

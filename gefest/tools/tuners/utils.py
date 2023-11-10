@@ -55,7 +55,7 @@ def average_edge_variance(
         get_args = _get_norm_args
     else:
         raise ValueError(
-            f'Invalin distribution function: {distrib}, only hp.uniform and hp.normal allowed.'
+            f'Invalid distribution function: {distrib}, only hp.uniform and hp.normal allowed.',
         )
 
     geom = domain.geometry

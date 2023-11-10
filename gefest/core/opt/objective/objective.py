@@ -9,7 +9,7 @@ from gefest.tools import Estimator
 class Objective(metaclass=ABCMeta):
     """Base objective class.
 
-    Must be used as base class for any user-defuned objetive.
+    Must be used as base class for any user-defined objectives.
 
     """
 
@@ -27,10 +27,10 @@ class Objective(metaclass=ABCMeta):
         **kwargs,
     ) -> list[Structure]:
         """Calls evaluate method."""
-        return self.evaluate(ind)
+        return self._evaluate(ind)
 
     @abstractmethod
-    def evaluate(
+    def _evaluate(
         self,
         ind: Structure,
     ) -> float:

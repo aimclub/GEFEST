@@ -1,6 +1,6 @@
 cython==0.29.36
 pandas==1.4.4
-numpy
+numpy==1.25.2
 typing==3.7.4.1
 matplotlib==3.6.3
 seaborn==0.9.0
@@ -15,13 +15,13 @@ scipy==1.9.3
 scikit-image==0.19.3
 scikit-learn==1.3.0
 pydantic==2.4.2
+autodoc_pydantic==2.0.1
 pydantic-yaml==1.1.1
 PyYAML==6.0.1
 moviepy==1.0.3
 joblib==1.3.2
 loguru==0.7.2
-
-polygenerator
+polygenerator==0.2.0
 
 flake8==6.0.0
 brunette==0.2.8

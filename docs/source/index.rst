@@ -13,6 +13,7 @@ Content:
 
    gefest/index
    components/index
+   api/index
    contribution
    faq
    about

@@ -33,13 +33,9 @@ class Postrocessor:
     def _apply_polygon_rule(structure, rule, attempts, domain) -> Union[Structure, None]:
         for idx_, _ in enumerate(structure.polygons):
             for _ in range(attempts):
-                if structure[idx_].points is None:
-                    logger.warning('bruh')
 
                 if not rule.validate(structure, idx_, domain):
                     structure[idx_] = rule.correct(structure, idx_, domain)
-                    if structure[idx_].points is None:
-                        logger.warning('bruh')
                 else:
                     break
             else:

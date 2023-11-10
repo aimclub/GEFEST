@@ -22,15 +22,15 @@ def crossover_structures(
     operations_probs: list[int],
     **kwargs,
 ) -> tuple[Structure]:
-    """Appls random crossover from given list for each pair.
+    """Applys random crossover from given list for pair of structures.
 
     Args:
         structure1 (Structure): First parent.
         structure1 (Structure): Second parent.
         domain (Domain): Task domain.
-        operations (list[Callable]): List of mutation operations to choose.
-        operation_chance (float): Chance to mutate polygon.
-        operations_probs (list[int]): Probablilites of each mutation operation.
+        operations (list[Callable]): List of crossovers operations to choose.
+        operation_chance (float): Chance of crossover.
+        operations_probs (list[int]): Probablilites of each crossover operation.
 
     Returns:
         tuple[Structure]: Сhildren.

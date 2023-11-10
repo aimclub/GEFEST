@@ -1,9 +1,15 @@
-from ctypes import Structure
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from gefest.core.geometry.datastructs.structure import Structure
+
+if TYPE_CHECKING:
+    from gefest.core.configs.optimization_params import OptimizationParams
 
 from golem.core.optimisers.meta.surrogate_optimizer import SurrogateEachNgenOptimizer
 from golem.core.optimisers.objective import Objective
 
-from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.opt.adapters.configuration_mapping import (
     map_into_gpa,
     map_into_graph_generation_params,

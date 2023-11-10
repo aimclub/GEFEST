@@ -5,7 +5,7 @@ from loguru import logger
 
 
 class BaseParallelDispatcher:
-    """Provides interface for parallel execution."""
+    """Provides api for easy to use parallel execution with joblib backernd."""
 
     def __init__(self, n_jobs: int = -1):
         """Inits parallel dispatcher.
