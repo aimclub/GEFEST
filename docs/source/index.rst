@@ -12,7 +12,7 @@ Content:
    :maxdepth: 1
 
    gefest/index
-   components/index
+   tutorials/index
    api/index
    contribution
    faq
