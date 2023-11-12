@@ -5,4 +5,5 @@ Tutorials
    :glob:
    :maxdepth: 1
 
+   optimizers
    tuners
