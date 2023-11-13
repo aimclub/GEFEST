@@ -88,8 +88,11 @@ def test_mutation_not_passed():
 
 
 @pytest.mark.parametrize(
-    'mut_oper,operat_prob, expected_result',
-    [([rotate_poly_mutation], [1], 0), ([resize_poly_mutation], [1], 0)],
+    'mut_oper, operat_prob, expected_result',
+    [
+        ([rotate_poly_mutation], [1], 0),
+        ([resize_poly_mutation], [1], 0),
+    ],
 )
 def test_mutation_rotate_resize_poly(mut_oper, operat_prob, expected_result):
     """Tests rotate poly operation."""

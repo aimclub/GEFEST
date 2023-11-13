@@ -379,18 +379,6 @@ def get_convex_safe_area(
                 slice_line,
                 scale_factor,
             )
-            # if not slice_points:
-            #     from shapely.geometry import Polygon as SPoly, LineString
-            #     from shapely.plotting import plot_line, plot_polygon
-            #     from matplotlib import pyplot as plt
-            #     plot_polygon(geom._poly_to_shapely_poly(Polygon([
-            #             left_cut[1],
-            #             *mid_points,
-            #             right_cut[1],
-            #         ]))
-            #     )
-            #     plot_line(LineString([(p.x,p.y) for p in slice_line]), color='m')
-            #     plt.show(block=True)
             if slice_points:
                 base_area = [
                     left_cut[1],

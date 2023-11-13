@@ -284,7 +284,6 @@ class Geometry2D(Geometry):
         """Returns points where line intersects polygon."""
         if self.is_closed:
             figure = self._poly_to_shapely_poly(figure)
-
         else:
             figure = self._poly_to_shapely_line(figure)
 
@@ -315,8 +314,8 @@ class Geometry2D(Geometry):
             points_sorted_by_distance = sorted(points_on_boundary_lines, key=bounding_box.distance)
             extended_line = LineString(points_sorted_by_distance[:2])
 
-        interaction = extended_line.intersection(figure)
-        if interaction:
+        if extended_line.intersects(figure):
+            interaction = extended_line.intersection(figure)
             if isinstance(interaction, ShapelyPoint):
                 interaction = [Point(interaction.x, interaction.y)]
             elif isinstance(interaction, MultiPoint):
