@@ -7,6 +7,7 @@ from gefest.core.geometry.domain import Domain
 
 class TestDomain:
     """Domain class tests collection."""
+
     @pytest.mark.parametrize(
         ', '.join(
             [

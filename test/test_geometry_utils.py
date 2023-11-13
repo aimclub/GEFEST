@@ -11,6 +11,7 @@ from gefest.core.geometry.utils import get_convex_safe_area
 
 class TestConvexSafeArea:
     """Utility tests for convex-safe selection of new points."""
+
     domain = Domain(
         allowed_area=[
             [0, 0],
@@ -71,7 +72,12 @@ class TestConvexSafeArea:
         """Crossing lines case."""
         with expectation:
             movment_area = get_convex_safe_area(
-                poly, domain, point_left_idx, point_right_idx, structure, poly_idx,
+                poly,
+                domain,
+                point_left_idx,
+                point_right_idx,
+                structure,
+                poly_idx,
             )
             s_poly = domain.geometry._poly_to_shapely_poly(poly)
             union = unary_union([s_poly, movment_area])
