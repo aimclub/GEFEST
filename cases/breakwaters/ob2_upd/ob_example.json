@@ -1,0 +1,39 @@
+{
+  "id": "ob_example2",
+  "case_description": {
+    "area_name": "Ob Bay",
+    "coords": "None",
+    "grid": {
+      "step": "None",
+      "step_unit": "deg",
+      "grid_type": "spherical"
+    },
+    "open_boundaries": "None"
+  },
+  "simulation": {
+    "spinup_start": "2018-01-01 00:00",
+    "start": "2018-01-02 00:00",
+    "end": "2018-01-03 23:00",
+    "integration_step": "10 MIN",
+    "parallel": "False",
+    "model": "SWAN4131"
+  },
+  "data": {
+    "upload_data": "True",
+    "storage_path": "./storage",
+    "force_overwrite": "False",
+    "bathy_source": "./data/landscape_PwiOsA2HE2igZUel.csv",
+    "bdc_dataset_type": "None",
+    "wind_dataset_type": "cfs2"
+  },
+  "output": {
+    "variables": "['HSig','PDIR','RTP']",
+    "save_output_fields": "True",
+    "save_spectres": "False",
+    "points": {
+    }
+  },
+  "nesting": {
+    "nested_grid": "None"
+  }
+}
