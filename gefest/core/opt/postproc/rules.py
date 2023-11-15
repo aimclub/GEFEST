@@ -312,7 +312,7 @@ def _forbidden_validity(validity):
     elif 'Self-intersection' in validity:
         return True
     else:
-        logger.critical('Unexpected shapely validity output.')
+        logger.critical('Unexpected shapely validity output. Got {validity}')
 
 
 class Rules(Enum):

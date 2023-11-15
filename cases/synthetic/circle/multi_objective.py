@@ -69,7 +69,7 @@ tuner_cfg = TunerParams(
 )
 
 opt_params = OptimizationParams(
-    optimizer='golem_optimizer',
+    optimizer='gefest_ga',
     domain=domain_cfg,
     tuner_cfg=tuner_cfg,
     n_steps=50,
@@ -87,6 +87,7 @@ opt_params = OptimizationParams(
         'pos_change_point',
     ],
     selector='tournament_selection',
+    multiobjective_selector='spea2',
     mutation_each_prob=[0.125, 0.125, 0.15, 0.35, 0.00, 0.00, 0.25],
     crossovers=[
         'polygon_level',

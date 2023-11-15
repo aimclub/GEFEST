@@ -13,6 +13,9 @@ from gefest.core.geometry.domain import Domain
 from gefest.core.opt.adapters.structure import StructureAdapter
 from gefest.core.opt.objective.objective import Objective
 from gefest.core.opt.operators.crossovers import CrossoverTypes, panmixis
+from gefest.core.opt.operators.multiobjective_selections import (
+    MultiObjectiveSelectionTypes,
+)
 from gefest.core.opt.operators.mutations import MutationTypes
 from gefest.core.opt.operators.selections import SelectionTypes
 from gefest.core.opt.postproc.resolve_errors import Postrocessor
@@ -42,6 +45,12 @@ ValidCrossovers = Enum(
 ValidSelection = Enum(
     'ValidSelection',
     ((value, value) for value in [r.name for r in SelectionTypes]),
+    type=str,
+)
+
+ValidMultiObjectiveSelection = Enum(
+    'ValidMultiObjectiveSelection',
+    ((value, value) for value in [r.name for r in MultiObjectiveSelectionTypes]),
     type=str,
 )
 
@@ -79,6 +88,13 @@ class OptimizationParams(BaseModel):
 
     selector: Union[Callable, ValidSelection]
     """Selection operation."""
+
+    multiobjective_selector: Union[Callable, ValidMultiObjectiveSelection] = 'moead'
+    """Evaluates one-dimensional fitness for multi objective.
+    Uses `selector` to select individuals by the produces values.
+    """
+    moead_multi_objective_selector_neighbors: int = 2
+    """Parameter used in moead selector."""
 
     optimizer: ValidOptimizer = 'gefest_ga'
     """Optimizer."""
@@ -197,6 +213,11 @@ class OptimizationParams(BaseModel):
 
         if isinstance(self.selector, str):
             self.selector = getattr(SelectionTypes, self.selector)
+
+        if isinstance(self.multiobjective_selector, str):
+            self.multiobjective_selector = getattr(
+                MultiObjectiveSelectionTypes, self.multiobjective_selector
+            ).value
 
         if self.mutation_each_prob is None:
             self.mutation_each_prob = [1 / len(self.mutations) for _ in range(len(self.mutations))]

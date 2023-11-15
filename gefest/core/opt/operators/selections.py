@@ -11,6 +11,7 @@ from gefest.core.geometry import Structure
 def roulette_selection(
     pop: list[Structure],
     pop_size: int,
+    **kwargs,
 ) -> list[Structure]:
     """Selects the best ones from provided population.
 
@@ -38,6 +39,7 @@ def tournament_selection(
     pop: list[Structure],
     pop_size: int,
     fraction: float = 0.1,
+    **kwargs,
 ) -> list[Structure]:
     """Selects the best ones from provided population.
 
