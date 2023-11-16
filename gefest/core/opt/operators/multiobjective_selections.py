@@ -8,6 +8,7 @@ from gefest.core.geometry.datastructs.structure import Structure
 
 class SPEA2:
     """SPEA2 selection strategy."""
+
     def __init__(self, single_demention_selection, init_pop, steps, **kwargs):
         self.steps = steps
         self.step_cntr = 0
@@ -144,6 +145,7 @@ class MOEAD:
 
     For details see: https://ieeexplore.ieee.org/document/4358754?arnumber=4358754
     """
+
     def __init__(self, single_demention_selection, init_pop, moead_n_neighbors, *args, **kwargs):
         self.ref_dirs, self.ideal, self.neighbors = self._setup(init_pop, moead_n_neighbors)
         self.single_demention_selection = single_demention_selection

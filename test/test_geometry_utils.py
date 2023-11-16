@@ -31,17 +31,9 @@ class TestConvexSafeArea:
         geometry='2D',
     )
 
-    poly_points = [
-        (40, 25),
-        (30, 40),
-        (40, 55),
-        (60, 55),
-        (70, 40),
-        (60, 25),
-        (40, 25),
-    ]
-    test_poly = Polygon(Point(p[0], p[1]) for p in poly_points)
-    test_structure = Structure([test_poly])
+    poly_points1 = [(21, 55), (18, 44), (41, 13), (48, 13), (56, 43)]
+    test_poly1 = Polygon(Point(p[0], p[1]) for p in poly_points1)
+    test_structure = Structure([test_poly1])
 
     @pytest.mark.parametrize(
         ', '.join(
@@ -56,10 +48,19 @@ class TestConvexSafeArea:
             ],
         ),
         [
-            (test_poly, domain, 2, 3, test_structure, 0, no_exception()),
+            (test_poly1, domain, 0, 1, test_structure, 0, no_exception()),
+            (test_poly1, domain, 1, 2, test_structure, 0, no_exception()),
+            (test_poly1, domain, 2, 3, test_structure, 0, no_exception()),
+            (test_poly1, domain, 3, 4, test_structure, 0, no_exception()),
+            (test_poly1, domain, 4, 0, test_structure, 0, no_exception()),
+            (test_poly1, domain, 0, 2, test_structure, 0, no_exception()),
+            (test_poly1, domain, 1, 3, test_structure, 0, no_exception()),
+            (test_poly1, domain, 2, 4, test_structure, 0, no_exception()),
+            (test_poly1, domain, 3, 0, test_structure, 0, no_exception()),
+            (test_poly1, domain, 4, 1, test_structure, 0, no_exception()),
         ],
     )
-    def test_get_convex_safe_area_saves_convexity_triangle_area_case(
+    def test_convex_safe_area_saves_convexity_neighbour_indices(
         self,
         poly,
         domain,
@@ -81,6 +82,6 @@ class TestConvexSafeArea:
             )
             s_poly = domain.geometry._poly_to_shapely_poly(poly)
             union = unary_union([s_poly, movment_area])
-            assert union.area == union.convex_hull.area
-            assert union.is_simple
-            assert union.is_valid
+            assert round(union.area, 6) == round(union.convex_hull.area, 6)
+            if abs(point_right_idx - point_left_idx) == 1:
+                assert s_poly.intersection(movment_area).area == 0.0

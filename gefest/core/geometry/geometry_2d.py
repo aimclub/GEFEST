@@ -352,8 +352,6 @@ class Geometry2D(Geometry):
                 if isinstance(simplified, MultiPolygon):
                     simplified = max(simplified.geoms, lambda p: p.area)
 
-                raise ValueError('Empty polygon produced 1')
-
             out = Polygon([Point(p[0], p[1]) for p in simplified.exterior.coords])
         else:
             simplified = self._poly_to_shapely_line(poly).convex_hull.simplify(tolerance)
@@ -551,7 +549,7 @@ class Geometry2D(Geometry):
             scale_factor,
         )
         parts = get_parts(split(poly, line)).tolist()
-        parts = [lambda p: list(mapping(p)['coordinates'][0][:-1]) for p in parts]
+        parts = [mapping(p)['coordinates'][0][:-1] for p in parts]
         return parts
 
     def min_distance(self, obj_1, obj_2) -> float:

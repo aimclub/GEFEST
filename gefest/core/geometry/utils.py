@@ -304,7 +304,10 @@ def get_convex_safe_area(
     poly_idx: int,
     **kwargs,
 ) -> Polygon:
-    """Finds an area from which a new point can be selected without breaking the convexity."""
+    """Finds an area from which a new point can be selected without breaking the convexity.
+
+    Point_left_idx and point_right_idx expected to be neighbours.
+    """
     geom = domain.geometry
     movment_area = None
 
@@ -341,15 +344,18 @@ def get_convex_safe_area(
         )
 
         p1, p2 = left_cut[1], right_cut[1]
-        pad_vector_points = [p1, geom.rotate_point(p2, p1, 90)]
+        pad_vector_points = [p1, geom.rotate_point(p2, p1, -90)]
+
         pad_vector = (
             pad_vector_points[1].x - pad_vector_points[0].x,
             pad_vector_points[1].y - pad_vector_points[0].y,
         )
+
         slice_line = (
             Point(left_cut[1].x + pad_vector[0], left_cut[1].y + pad_vector[1]),
             Point(right_cut[1].x + pad_vector[0], right_cut[1].y + pad_vector[1]),
         )
+
         scale_factor = max(domain.max_x, domain.max_y) * 100
 
         if sum(cut_angles) < 170:
@@ -399,9 +405,6 @@ def get_convex_safe_area(
                 geom.intersection_line_line(right_cut, slice_line, scale_factor, scale_factor),
                 right_cut[1],
             ]
-            if base_area[1] is None or base_area[2] is None:
-                logger.warning('here')
-
             if not geom._poly_to_shapely_poly(Polygon(base_area)).is_simple:
                 base_area = [
                     left_cut[1],

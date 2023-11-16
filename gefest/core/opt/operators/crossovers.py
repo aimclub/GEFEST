@@ -121,7 +121,7 @@ def polygon_level_crossover(
     poly_1 = pairs_dists[0][0][0]
     poly_2 = pairs_dists[0][0][1]
     if intersected:
-        #  adaptive angle  #
+        # now not adaptive angle #
         split_angle = (np.random.rand() * 2 - 1) * (70)
     elif pairs_dists[0][1] > domain.dist_between_polygons:
         return (s1,)
