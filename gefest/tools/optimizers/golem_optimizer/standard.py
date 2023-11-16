@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from gefest.core.geometry import Structure
+
 if TYPE_CHECKING:
     from gefest.core.configs.optimization_params import OptimizationParams
 
@@ -23,7 +25,7 @@ class StandardOptimizer(Optimizer):
 
     """
 
-    def __init__(self, opt_params: OptimizationParams, **kwargs) -> None:
+    def __init__(self, opt_params: OptimizationParams, initial_population=None, **kwargs) -> None:
         super().__init__(opt_params.log_dispatcher, **kwargs)
         self.opt_params = opt_params
         self.objective = Objective(
@@ -33,9 +35,14 @@ class StandardOptimizer(Optimizer):
         self.requirements = map_into_graph_requirements(opt_params)
         self.ggp = map_into_graph_generation_params(opt_params)
         self.gpa = map_into_gpa(opt_params)
-        self.initial_pop = list(
-            map(opt_params.golem_adapter.adapt, opt_params.sampler(opt_params.pop_size)),
-        )
+
+        if initial_population:
+            self.initial_pop = initial_population
+        else:
+            self.initial_pop: list[Structure] = list(
+                map(opt_params.golem_adapter.adapt, opt_params.sampler(opt_params.pop_size)),
+            )
+
         self.__standard_opt = EvoGraphOptimizer(
             objective=self.objective,
             initial_graphs=self.initial_pop,

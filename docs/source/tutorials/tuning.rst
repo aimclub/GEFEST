@@ -1,8 +1,11 @@
 .. role:: raw-html-m2r(raw)
    :format: html
 
-Tuners
+Tuning
 ======
+
+Tuners
+------
 
 GEFEST provides api for 4 tuners from `GOLEM <https://thegolem.readthedocs.io/en/latest/api/tuning.html>`_\ :
 
@@ -19,7 +22,7 @@ GEFEST provides api for 4 tuners from `GOLEM <https://thegolem.readthedocs.io/en
      - simultaneous
      - sequential
      - simultaneous
-   * - ****Backend**
+   * - **Backend**
      - `iOpt <https://github.com/aimclub/iOpt>`_
      - `Optuna <https://github.com/optuna/optuna>`_
      - `Hyperopt <https://github.com/hyperopt/hyperopt>`_
@@ -30,11 +33,10 @@ GEFEST provides api for 4 tuners from `GOLEM <https://thegolem.readthedocs.io/en
      - :raw-html-m2r:`<code style="background:red;color:white;font-weight:bold">No</code>`
      - :raw-html-m2r:`<code style="background:red;color:white;font-weight:bold">No</code>`
 
-
 How to tune
 -----------
 
-To initialize tuner and run tuning, similarly to the optimizers, you need an ``OptimizationParams`` 
+To initialize tuner and run tuning, similarly to the optimisers, you need an ``OptimizationParams`` 
 with defined ``TunerParams`` and also one or more ``Structure`` objects.
 
 More details about ``OptimizationParams`` you can find in `cases` and `API referece` sections of this documentation.
