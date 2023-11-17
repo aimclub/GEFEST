@@ -47,7 +47,7 @@ class GolemTuner:
         self.domain: Domain = opt_params.domain
         self.validator = partial(validate, rules=opt_params.postprocess_rules, domain=self.domain)
         self.tuner_type: str = opt_params.tuner_cfg.tuner_type
-        self.eval_n_jobs: int = 1
+        self.estimation_n_jobs: int = opt_params.estimation_n_jobs
         self.adapter: Callable = opt_params.golem_adapter
         self.objective = GolemObjectiveWithPreValidation(
             quality_metrics={obj.__class__.__name__: obj for obj in opt_params.objectives},
@@ -71,7 +71,7 @@ class GolemTuner:
             'search_space': search_space,
             'adapter': self.adapter,
             'iterations': self.n_steps_tune,
-            'n_jobs': self.eval_n_jobs,
+            'n_jobs': self.estimation_n_jobs,
             'timeout': self.timeout,
         }
         if self.tuner_type == 'optuna':

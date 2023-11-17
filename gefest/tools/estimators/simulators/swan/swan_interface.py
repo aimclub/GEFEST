@@ -76,7 +76,7 @@ class Swan(Estimator):
         res = []
         for i in range(1538 // 32):
             hs_target = np.sum(
-                [z[i * 32 : (i + 1) * 32][target[0], target[1]] for target in self.targets]
+                [z[i * 32 : (i + 1) * 32][target[0], target[1]] for target in self.targets],
             )
 
             res.append(hs_target)

@@ -135,8 +135,17 @@ class OptimizationParams(BaseModel):
     extra: int = 5
     """Number of extra structures to generate on each optimization step."""
 
+    estimation_n_jobs: Optional[int] = 1
+    """Number of cores for estimator parallel execution.
+    Use more than 1 core only if you are sure that a particular estimator supports it!
+    For example, if the estimator uses an external simulator,
+    uses parallel calculations by itself,
+    then increasing the number of jobs in the code may not have an effect
+    or even slow down the execution of the program.
+    """
+
     n_jobs: Optional[int] = -1
-    """Nuber of cores to use in parallel execution.
+    """Nuber of cores to use in parallel execution of reproduction operations in GEFEST.
         n_jobs = -1 to use all cores,
         n_jobs > 0 to spicic number of cores,
         n_jobs = 0 to eval sequentially without joblib,
@@ -216,7 +225,8 @@ class OptimizationParams(BaseModel):
 
         if isinstance(self.multiobjective_selector, str):
             self.multiobjective_selector = getattr(
-                MultiObjectiveSelectionTypes, self.multiobjective_selector
+                MultiObjectiveSelectionTypes,
+                self.multiobjective_selector,
             ).value
 
         if self.mutation_each_prob is None:

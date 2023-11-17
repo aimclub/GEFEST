@@ -31,7 +31,7 @@ def map_into_graph_requirements(
         keep_n_best=opt_params.pop_size,
         keep_history=opt_params.golem_keep_histoy,
         num_of_generations=opt_params.n_steps,
-        n_jobs=opt_params.n_jobs,
+        n_jobs=opt_params.estimation_n_jobs,
         history_dir=opt_params.log_dir,
     )
 

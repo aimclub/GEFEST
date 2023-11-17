@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import numpy as np
+
 if TYPE_CHECKING:
     from gefest.core.configs.optimization_params import OptimizationParams
 
@@ -49,11 +51,19 @@ class CrossoverStrategy(Strategy):
 
         pairs = copy.deepcopy(self.parent_pairs_selector(pop))
 
+        crossover_mask = np.random.choice(
+            [True, False],
+            size=len(pairs),
+            p=[self.crossover_chacne, 1 - self.crossover_chacne],
+        )
+        pairs = [pair for idx, pair in enumerate(pairs) if crossover_mask[idx]]
+
         new_generation = self._pm.exec_parallel(
             func=crossover,
             arguments=pairs,
             use=True,
         )
+
         new_generation = self._pm.exec_parallel(
             func=self.postprocess,
             arguments=[(ind,) for ind in new_generation],

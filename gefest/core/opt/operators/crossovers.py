@@ -36,7 +36,6 @@ def crossover_structures(
         tuple[Structure]: Сhildren.
     """
     s1, s2 = copy.deepcopy(structure1), copy.deepcopy(structure2)
-
     chosen_crossover = np.random.choice(
         a=operations,
         size=1,

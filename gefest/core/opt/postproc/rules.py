@@ -3,7 +3,6 @@ from enum import Enum
 from itertools import combinations
 
 import numpy as np
-from loguru import logger
 from shapely.geometry import GeometryCollection, LineString, MultiPoint
 from shapely.geometry import Point as ShapelyPoint
 from shapely.geometry import Polygon as ShapelyPolygon
@@ -309,10 +308,8 @@ class PolygonNotSelfIntersects(PolygonRule):
 def _forbidden_validity(validity):
     if 'Valid Geometry' in validity:
         return False
-    elif 'Self-intersection' in validity:
-        return True
     else:
-        logger.critical('Unexpected shapely validity output. Got {validity}')
+        return True
 
 
 class Rules(Enum):

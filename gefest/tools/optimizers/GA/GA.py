@@ -29,7 +29,10 @@ class BaseGA(Optimizer):
         self.crossover = getattr(strategies, opt_params.crossover_strategy)(opt_params=opt_params)
         self.mutation = getattr(strategies, opt_params.mutation_strategy)(opt_params=opt_params)
         self.sampler: Callable = opt_params.sampler
-        self.objectives_evaluator: ObjectivesEvaluator = ObjectivesEvaluator(opt_params.objectives)
+        self.objectives_evaluator: ObjectivesEvaluator = ObjectivesEvaluator(
+            opt_params.objectives,
+            opt_params.estimation_n_jobs,
+        )
         self.pop_size = opt_params.pop_size
         self.n_steps = opt_params.n_steps
         self.domain = self.opt_params.domain
@@ -46,12 +49,12 @@ class BaseGA(Optimizer):
                 self.opt_params.extra = 0
                 logger.warning('For moead extra not available.')
 
-        self.selector = self.opt_params.multiobjective_selector(
-            single_demention_selection=self.selector,
-            init_pop=self._pop,
-            moead_n_neighbors=self.opt_params.moead_multi_objective_selector_neighbors,
-            steps=self.n_steps,
-        )
+            self.selector = self.opt_params.multiobjective_selector(
+                single_demention_selection=self.selector,
+                init_pop=self._pop,
+                moead_n_neighbors=self.opt_params.moead_multi_objective_selector_neighbors,
+                steps=self.n_steps,
+            )
 
         self.log_dispatcher.log_pop(self._pop, '00000_init')
 
@@ -62,11 +65,12 @@ class BaseGA(Optimizer):
             list[Structure]: Optimized population.
         """
         for step in tqdm(range(self.n_steps)):
-            self._pop = self.crossover(self._pop)
-            self._pop = self.mutation(self._pop)
+            self._pop = self.selector(self._pop, self.pop_size)
+            child = self.crossover(self._pop)
+            mutated_child = self.mutation(child)
+            self._pop.extend(mutated_child)
             self._pop.extend(self.sampler(self.opt_params.extra))
             self._pop = self.objectives_evaluator(self._pop)
-            self._pop = self.selector(self._pop, self.pop_size)
             self.log_dispatcher.log_pop(self._pop, str(step + 1))
 
         return self._pop
