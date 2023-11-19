@@ -77,7 +77,7 @@ class OptimizationParams(BaseModel):
     domain: Domain
     """Task domain."""
 
-    objectives: list[Objective]
+    objectives: list[Union[Objective, Callable]]
     """Task objectives."""
 
     mutations: Union[list[Callable[[Any], Structure]], list[ValidMutations]]

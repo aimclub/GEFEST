@@ -44,7 +44,7 @@ def generate_map(domain, structure):
     return obstacle_map
 
 
-def generate_random_map(map_size, random_seed):
+def generate_random_map(map_size: tuple[int, int], random_seed: int):
     """Randomly generate an array of zeros (free media) and ones (obstacles).
 
     The obstacles have basic geometric shapes.

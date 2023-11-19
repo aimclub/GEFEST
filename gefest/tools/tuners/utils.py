@@ -4,29 +4,8 @@ from hyperopt import hp
 
 from gefest.core.geometry import Structure
 from gefest.core.geometry.domain import Domain
-from gefest.core.opt.objective.objective import Objective
 
 VarianceGeneratorType = Callable[[Structure], list[float]]
-
-
-def objective_validation_wrap(
-    struct: Structure,
-    objectives: Objective,
-    validator: Callable,
-) -> float:
-    """Applys validation rules to structure.
-
-    Used for GOLEM tuner as objective to filter out
-    invalid cases in tuning process.
-
-    Args:
-        struct (Structure): Changed stucture.
-        fitness_fun (Fitness): Fitness instance for current task.
-        validator (Callable): Util for structure validation.
-
-    Returns:
-        float: None if structure invalid else fintess function output
-    """
 
 
 def _get_uniform_args(mode: float, variance: float) -> tuple[float, float]:

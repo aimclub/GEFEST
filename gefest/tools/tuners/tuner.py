@@ -43,6 +43,9 @@ class GolemTuner:
         opt_params: OptimizationParams,
         **kwargs,
     ) -> None:
+        if opt_params.tuner_cfg is None:
+            raise ValueError('TunerParams config not provided. Check cofiguration file.')
+
         self.log_dispatcher = opt_params.log_dispatcher
         self.domain: Domain = opt_params.domain
         self.validator = partial(validate, rules=opt_params.postprocess_rules, domain=self.domain)

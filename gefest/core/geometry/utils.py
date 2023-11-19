@@ -86,21 +86,6 @@ def get_random_poly(parent_structure: Optional[Structure], domain: Domain) -> Op
     return polygon
 
 
-def get_random_point(polygon: Polygon, structure: Structure, domain: Domain) -> Optional[Point]:
-    """Generatres random point for polygon."""
-    centroid = domain.geometry.get_centroid(polygon)
-    sigma = _distance(centroid, structure, domain.geometry) / 3
-    point = create_polygon_point(centroid, sigma)
-    max_attempts = 20  # Number of attempts to create in bound point
-    while not _in_bound(point, domain):
-        point = create_polygon_point(centroid, sigma)
-        max_attempts -= 1
-        if max_attempts == 0:
-            return None
-
-    return point
-
-
 def create_poly(centroid: Point, sigma: int, domain: Domain, geometry: Geometry2D) -> Polygon:
     """Generates random polygon using poltgenerator lib.
 
@@ -189,45 +174,6 @@ def _create_area(domain: Domain, structure: Structure, geometry: Geometry2D) -> 
     centroid = geom.get_random_point_in_shapey_geom(area.buffer(-sigma, 1))
 
     return centroid, sigma * 0.99
-
-
-def create_random_point(domain: Domain) -> Point:
-    """Returns random point from domain."""
-    point = Point(
-        np.random.uniform(low=domain.min_x, high=domain.max_x),
-        np.random.uniform(low=domain.min_y, high=domain.max_y),
-    )
-    while not _in_bound(point, domain):
-        point = Point(
-            np.random.uniform(low=domain.min_x, high=domain.max_x),
-            np.random.uniform(low=domain.min_y, high=domain.max_y),
-        )
-
-    return point
-
-
-def create_polygon_point(centroid: Point, sigma: int) -> Point:
-    """Generates point."""
-    point = Point(
-        np.random.normal(centroid.x, sigma, 1)[0],
-        np.random.normal(centroid.y, sigma, 1)[0],
-    )
-
-    return point
-
-
-def _in_bound(point: Point, domain: Domain) -> bool:
-    return domain.geometry.is_contain_point(domain.allowed_area, point)
-
-
-def _distance(point: Point, structure: Structure, geometry: Geometry2D) -> float:
-    polygons = structure.polygons
-    distances = []
-    for poly in polygons:
-        d = geometry.centroid_distance(point, poly)
-        distances.append(d)
-
-    return min(distances)
 
 
 def get_selfintersection_safe_point(

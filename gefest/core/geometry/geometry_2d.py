@@ -38,7 +38,7 @@ class Geometry2D(Geometry):
 
     def get_length(self, polygon: Polygon):
         """Returns polygon perimeter."""
-        if len(polygon.points) < 1:
+        if len(polygon.points) <= 2:
             return 0
 
         geom_polygon = LineString([ShapelyPoint(pt.x, pt.y) for pt in polygon])
@@ -51,7 +51,7 @@ class Geometry2D(Geometry):
             return Polygon(self.get_coords(geom_in))
         # add other shapely objects
 
-    def get_coords(self, poly) -> list[Point]:
+    def get_coords(self, poly: Union[ShapelyPolygon, LineString]) -> list[Point]:
         """The function for getting points.
 
         Args:
@@ -189,7 +189,7 @@ class Geometry2D(Geometry):
         Returns:
             value of the :obj:`polygon` area.
         """
-        if len(polygon.points) <= 1:
+        if len(polygon.points) <= 2:
             return 0
 
         geom_polygon = ShapelyPolygon([self._pt_to_shapely_pt(pt) for pt in polygon])
@@ -331,7 +331,7 @@ class Geometry2D(Geometry):
         if len(poly) < 3:
             return poly
 
-        if self._poly_to_shapely_line(poly).is_simple:
+        if self._poly_to_shapely_poly(poly).is_simple:
 
             poly = self._poly_to_shapely_poly(inp)
             compressed = poly.buffer(-tolerance, join_style='mitre')
@@ -356,11 +356,9 @@ class Geometry2D(Geometry):
         else:
             simplified = self._poly_to_shapely_line(poly).convex_hull.simplify(tolerance)
             if simplified.is_empty:
-                raise ValueError('Empty polygon produced 2')
+                raise ValueError('Empty polygon produced')
 
             out = Polygon([Point(p[0], p[1]) for p in simplified.exterior.coords])
-        # plot_polygon(simplified, color='b')
-        # plt.show()
 
         return out
 
