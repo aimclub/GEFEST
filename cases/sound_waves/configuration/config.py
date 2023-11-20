@@ -3,7 +3,6 @@ from pathlib import Path
 import numpy as np
 
 from cases.sound_waves.microphone_points import Microphone
-from cases.sound_waves.poly_from_point import poly_from_comsol_txt
 from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.configs.tuner_params import TunerParams
 from gefest.core.geometry.datastructs.structure import Structure
@@ -14,6 +13,7 @@ from gefest.tools.estimators.simulators.sound_wave.sound_interface import (
     SoundSimulator,
     generate_map,
 )
+from gefest.tools.utils import poly_from_comsol_txt
 
 # # # Metrics # # #
 
