@@ -44,16 +44,16 @@ len_y =max(coord_Y)- min(coord_Y)
 geometry = Geometry2D()
 
 path_=f"{root}/cases/synthetic/syn_gen/Comsol_points/lightning.txt"
-#best_poly = poly_from_comsol_txt(path=path_).polygons[0]
+best_poly = poly_from_comsol_txt(path=path_).polygons[0]
 
-best_poly = random_star_shaped_polygon(num_points=4)
-best_poly = Polygon([Point(p[0]*min(coord_X)+len_x/2,p[1]*min(coord_Y)+len_y/2) for p in best_poly])
+# best_poly = random_star_shaped_polygon(num_points=4)
+# best_poly = Polygon([Point(p[0]*min(coord_X)+len_x/2,p[1]*min(coord_Y)+len_y/2) for p in best_poly])
 #best_poly.points.append(best_poly.points[0])
 
 
 
 plt.ion()
-noise = NoisedPoly(init_poly=best_poly,scale=0.01,degrees_to_rotate=10)
+noise = NoisedPoly(init_poly=best_poly,scale=0.06,degrees_to_rotate=30)
 for _ in range(200):
     #angle = np.random.randint(-100, 100)
     plt.clf()

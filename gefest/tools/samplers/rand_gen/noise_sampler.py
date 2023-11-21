@@ -5,17 +5,28 @@ from gefest.core.geometry import Point, Polygon, Structure
 import numpy as np
 from gefest.core.geometry.geometry_2d import Geometry2D
 
+
 class NoisedPoly():
+    """Сlass for revers mutation of synthetic geometry. It is a sampler of geometry,
+         that generate simillary to reference polygons.
+
+        class apply a noise for every point of polygon (except first and last for close geometry!!!),
+         than it can rotate and resize obtained polygon.
+    Args:
+         scale (float): - scale factor mapped to domain side. Necessary for obtain
+            'sigma' arg for uniform noise function.
+                Recommend from 0.01 to 0.05.
+                May be tested for other examples;
+         init_poly (Polygon): - Reference polygon necessary to generate new reverse mutated geometry;
+         resize_scale (List[min,max]): range of min and max value for
+            random.uniform generation x_scale and y_scale: (scale value for **x** axis ;scale value for **y** axis).
+                Necessary for resize_polygon function;
+        degrees_to_rotate (int;float): +/- degrees to rotate polygon;
+        rules (List[Rules]): List of geometry validation rules
+    """
     geometry = Geometry2D()
 
-    """
-    class for revers mutation of synthetic geometry. It is a sampler of geometry,
-     that generate simillary to reference polygons.
-
-    class apply a noise for every point of polygon (except first and last for close geometry!!!),
-     than it can rotate and resize obtained polygon.
-    """
-    def __init__(self, init_poly:Polygon, scale:float=0.1,
+    def __init__(self, init_poly:Polygon, scale:float=0.01,
                  resize_scale:List=None, probability:float=0.75,
                  degrees_to_rotate:int=180, rules:List= None,
                  domain=None):
@@ -76,8 +87,7 @@ class NoisedPoly():
         return poly
 
     def resize_polygon(self,poly: Polygon) -> Polygon:
-        """
-        resize polygon size
+        """resize polygon size func
         """
         if np.random.uniform(0, 1) < self.proba:
             poly = self.geometry.resize_poly(poly,self.x_scale,self.y_scale)
