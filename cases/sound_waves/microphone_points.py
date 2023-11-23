@@ -4,7 +4,7 @@ import numpy as np
 class Microphone:
     """Slices microphone points where makes a sound measurements."""
     def __init__(self, matrix: np.ndarray = None):
-        self.matrix = np.random.rand(120, 120)
+        self.matrix = np.random.rand(120, 120) if matrix is None else matrix
 
     def array(self):
         """Generates np.array of sound pressure."""

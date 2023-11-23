@@ -29,4 +29,3 @@ class LogDispatcher:
             logger.log(4, dump)
 
         logger.remove(inividual_log_handler)
-        logger.info('Population logged. May be not sorted by fitness.')

@@ -18,7 +18,7 @@ class Domain(BaseModel):
     max_points_num: int = 50
     polygon_side: float = 0.0001
     min_dist_from_boundary: float = 0.0001
-    prohibited_area: Optional[Union[Structure, str]] = Field(default=Structure([]))
+    prohibited_area: Optional[Union[Structure, str]] = Field(default=Structure())
     fixed_points: Optional[Union[Polygon, list[list[float]]]] = Field(default_factory=list)
     geometry_is_convex: bool = True
     geometry_is_closed: bool = True

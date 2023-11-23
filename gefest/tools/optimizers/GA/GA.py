@@ -64,7 +64,9 @@ class BaseGA(Optimizer):
         Returns:
             list[Structure]: Optimized population.
         """
-        for step in tqdm(range(self.n_steps)):
+        pbar = tqdm(range(self.n_steps))
+        for step in pbar:
+            pbar.set_description(f'Best fitness: {self._pop[0].fitness}')
             self._pop = self.selector(self._pop, self.pop_size)
             child = self.crossover(self._pop)
             mutated_child = self.mutation(child)
@@ -73,4 +75,5 @@ class BaseGA(Optimizer):
             self._pop = self.objectives_evaluator(self._pop)
             self.log_dispatcher.log_pop(self._pop, str(step + 1))
 
+        pbar.set_description(f'Best fitness: {self._pop[0].fitness}')
         return self._pop

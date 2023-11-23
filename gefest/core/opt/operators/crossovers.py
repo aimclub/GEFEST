@@ -94,7 +94,7 @@ def polygon_level_crossover(
     domain: Domain,
     **kwargs,
 ):
-    """Exchanges polygons of two structure."""
+    """Exchanges points of two nearest polygons in structure."""
     geom = domain.geometry
     s1, s2 = copy.deepcopy(s1), copy.deepcopy(s2)
     intersected = False

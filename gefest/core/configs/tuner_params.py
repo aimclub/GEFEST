@@ -35,7 +35,7 @@ class TunerParams(BaseModel):
     verbose: bool = True
     """GOLEM console info."""
 
-    variacne_generator: Union[Callable[[Structure], list[float]], str] = utils.average_edge_variance
+    variacne_generator: Union[Callable[[Structure], list[float]], str] = utils.percent_edge_variance
     """The function for generating the search space includes intervals
     for each component of each point of each polygon in the provided structure.
 
@@ -80,15 +80,12 @@ class TunerParams(BaseModel):
     @classmethod
     def variacne_generator_fun_validate(cls, value):
         """Checks if specified variance generation function exists."""
-        fun_names = ['average_edge_variance']
+        fun_names = ['percent_edge_variance']
         if isinstance(value, str):
             if value in fun_names:
                 return getattr(utils, value)
-            else:
-                raise ValueError(f'Invalid distribution name: {value}. Allowed names: {fun_names}')
         elif isinstance(value, Callable):
-            if value.__module__.split('.')[0] == hp.__name__.split('.')[0]:
-                return value
+            return value
         else:
             raise ValueError(f'Invalid argument: {value} of type {type(value)}.')
 

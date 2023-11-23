@@ -1,9 +1,13 @@
 from copy import deepcopy
+from functools import partial
 from pathlib import Path
 
 import numpy as np
 
 from cases.sound_waves.microphone_points import Microphone
+from gefest.core.geometry.datastructs.point import Point
+from gefest.core.geometry.datastructs.polygon import Polygon
+from gefest.tools.tuners.utils import percent_edge_variance
 from gefest.tools.utils import poly_from_comsol_txt
 from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.configs.tuner_params import TunerParams
@@ -23,6 +27,9 @@ INITIAL_P = 200
 MAX_PRESSURE = INITIAL_P / 2
 MIN_PRESSURE = -INITIAL_P / 2
 
+import numpy as np
+
+
 import itertools
 from numpy.core.umath import pi
 class SoundFieldFitness(Objective):
@@ -36,7 +43,6 @@ class SoundFieldFitness(Objective):
         self.map_size = (round(1.2 * domain.max_y), round(1.2 * domain.max_x))
         self.size_y, self.size_x = self.map_size
         self.duration = duration
-        # obstacle_map handling
 
         # Source position is the center of the map
         self.s_y = self.size_y // 2
@@ -97,6 +103,7 @@ class SoundFieldFitness(Objective):
     def _evaluate(self, ind: Structure):
         self.iteration = 0
         obstacle_map = np.zeros((self.size_y, self.size_x))
+        obstacle_map = generate_map(self.domain, ind)
         pressure = np.zeros((self.size_y, self.size_x))
         pressure_hist = np.zeros((self.duration, self.size_y, self.size_x))
         velocities = np.zeros((self.size_y, self.size_x, 4))
@@ -104,14 +111,14 @@ class SoundFieldFitness(Objective):
         for iteration in range(self.duration):
             pressure_hist[iteration] = deepcopy(pressure)
             velocities, pressure = self.step(velocities, pressure, obstacle_map)
-        # best_spl = self._reference_spl(sim)
+
         spl = self.spl(pressure_hist)
 
         current_spl = np.nan_to_num(spl, nan=0, neginf=0, posinf=0)
         micro = Microphone(matrix=current_spl).array()
-        current_spl = np.concatenate(micro[1])
+        current_spl = np.concatenate(micro[-1])
         l_f = np.sum(np.abs(deepcopy(self.best_spl) - current_spl))
-        return l_f
+        return l_f / len(current_spl)
 
 
 # # # Precompute domain arguments # # #
@@ -122,48 +129,50 @@ pass
 
 domain_cfg = Domain(
     allowed_area=[
-        [0, 0],
-        [0, 120],
-        [120, 120],
-        [120, 0],
-        [0, 0],
+        [20, 20],
+        [20, 100],
+        [100, 100],
+        [100, 20],
+        [20, 20],
     ],
     name='main',
     min_poly_num=1,
-    max_poly_num=1,
+    max_poly_num=4,
     min_points_num=3,
-    max_points_num=15,
-    polygon_side=0.0001,
-    min_dist_from_boundary=0.0001,
+    max_points_num=16,
+    polygon_side=0.001,
+    min_dist_from_boundary=0.001,
     geometry_is_convex=True,
     geometry_is_closed=True,
     geometry='2D',
 )
 
+
 tuner_cfg = TunerParams(
-    tuner_type='optuna',
-    n_steps_tune=25,
-    hyperopt_dist='uniform',
+    tuner_type='sequential',
+    n_steps_tune=1000,
+    hyperopt_dist='normal',
     verbose=True,
-    timeout_minutes=60,
+    variacne_generator=partial(percent_edge_variance, percent=0.5),
+    timeout_minutes=30,
 )
 
 
 best_structure = poly_from_comsol_txt(str(Path(__file__).parent) + '\\figures\\bottom_square.txt')
-best_spl = SoundSimulator(domain_cfg, 50, None)(best_structure)
+best_spl = SoundSimulator(domain_cfg, 200, None)(best_structure)
 best_spl = np.nan_to_num(best_spl, nan=0, neginf=0, posinf=0)
 micro = Microphone(matrix=best_spl).array()
-best_spl = np.concatenate(micro[1])
+best_spl = np.concatenate(micro[-1])
 
 opt_params = OptimizationParams(
     optimizer='gefest_ga',
     domain=domain_cfg,
     tuner_cfg=tuner_cfg,
-    n_steps=10,
-    pop_size=10,
+    n_steps=100,
+    pop_size=100,
     postprocess_attempts=3,
-    mutation_prob=0.6,
-    crossover_prob=0.6,
+    mutation_prob=0.9,
+    crossover_prob=0.7,
     mutations=[
         'rotate_poly',
         'resize_poly',
@@ -173,13 +182,13 @@ opt_params = OptimizationParams(
         'drop_poly',
         'pos_change_point',
     ],
-    selector='tournament_selection',
-    mutation_each_prob=[0.125, 0.125, 0.15, 0.35, 0.00, 0.00, 0.25],
+    selector='roulette_selection',
+    mutation_each_prob=[0.125, 0.125, 0.25, 0.25, 0.0, 0.0, 0.25],
     crossovers=[
         'polygon_level',
         'structure_level',
     ],
-    crossover_each_prob=[0.0, 1.0],
+    crossover_each_prob=[1.0, 0.0],
     postprocess_rules=[
         'not_out_of_bounds',
         'valid_polygon_geom',
@@ -189,11 +198,11 @@ opt_params = OptimizationParams(
         'not_too_close_points',
     ],
     extra=5,
-    estimation_n_jobs=1,
-    n_jobs=-1,
-    log_dir='logs',
-    run_name='run_name',
-    golem_keep_histoy=False,
+    estimation_n_jobs=-1,
+    n_jobs=11,
+    log_dir='logs/tuners_exp',
+    run_name='roulette_1_obj',
+    golem_keep_histoy=True,
     golem_genetic_scheme_type='steady_state',
     golem_surrogate_each_n_gen=5,
     objectives=[
@@ -201,7 +210,7 @@ opt_params = OptimizationParams(
             domain_cfg,
             None,
             best_spl,
-            50
+            200
         ),
     ],
 )

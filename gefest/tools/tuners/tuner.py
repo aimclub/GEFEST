@@ -15,8 +15,8 @@ from gefest.core.geometry import Structure
 from gefest.core.geometry.domain import Domain
 from gefest.core.opt.objective.tuner_objective import GolemObjectiveWithPreValidation
 from gefest.core.opt.postproc.resolve_errors import validate
-from gefest.tools.tuners.utils import VarianceGeneratorType
 
+VarianceGeneratorType = Callable[[Structure], list[float]]
 GolemTunerType = Union[IOptTuner, OptunaTuner, SequentialTuner, SimultaneousTuner]
 
 
@@ -124,7 +124,7 @@ class GolemTuner:
             graph = self.adapter.adapt(struct)
             search_space = self._generate_search_space(
                 graph,
-                self.generate_variances(struct, self.domain, self.hyperopt_distrib),
+                self.generate_variances(struct, self.domain),
             )
             tuner = self._get_tuner(graph, SearchSpace(search_space))
             tuned_structures = tuner.tune(graph)

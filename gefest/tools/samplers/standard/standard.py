@@ -8,8 +8,6 @@ if TYPE_CHECKING:
 from functools import partial
 from typing import Callable
 
-from loguru import logger
-
 from gefest.core.geometry import Structure
 from gefest.core.geometry.domain import Domain
 from gefest.core.geometry.utils import get_random_structure
@@ -60,6 +58,5 @@ class StandardSampler(Sampler):
 
         random_pop = [ind for ind in corrected if ind is not None]
 
-        logger.info(f'{n_samples}, {len(random_pop)}')
         pop = random_pop[:n_samples]
         return pop
