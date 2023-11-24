@@ -1,6 +1,7 @@
 from copy import deepcopy
 from typing import Union
 
+from golem.utilities.data_structures import ensure_wrapped_in_sequence
 from loguru import logger
 
 from gefest.core.geometry import Structure
@@ -20,8 +21,7 @@ class Postrocessor:
         attempts: int = 3,
     ) -> list[Union[Structure, None]]:
         """Applys postprocessing rules over all provided structures."""
-        if not isinstance(structures, (list, tuple)):
-            structures = [structures]
+        structures = ensure_wrapped_in_sequence(structures)
 
         post_processed = [
             Postrocessor.postprocess_structure(struct, rules, domain, attempts)

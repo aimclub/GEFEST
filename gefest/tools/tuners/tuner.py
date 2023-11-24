@@ -9,6 +9,7 @@ from golem.core.tuning.optuna_tuner import OptunaTuner
 from golem.core.tuning.search_space import OperationParametersMapping, SearchSpace
 from golem.core.tuning.sequential import SequentialTuner
 from golem.core.tuning.simultaneous import SimultaneousTuner
+from golem.utilities.data_structures import ensure_wrapped_in_sequence
 
 from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.geometry import Structure
@@ -116,8 +117,7 @@ class GolemTuner:
         Returns:
             list[Structure]: Tuned structures.
         """
-        if isinstance(objects_for_tune, Structure):
-            objects_for_tune = [objects_for_tune]
+        objects_for_tune = ensure_wrapped_in_sequence(objects_for_tune)
 
         tuned_objects = []
         for struct in objects_for_tune:
@@ -129,9 +129,9 @@ class GolemTuner:
             tuner = self._get_tuner(graph, SearchSpace(search_space))
             tuned_structures = tuner.tune(graph)
             metrics = tuner.obtained_metric
-            if isinstance(tuned_structures, Structure):
-                tuned_structures = [tuned_structures]
-                metrics = [tuner.obtained_metric]
+
+            tuned_structures = ensure_wrapped_in_sequence(tuned_structures)
+            metrics = ensure_wrapped_in_sequence(tuner.obtained_metric)
 
             for idx_, _ in enumerate(tuned_structures):
                 tuned_structures[idx_].fitness = metrics[idx_]

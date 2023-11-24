@@ -129,6 +129,7 @@ def test_distance():
 
 
 def test_get_coords_from_linestring():
+    """Test coordinate sequence extraction from LineString."""
     poly = LineString([(1, 2), (5, 6), (9, 3), (-5, 4)])
     coords = geometry.get_coords(poly)
     for idx_, point in enumerate(coords):
@@ -137,6 +138,7 @@ def test_get_coords_from_linestring():
 
 
 def test_get_coords_from_polygon():
+    """Test coordinate sequence extraction from Shapely polygon."""
     poly = ShapelyPolygon([(1, 2), (5, 6), (9, 3), (-5, 4)])
     coords = geometry.get_coords(poly)
     for idx_, point in enumerate(coords):
@@ -180,6 +182,7 @@ def test_get_coords_from_polygon():
     ],
 )
 def test_get_angle_between_two_vectors(points, angle):
+    """Test angle evaluation between two segments."""
     v1 = (Point(points[0], points[1]), Point(points[2], points[3]))
     v2 = (Point(points[4], points[5]), Point(points[6], points[7]))
     assert round(geometry.get_angle(vector1=v1, vector2=v2), 3) == angle
@@ -232,6 +235,7 @@ def test_get_angle_between_two_vectors(points, angle):
     ],
 )
 def test_get_length(poly, perimeter):
+    """Test perimeter evaluation."""
     poly = Polygon([Point(p[0], p[1]) for p in poly])
     assert round(geometry.get_length(poly), 3) == perimeter
 
@@ -342,6 +346,7 @@ def test_get_length(poly, perimeter):
     ],
 )
 def test_nearest_points(poly1, poly2, point):
+    """Test evaluation of neatest point to polygon in another polygon."""
     point_res = geometry.nearest_points(
         Polygon([Point(p[0], p[1]) for p in poly1]),
         Polygon([Point(p[0], p[1]) for p in poly2]),
@@ -468,7 +473,8 @@ def test_nearest_points(poly1, poly2, point):
         ),
     ],
 )
-def test_simpplify(poly, tolerance, expected):
+def test_simplify(poly, tolerance, expected):
+    """Test polygon simplification."""
     res = geometry.simplify(
         Polygon([Point(p[0], p[1]) for p in poly]),
         tolerance,
@@ -494,6 +500,7 @@ def test_simpplify(poly, tolerance, expected):
     ],
 )
 def test_get_random_point_in_shapey_geom(shapely_geom, expectation):
+    """Test random point selection in arbitrary geometries."""
     with expectation:
         point = geometry.get_random_point_in_shapey_geom(shapely_geom)
         assert shapely_geom.contains(ShapelyPoint(point.coords))

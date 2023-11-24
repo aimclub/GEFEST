@@ -38,7 +38,8 @@ else:
     best_poly = random_star_shaped_polygon(num_points=77)  # Generate random polygon
     best_poly = Polygon(
         [Point(p[0] * min(coord_x) + len_x / 2, p[1] * min(coord_y) + len_y / 2)
-         for p in best_poly])
+         for p in best_poly]
+    )
     best_poly.points.append(best_poly.points[0])
 
 plt.ion()
@@ -47,7 +48,7 @@ noise = NoisedPoly(
     scale=0.03,
     degrees_to_rotate=30,
     rules=[PolygonNotSelfIntersects()],
-    resize_scale=[0.5, 1.75]
+    resize_scale=[0.5, 1.75],
 )
 
 for _ in range(200):

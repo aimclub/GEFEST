@@ -1,6 +1,7 @@
 import itertools
 from copy import deepcopy
 
+import numba as nb
 import numpy as np
 from numpy import ndarray
 from numpy.core.umath import pi
@@ -87,6 +88,65 @@ def generate_random_map(map_size: tuple[int, int], random_seed: int):
     return obstacle_map
 
 
+@nb.jit(nopython=True, fastmath=True)
+def _upd_v(v_, p_, i, j, size_x, size_y):
+    v_[i, j, 0] = v_[i, j, 0] + p_[i, j] - p_[i - 1, j] if i > 0 else p_[i, j]
+    v_[i, j, 1] = v_[i, j, 1] + p_[i, j] - p_[i, j + 1] if j < size_x - 1 else p_[i, j]
+    v_[i, j, 2] = v_[i, j, 2] + p_[i, j] - p_[i + 1, j] if i < size_y - 1 else p_[i, j]
+    v_[i, j, 3] = v_[i, j, 3] + p_[i, j] - p_[i, j - 1] if j > 0 else p_[i, j]
+    return v_
+
+
+def update_velocity(
+    velocities: np.ndarray,
+    pressure: np.ndarray,
+    obstacle_map: np.ndarray,
+    size_x: int,
+    size_y: int,
+):
+    """Update the velocity field based on Komatsuzaki's transition rules."""
+    for i, j in itertools.product(range(size_y), range(size_x)):
+        if obstacle_map[i, j] == 1:
+            velocities[i, j, :] = 0.0
+            continue
+
+        velocities = _upd_v(velocities, pressure, i, j, size_x, size_y)
+
+    return velocities
+
+
+@nb.jit(nopython=True, fastmath=True)
+def update_perssure(pressure, velocities):
+    """Update the pressure field based on Komatsuzaki's transition rules."""
+    return pressure - CA2 * DAMPING * np.sum(velocities, axis=2)
+
+
+@nb.jit(nopython=True, fastmath=True)
+def _upd_p(omega, iteration):
+    return INITIAL_P * np.sin(omega * iteration)
+
+
+def eval_spl(pressure_hist, integration_interval=60):
+    """Computes the sound pressure level map.
+
+    https://en.wikipedia.org/wiki/Sound_pressure#Sound_pressure_level
+
+    Args:
+        integration_interval (int): interval over which the rms pressure
+                                        is computed, starting from the last
+                                        simulation iteration backwards.
+
+    Returns:
+        spl (np.array): map of sound pressure level (dB).
+    """
+    if integration_interval > pressure_hist.shape[0]:
+        integration_interval = pressure_hist.shape[0]
+
+    rms_p = np.sqrt(np.mean(np.square(pressure_hist[-integration_interval:-1]), axis=0))
+
+    return 20 * np.log10(rms_p / (20 * 10e-6))
+
+
 class SoundSimulator(Estimator):
     """Class for the configuration and simulation of sound propagation in a map with obstacles.
 
@@ -134,59 +194,13 @@ class SoundSimulator(Estimator):
         # outflow velocities from each cell
         self._velocities = np.zeros((self.size_y, self.size_x, 4))
 
-    def update_velocity(self):
-        """Update the velocity field based on Komatsuzaki's transition rules."""
-        V = self._velocities
-        P = self.pressure
-        for i, j in itertools.product(range(self.size_y), range(self.size_x)):
-            if self.obstacle_map[i, j] == 1:
-                V[i, j, 0:4] = 0.0
-                continue
-
-            V[i, j, 0] = V[i, j, 0] + P[i, j] - P[i - 1, j] if i > 0 else P[i, j]
-            V[i, j, 1] = V[i, j, 1] + P[i, j] - P[i, j + 1] if j < self.size_x - 1 else P[i, j]
-            V[i, j, 2] = V[i, j, 2] + P[i, j] - P[i + 1, j] if i < self.size_y - 1 else P[i, j]
-            V[i, j, 3] = V[i, j, 3] + P[i, j] - P[i, j - 1] if j > 0 else P[i, j]
-
-    def update_perssure(self):
-        """Update the pressure field based on Komatsuzaki's transition rules."""
-        self.pressure -= CA2 * DAMPING * np.sum(self._velocities, axis=2)
-
-    def step(self):
+    def step(self, velocities, pressure, obstacle_map):
         """Perform a simulation step, upadting the wind an pressure fields."""
-        self.pressure[self.s_y, self.s_x] = INITIAL_P * np.sin(self.omega * self.iteration)
-        self.update_velocity()
-        self.update_perssure()
+        pressure[self.s_x, self.s_y] = _upd_p(self.omega, self.iteration)
+        velocities = update_velocity(velocities, pressure, obstacle_map, self.size_x, self.size_y)
+        pressure = update_perssure(pressure, velocities)
         self.iteration += 1
-
-    def spl(self, integration_interval=60):
-        """Computes the sound pressure level map.
-
-        https://en.wikipedia.org/wiki/Sound_pressure#Sound_pressure_level
-
-        Args:
-            integration_interval (int): interval over which the rms pressure
-                                        is computed, starting from the last
-                                        simulation iteration backwards.
-
-        Returns:
-            spl (np.array): map of sound pressure level (dB).
-        """
-        p0 = 20 * 10e-6  # Pa
-        if integration_interval > self.pressure_hist.shape[0]:
-            integration_interval = self.pressure_hist.shape[0]
-
-        rms_p = np.sqrt(np.mean(np.square(self.pressure_hist[-integration_interval:-1]), axis=0))
-
-        rms_p[rms_p == 0.0] = 0.000000001
-        matrix_db = 20 * np.log10(rms_p / p0)
-        return matrix_db
-
-    def run(self):
-        """Runs soun estimation."""
-        for iteration in range(self.duration):
-            self.pressure_hist[iteration] = deepcopy(self.pressure)
-            self.step()
+        return velocities, pressure
 
     def estimate(self, structure: Structure) -> ndarray:
         """Estimates sound pressule level for provided structure.
@@ -197,12 +211,17 @@ class SoundSimulator(Estimator):
         Returns:
             ndarray: map of sound pressure level (dB)
         """
-        self.obstacle_map = generate_map(self.domain, structure)
-        self.run()
-        spl = self.spl()
+        self.iteration = 0
+        obstacle_map = np.zeros((self.size_y, self.size_x))
+        obstacle_map = generate_map(self.domain, structure)
+        pressure = np.zeros((self.size_y, self.size_x))
+        pressure_hist = np.zeros((self.duration, self.size_y, self.size_x))
+        velocities = np.zeros((self.size_y, self.size_x, 4))
 
-        self.pressure = np.zeros((self.size_y, self.size_x))
-        self.pressure_hist = np.zeros((self.duration, self.size_y, self.size_x))
-        self._velocities = np.zeros((self.size_y, self.size_x, 4))
+        for iteration in range(self.duration):
+            pressure_hist[iteration] = deepcopy(pressure)
+            velocities, pressure = self.step(velocities, pressure, obstacle_map)
+
+        spl = eval_spl(pressure_hist)
 
         return spl

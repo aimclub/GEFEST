@@ -45,13 +45,13 @@ Here we will take a closer look at several ``TunerParams`` attributes which may 
 
 .. code-block:: python
 
-   from gefest.tools.tuners.utils import verage_edge_variance
+   from gefest.tools.tuners.utils import percent_edge_variance
 
    tuner_cfg = TunerParams(
        tuner_type='optuna',
        n_steps_tune=10,
        hyperopt_dist='uniform',
-       variance_generator=verage_edge_variance,
+       variance_generator=percent_edge_variance,
        verbose=True,
        timeout_minutes=60,
    )

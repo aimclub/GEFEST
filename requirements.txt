@@ -1,4 +1,5 @@
 cython==0.29.36
+numba==0.58.1
 pandas==1.4.4
 numpy==1.25.2
 typing==3.7.4.1

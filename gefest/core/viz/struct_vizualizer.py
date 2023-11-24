@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import moviepy.editor as mp
+from golem.utilities.data_structures import ensure_wrapped_in_sequence
 from matplotlib.lines import Line2D
 from moviepy.video.io.bindings import mplfig_to_npimage
 
@@ -41,11 +42,8 @@ class StructVizualizer:
         Returns:
             matplotlib.pyplot.figure
         """
-        if not isinstance(structs, list):
-            structs = [structs]
-
-        if not isinstance(infos, list):
-            infos = [infos]
+        structs = ensure_wrapped_in_sequence(structs)
+        infos = ensure_wrapped_in_sequence(infos)
 
         fig = plt.figure()
         for struct, linestyle in zip(structs, linestyles):

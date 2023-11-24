@@ -9,7 +9,6 @@ from random import randint
 from typing import Optional
 
 import numpy as np
-from loguru import logger
 from polygenerator import (
     random_convex_polygon,
     random_polygon,
@@ -351,6 +350,10 @@ def get_convex_safe_area(
                 geom.intersection_line_line(right_cut, slice_line, scale_factor, scale_factor),
                 right_cut[1],
             ]
+
+            if None in base_area:
+                return None
+
             if not geom._poly_to_shapely_poly(Polygon(base_area)).is_simple:
                 base_area = [
                     left_cut[1],
@@ -403,7 +406,6 @@ def _substract_oссupied_area(
         )
 
     if movment_area.is_empty:
-        logger.warning('Empty movment area.')
         movment_area = None
     elif isinstance(movment_area, (MultiPolygon, GeometryCollection)):
         for g_ in movment_area.geoms:

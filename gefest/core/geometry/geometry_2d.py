@@ -2,6 +2,7 @@ from typing import Union
 from uuid import uuid4
 
 import numpy as np
+from golem.utilities.data_structures import ensure_wrapped_in_sequence
 from loguru import logger
 from shapely import affinity, get_parts
 from shapely.affinity import scale
@@ -454,9 +455,7 @@ class Geometry2D(Geometry):
     def difference_polys(self, base_poly: Polygon, diff_polys: list[Polygon]):
         """Returns area of base_poly difference with diff_polys polygons."""
         base_poly = self._poly_to_shapely_poly(base_poly)
-        if isinstance(diff_polys, Polygon):
-            diff_polys = [diff_polys]
-
+        diff_polys = ensure_wrapped_in_sequence(diff_polys)
         diff_polys = [self._poly_to_shapely_poly for poly in diff_polys]
 
         for poly in diff_polys:
