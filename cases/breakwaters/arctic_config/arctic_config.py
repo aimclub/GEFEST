@@ -1,9 +1,8 @@
-import json
 import pickle
 from pathlib import Path
 
 import numpy as np
-from shapely.geometry import shape
+from breakwaters.breakwaters_utils import parse_arctic_geojson
 
 from gefest.core.configs.optimization_params import OptimizationParams
 from gefest.core.configs.tuner_params import TunerParams
@@ -13,48 +12,24 @@ from gefest.core.opt.objective.objective import Objective
 from gefest.tools.estimators.simulators.swan.swan_interface import Swan
 
 root_path = Path(__file__).parent.parent.parent.parent
-with open(
-    f"{root_path}/cases/breakwaters/newdata/result_PwiOsA2HE2igZUel.geojson", "r"
-) as file:
-    res_list = json.load(file)
-with open(
-    f"{root_path}/cases/breakwaters/newdata/border_PwiOsA2HE2igZUel.geojson", "r"
-) as file:
-    border_dict = json.load(file)
+result_path = 'cases/breakwaters/newdata/result_PwiOsA2HE2igZUel.geojson'
+border_path = 'cases/breakwaters/newdata/border_PwiOsA2HE2igZUel.geojson'
 
 
-border = shape(border_dict["features"][0]["geometry"])
-water = [i for i in res_list["features"] if i["properties"]["type"] == "water"]
-water_coord = [p["geometry"]["coordinates"] for p in water]
-cargo_piers = [
-    i for i in res_list["features"] if i["properties"]["type"] == "cargo_pier"
-]
-passenger_pier = [
-    i for i in res_list["features"] if i["properties"]["type"] == "passenger_pier"
-]
-piers = [
-    i
-    for i in res_list["features"]
-    if (i["properties"]["type"] == "passenger_pier")
-    or (i["properties"]["type"] == "cargo_pier")
-]
-piers_coords = [x[0] for x in [i["geometry"]["coordinates"] for i in piers]]
-piers_line = [max(p, key=lambda i: i[1]) for p in piers_coords]
-unique_types = np.unique([i["properties"]["type"] for i in res_list["features"]])
-allow_water = [
-    i
-    for i in water_coord[0][0]
-    if (i[0] > 74.8) and (i[1] < 67.942) and (i[1] > 67.915)
-]
+allow_water = parse_arctic_geojson(
+    result_path=result_path,
+    border_path=border_path,
+    root_path=root_path
+)
 allow_area = [[74.80, 67.92], [74.80, 67.94]] + allow_water + [[74.80, 67.92]]
 grid_resolution_x = 17  # Number of points on x-axis
 grid_resolution_y = 31  # Number of points on y-axis
-coord_Y = np.linspace(
+coord_y = np.linspace(
     min([p[1] for p in allow_area]) * 500,
     max([p[1] for p in allow_area]) * 500,
     grid_resolution_y + 1,
 )  # X coordinate for spatial grid
-coord_X = np.linspace(
+coord_x = np.linspace(
     min([p[0] for p in allow_area]) * 500,
     max([p[0] for p in allow_area]) * 500,
     grid_resolution_x + 1,
@@ -66,10 +41,18 @@ targets = [[10, 15], [12, 14], [14, 14], [16, 14]]
 # WINDWIND 19.1 225
 # targets = [[14,10],[16,10],[18,10]]
 # # # Metrics # # #
+
+
 def load_file_from_path(path: str):
+    """Func to load pickle file.
+
+    :param path:
+    :return:
+    """
     with open(path, "rb") as f:
         _file = pickle.load(f)
         f.close()
+
     return _file
 
 
@@ -81,11 +64,11 @@ pass
 
 domain_cfg = Domain(
     allowed_area=[
-        (min(coord_X), min(coord_Y)),
-        (min(coord_X), max(coord_Y)),
-        (max(coord_X), max(coord_Y)),
-        (max(coord_X), min(coord_Y)),
-        (min(coord_X), min(coord_Y)),
+        (min(coord_x), min(coord_y)),
+        (min(coord_x), max(coord_y)),
+        (max(coord_x), max(coord_y)),
+        (max(coord_x), min(coord_y)),
+        (min(coord_x), min(coord_y)),
     ],
     name="main",
     min_poly_num=1,
@@ -119,6 +102,7 @@ swan_estimator = Swan(
 
 
 class BreakWatersFitness(Objective):
+    """Class to init Objective for BreakWater case."""
     def __init__(self, domain, estimator):
         super().__init__(domain, estimator)
         self.estimator = estimator
@@ -128,9 +112,7 @@ class BreakWatersFitness(Objective):
         return fitness
 
 
-#  fitness estimator
 estimator = BreakWatersFitness(domain_cfg, swan_estimator)
-
 opt_params = OptimizationParams(
     optimizer="gefest_ga",
     domain=domain_cfg,
