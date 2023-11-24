@@ -1,26 +1,44 @@
-from gefest.core.structure.domain import Domain
+from abc import ABCMeta, abstractmethod
+from typing import Any, Callable
+
+from gefest.core.geometry import Structure
+from gefest.core.geometry.domain import Domain
 
 
-class Sampler:
-    """
-    ::TODO::
-    make abstract class for all samplers
-    """
-    def __init__(self, sampler, domain: 'Domain'):
-        """
-        Base sampler class
-        :param sampler: (Object) object with method sample
-        :param domain: (Domain) design domain
-        """
-        self.sampler = sampler
+class Sampler(metaclass=ABCMeta):
+    """Interface for samplers."""
+
+    def __init__(
+        self,
+        samples_generator: Callable[[Any], Structure],
+        domain: Domain,
+    ) -> None:
+        self.samples_generator = samples_generator
         self.domain = domain
 
-    def sample(self, n_samples: int):
-        """
-        Sampling from certain sampler
-        :param n_samples: (Int) number of samples
-        :return: (List(Structure)) sample n_samples structures
-        """
-        samples = self.sampler.sample(n_samples=n_samples, domain=self.domain)
+    def __call__(
+        self,
+        n_samples: int,
+        **kwargs,
+    ) -> list[Structure]:
+        """Simplifies usage of samplers.
 
-        return samples
+        Args:
+            n_samples (int): Number of samples to generate.
+
+        Returns:
+            list[Structure]: Generated samples.
+        """
+        return self.sample(n_samples)
+
+    @abstractmethod
+    def sample(self, n_samples: int) -> list[Structure]:
+        """Must implement sampling logic.
+
+        Args:
+            n_samples (int): Number of samples to generate.
+
+        Returns:
+            list[Structure]: Generated samples.
+        """
+        ...

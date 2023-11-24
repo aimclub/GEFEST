@@ -1,39 +1,20 @@
-from typing import Optional, Callable, List
-from gefest.core.structure.structure import Structure
+from abc import ABCMeta, abstractmethod
+from typing import Any
+
+from gefest.core.geometry import Structure
 
 
-class Estimator:
-    """
-    ::TODO:: make abstract class for further specific realizations in different problems
-    """
+class Estimator(metaclass=ABCMeta):
+    """Interface for estimation backends, e.g. physical simulators, neural networks."""
 
-    def __init__(self, estimator, loss: Optional[Callable] = None):
-        """
-        Base estimator class, Structure -> Performance
-        :param estimator: estimator with .estimate() method
-        :param loss: function for minimizing, it takes estimator as argument,
-                     if None estimator using as cost function
-        """
-        self.estimator = estimator
-        self.loss = loss
+    def __call__(
+        self,
+        struct: Structure,
+    ) -> Any:
+        """Incapsulates estimate method call for simler estimator usage."""
+        return self.estimate(struct)
 
-    def estimate(self, population: List[Structure]):
-        """
-        Estimation of performance
-        :param population: List(Structure) population of structures for estimation
-        :return: List(Float) performance of population
-        """
-        performance = []
-        size = len(population)
-
-        if self.loss:
-            for i in range(size):
-                one_perf = self.loss(population[i], self.estimator)
-                performance.append(one_perf)
-
-        else:
-            for i in range(size):
-                one_perf = self.estimator.estimate(population[i])
-                performance.append(one_perf)
-
-        return performance
+    @abstractmethod
+    def estimate(self, struct: Structure) -> Any:
+        """Must implemet logic of estimation."""
+        ...

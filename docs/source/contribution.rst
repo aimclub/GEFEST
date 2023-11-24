@@ -55,6 +55,24 @@ repository <https://github.com/ITMO-NSS-team/GEFEST/>`__ on GitHub:
 
          $ pytest -s
 
+7. After all the necessary code is added and tested, make sure there is no flake8 errors.
+
+Run autoformatters:
+
+:: 
+
+      $ brunette gefest test
+      $ isort gefest test
+
+Run code style checks:
+
+::  
+
+      $ flake8 gefest test --count --statistics
+
+If flake8 throws errors that are inconsistent or difficult to fix by editing new code, 
+exclude them in setup.cfg or create an issue.
+
 7. When you're done editing and local testing, run:
 
    ::

@@ -1,56 +1,62 @@
-from copy import deepcopy
-from multiprocessing import Pool
+from __future__ import annotations
 
-from gefest.core.algs.postproc.resolve_errors import postprocess
-from gefest.core.opt.constraints import check_constraints
-from gefest.core.structure.domain import Domain
-from gefest.core.structure.structure import get_random_structure
+from typing import TYPE_CHECKING
 
-MAX_ITER = 50000
-NUM_PROC = 1
+if TYPE_CHECKING:
+    from gefest.core.configs.optimization_params import OptimizationParams
+
+from functools import partial
+from typing import Callable
+
+from gefest.core.geometry import Structure
+from gefest.core.geometry.domain import Domain
+from gefest.core.geometry.utils import get_random_structure
+from gefest.core.utils.parallel_manager import BaseParallelDispatcher
+from gefest.tools.samplers.sampler import Sampler
 
 
-class StandardSampler:
+class StandardSampler(Sampler):
+    """Generator of random structures.
 
-    def sample(self, n_samples: int, domain: Domain, initial_state=None):
-        # Method for initialization of population
+    The get_random_structure utility is used for structure generation.
+    The generated samples satisfy the domain configuration.
+    """
 
-        population_new = []
+    def __init__(self, opt_params: OptimizationParams) -> None:
+        super().__init__(
+            samples_generator=get_random_structure,
+            domain=opt_params.domain,
+        )
+        self.domain: Domain = opt_params.domain
+        self.postprocessor: Callable = opt_params.postprocessor
+        self.postprocess_attempts: int = opt_params.postprocess_attempts
+        self._pm = BaseParallelDispatcher(opt_params.n_jobs)
 
-        if initial_state is None:
-            while len(population_new) < n_samples:
-                if NUM_PROC > 1:
-                    with Pool(NUM_PROC) as p:
-                        new_items = p.map(self.get_pop_worker, [domain] * n_samples)
-                else:
-                    new_items = []
-                    for i in range(n_samples):
-                        new_items.append(self.get_pop_worker(domain))
+    def __call__(self, n_samples: int) -> list[Structure]:
+        """Calls sample method."""
+        return self.sample(n_samples=n_samples)
 
-                for structure in new_items:
-                    population_new.append(structure)
-                    if len(population_new) == n_samples:
-                        return population_new
-        else:
-            for _ in range(n_samples):
-                population_new.append(deepcopy(initial_state))
-        return population_new
+    def sample(self, n_samples: int) -> list[Structure]:
+        """Generates requested number of random samples.
 
-    def get_pop_worker(self, domain):
-        # Create a random structure and postprocess it
-        structure = get_random_structure(domain=domain)
-        structure = postprocess(structure, domain)
-        constraints = check_constraints(structure=structure, domain=domain)
-        max_attempts = 3  # Number of postprocessing attempts
-        while not constraints:
-            structure = postprocess(structure, domain)
-            constraints = check_constraints(structure=structure, domain=domain)
-            max_attempts -= 1
-            if max_attempts < 0:
-                # If the number of attempts is over,
-                # a new structure is created on which postprocessing is performed
-                structure = get_random_structure(domain=domain)
-                structure = postprocess(structure, domain)
-                constraints = check_constraints(structure=structure, domain=domain)
+        Args:
+            n_samples (int): Number of samples to generate.
 
-        return structure
+        Returns:
+            list[Structure]: Generated samples.
+        """
+        random_pop = self._pm.exec_parallel(
+            partial(get_random_structure, domain=self.domain),
+            tuple(range(n_samples + 1)),
+            False,
+            False,
+        )
+        corrected = self._pm.exec_parallel(
+            self.postprocessor,
+            [(ind,) for ind in random_pop],
+        )
+
+        random_pop = [ind for ind in corrected if ind is not None]
+
+        pop = random_pop[:n_samples]
+        return pop

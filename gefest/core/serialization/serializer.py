@@ -16,20 +16,19 @@ class Serializer(JSONEncoder, JSONDecoder):
 
     def __init__(self, *args, **kwargs):
         for base_class, coder_name in [(JSONEncoder, 'default'), (JSONDecoder, 'object_hook')]:
-            base_kwargs = {k: kwargs[k] for k in kwargs.keys() & signature(base_class.__init__).parameters}
+            base_kwargs = {
+                k: kwargs[k] for k in kwargs.keys() & signature(base_class.__init__).parameters
+            }
             base_kwargs[coder_name] = getattr(self, coder_name)
             base_class.__init__(self, **base_kwargs)
 
         if not Serializer.CODERS_BY_TYPE:
             from gefest.core.opt.result import Result
-            from gefest.core.structure.structure import Structure
             from gefest.core.structure.point import Point
             from gefest.core.structure.polygon import Polygon
+            from gefest.core.structure.structure import Structure
 
-            from .any import (
-                any_from_json,
-                any_to_json,
-            )
+            from .any import any_from_json, any_to_json
 
             _to_json = Serializer._to_json
             _from_json = Serializer._from_json
@@ -38,12 +37,13 @@ class Serializer(JSONEncoder, JSONDecoder):
                 Result: basic_serialization,
                 Structure: basic_serialization,
                 Polygon: basic_serialization,
-                Point: basic_serialization
-
+                Point: basic_serialization,
             }
 
     @staticmethod
-    def _get_field_checker(obj: Union[INSTANCE_OR_CALLABLE, Type[INSTANCE_OR_CALLABLE]]) -> Callable[..., bool]:
+    def _get_field_checker(
+        obj: Union[INSTANCE_OR_CALLABLE, Type[INSTANCE_OR_CALLABLE]],
+    ) -> Callable[..., bool]:
         if isclass(obj):
             return issubclass
         return isinstance
@@ -80,9 +80,7 @@ class Serializer(JSONEncoder, JSONDecoder):
             obj_module = obj.__module__
         else:
             obj_module = obj.__class__.__module__
-        return {
-            CLASS_PATH_KEY: f'{obj_module}{MODULE_X_NAME_DELIMITER}{obj_name}'
-        }
+        return {CLASS_PATH_KEY: f'{obj_module}{MODULE_X_NAME_DELIMITER}{obj_name}'}
 
     def default(self, obj: INSTANCE_OR_CALLABLE) -> Dict[str, Any]:
         """Tries to encode objects that are not simply json-encodable to JSON-object
@@ -119,7 +117,7 @@ class Serializer(JSONEncoder, JSONDecoder):
         return obj_cls
 
     def object_hook(self, json_obj: Dict[str, Any]) -> Union[INSTANCE_OR_CALLABLE, dict]:
-        """Decodes every JSON-object to python class/func object or just returns dict
+        """Decodes every JSON-object to python class/func object or just returns dict.
 
         Args:
             json_obj: dict to be decoded into Python class, function or
@@ -127,6 +125,7 @@ class Serializer(JSONEncoder, JSONDecoder):
 
         Returns:
             Python class, function or method object OR input if it's just a regular dict
+
         """
 
         if CLASS_PATH_KEY in json_obj:
@@ -134,8 +133,13 @@ class Serializer(JSONEncoder, JSONDecoder):
             del json_obj[CLASS_PATH_KEY]
             base_type = Serializer._get_base_type(obj_cls)
             if isclass(obj_cls) and base_type is not None:
-                return Serializer._get_coder_by_type(base_type, Serializer._from_json)(obj_cls, json_obj)
+                return Serializer._get_coder_by_type(base_type, Serializer._from_json)(
+                    obj_cls,
+                    json_obj,
+                )
             elif isfunction(obj_cls) or ismethod(obj_cls):
                 return obj_cls
+
             raise TypeError(f'Parsed obj_cls={obj_cls} is not serializable, but should be')
+
         return json_obj

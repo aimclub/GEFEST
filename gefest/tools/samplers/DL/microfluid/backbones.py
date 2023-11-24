@@ -1,5 +1,4 @@
 import torch
-
 from torch import nn
 
 
@@ -26,12 +25,15 @@ class Encoder(nn.Module):
         for channels in self.conv_dims:
             model.append(
                 nn.Sequential(
-                    nn.Conv2d(in_channels=in_channel,
-                              out_channels=channels,
-                              kernel_size=3,
-                              stride=2),
+                    nn.Conv2d(
+                        in_channels=in_channel,
+                        out_channels=channels,
+                        kernel_size=3,
+                        stride=2,
+                    ),
                     nn.BatchNorm2d(channels),
-                    nn.ReLU())
+                    nn.ReLU(),
+                ),
             )
             in_channel = channels
 
@@ -40,8 +42,7 @@ class Encoder(nn.Module):
 
         self.model = nn.Sequential(*model)
 
-        self.sample = nn.Linear(in_features=self.conv_dims[-1],
-                                out_features=self.hidden_dim)
+        self.sample = nn.Linear(in_features=self.conv_dims[-1], out_features=self.hidden_dim)
 
     def forward(self, x):
         """
@@ -72,7 +73,9 @@ class Decoder(nn.Module):
         self.hidden_dim = hidden_dim
 
         conv_dims.reverse()  # Reversing dims to create decoder
-        self.conv_dims = conv_dims  # It is possible to decrease number of parameters for prevent overfitting
+        self.conv_dims = (
+            conv_dims  # It is possible to decrease number of parameters for prevent overfitting
+        )
 
         self.input_layer = nn.Linear(self.hidden_dim, self.conv_dims[0] * 4)
 
@@ -85,35 +88,33 @@ class Decoder(nn.Module):
         for i in range(len(self.conv_dims) - 1):
             model.append(
                 nn.Sequential(
-                    nn.ConvTranspose2d(in_channels=self.conv_dims[i],
-                                       out_channels=self.conv_dims[i + 1],
-                                       kernel_size=3,
-                                       stride=2,
-                                       padding=1,
-                                       output_padding=1
-                                       ),
+                    nn.ConvTranspose2d(
+                        in_channels=self.conv_dims[i],
+                        out_channels=self.conv_dims[i + 1],
+                        kernel_size=3,
+                        stride=2,
+                        padding=1,
+                        output_padding=1,
+                    ),
                     nn.BatchNorm2d(self.conv_dims[i + 1]),
-                    nn.ReLU()
-                )
+                    nn.ReLU(),
+                ),
             )
         self.model = nn.Sequential(*model)
 
         self.final_layer = nn.Sequential(
-            nn.ConvTranspose2d(in_channels=self.conv_dims[-1],
-                               out_channels=self.conv_dims[-1],
-                               kernel_size=3,
-                               stride=2,
-                               padding=1,
-                               output_padding=1
-                               ),
+            nn.ConvTranspose2d(
+                in_channels=self.conv_dims[-1],
+                out_channels=self.conv_dims[-1],
+                kernel_size=3,
+                stride=2,
+                padding=1,
+                output_padding=1,
+            ),
             nn.BatchNorm2d(self.conv_dims[i + 1]),
             nn.ReLU(),
-            nn.Conv2d(in_channels=self.conv_dims[-1],
-                      out_channels=1,
-                      kernel_size=3,
-                      padding=1
-                      ),
-            nn.Sigmoid()
+            nn.Conv2d(in_channels=self.conv_dims[-1], out_channels=1, kernel_size=3, padding=1),
+            nn.Sigmoid(),
         )
 
     def forward(self, z):
@@ -122,8 +123,8 @@ class Decoder(nn.Module):
         :param z: (Tensor) [B x hidden_dim]
         :return: (Tensor) [B x C x W x H]
         """
-        input = self.input_layer(z).view(-1, self.conv_dims[0], 2, 2)
-        out_decoder = self.model(input)
+        input_ = self.input_layer(z).view(-1, self.conv_dims[0], 2, 2)
+        out_decoder = self.model(input_)
         out_final = self.final_layer(out_decoder)
 
         return out_final
@@ -163,27 +164,26 @@ class Discriminator(nn.Module):
         for _ in range(n_layers):
             model.append(
                 nn.Sequential(
-                    nn.Linear(in_features=in_dim,
-                              out_features=in_dim * 4),
+                    nn.Linear(in_features=in_dim, out_features=in_dim * 4),
                     nn.Dropout(p=0.2),
-                    nn.ReLU())
+                    nn.ReLU(),
+                ),
             )
             in_dim = in_dim * 4
 
         for _ in range(n_layers):
             model.append(
                 nn.Sequential(
-                    nn.Linear(in_features=in_dim,
-                              out_features=int(in_dim / 4)),
+                    nn.Linear(in_features=in_dim, out_features=int(in_dim / 4)),
                     nn.Dropout(p=0.2),
-                    nn.ReLU())
+                    nn.ReLU(),
+                ),
             )
             in_dim = int(in_dim / 4)
 
         self.model = nn.Sequential(*model)
 
-        self.prob = nn.Linear(in_features=in_dim,
-                              out_features=1)
+        self.prob = nn.Linear(in_features=in_dim, out_features=1)
 
     def forward(self, x):
         """

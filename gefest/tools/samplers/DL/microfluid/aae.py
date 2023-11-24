@@ -1,6 +1,6 @@
-import torch
 import time
 
+import torch
 from torch import nn
 
 
@@ -10,7 +10,7 @@ class AAE(nn.Module):
     # Adversarial Auto Encoder model
     ################################
 
-    def __init__(self, Encoder, Decoder, Discriminator, hidden_dim, conv_dims, n_layers, device):
+    def __init__(self, encoder, decoder, discriminator, hidden_dim, conv_dims, n_layers, device):
         """
         Creating AAE model
         :param Encoder: Encoder model
@@ -26,9 +26,9 @@ class AAE(nn.Module):
         self.device = device
         self.hidden_dim = hidden_dim
 
-        self.encoder = Encoder(hidden_dim, conv_dims, device).to(device)
-        self.decoder = Decoder(hidden_dim, conv_dims, device).to(device)
-        self.discriminator = Discriminator(hidden_dim, n_layers, device).to(device)
+        self.encoder = encoder(hidden_dim, conv_dims, device).to(device)
+        self.decoder = decoder(hidden_dim, conv_dims, device).to(device)
+        self.discriminator = discriminator(hidden_dim, n_layers, device).to(device)
 
         self.mse = nn.MSELoss()
         self.bce = nn.BCELoss()
@@ -139,21 +139,21 @@ class AAE(nn.Module):
         params = {
             'ae': list(self.decoder.parameters()) + list(self.encoder.parameters()),
             'encoder': list(self.encoder.parameters()),
-            'discriminator': list(self.discriminator.parameters())
+            'discriminator': list(self.discriminator.parameters()),
         }
 
         ae_optim = torch.optim.Adam(params=params['ae'], lr=1e-3)
         en_optim = torch.optim.Adam(params=params['encoder'], lr=1e-4)
         dis_optim = torch.optim.Adam(params=params['discriminator'], lr=1e-4)
 
-        print('opt=%s(lr=%f), epochs=%d, device=%s,\n'
-              'en loss \u2193, gen loss \u2193, dis loss \u2191' % \
-              (type(en_optim).__name__,
-               en_optim.param_groups[0]['lr'], epochs, self.device))
+        print(
+            'opt=%s(lr=%f), epochs=%d, device=%s,\n'
+            'en loss \u2193, gen loss \u2193, dis loss \u2191'
+            % (type(en_optim).__name__, en_optim.param_groups[0]['lr'], epochs, self.device),
+        )
 
         history = {'loss': [], 'val_loss': []}
 
-        train_len = len(trainloader.dataset)
         test_len = len(testloader.dataset)
 
         for epoch in range(epochs):
@@ -187,7 +187,11 @@ class AAE(nn.Module):
                 d_z_sample = self.discriminator(z_sample)
 
                 # Standard normal distribution was taken as prior
-                z_prior = torch.normal(mean=0, std=1, size=(batch_samples.size(dim=0), self.hidden_dim)).to(self.device)
+                z_prior = torch.normal(
+                    mean=0,
+                    std=1,
+                    size=(batch_samples.size(dim=0), self.hidden_dim),
+                ).to(self.device)
                 d_z_prior = self.discriminator(z_prior)
 
                 discrim_reg = self.discr_reg(d_z_sample, d_z_prior)
@@ -211,12 +215,19 @@ class AAE(nn.Module):
                 end_time = time.time()
                 work_time = end_time - start_time
 
-                print('Epoch/batch %3d/%3d \n'
-                      'recon_loss %5.5f, discr_reg %5.5f, encoder_reg %5.5f \n'
-                      'batch time %5.2f sec' % \
-                      (epoch + 1, i,
-                       recon_loss.item(), discrim_reg.item(), encoder_reg.item(),
-                       work_time))
+                print(
+                    'Epoch/batch %3d/%3d \n'
+                    'recon_loss %5.5f, discr_reg %5.5f, encoder_reg %5.5f \n'
+                    'batch time %5.2f sec'
+                    % (
+                        epoch + 1,
+                        i,
+                        recon_loss.item(),
+                        discrim_reg.item(),
+                        encoder_reg.item(),
+                        work_time,
+                    ),
+                )
 
             #######################
             # VALIDATION PART
@@ -226,7 +237,7 @@ class AAE(nn.Module):
             val_dis_loss = 0.0
 
             with torch.no_grad():
-                for i, batch_samples in enumerate(testloader):
+                for _, batch_samples in enumerate(testloader):
                     batch_samples = batch_samples['image'].to(self.device)
 
                     recon_loss, discrim_reg, encoder_reg = self.get_losses(batch_samples)
@@ -240,10 +251,11 @@ class AAE(nn.Module):
             val_dis_loss = val_dis_loss / test_len
 
             if epoch + 1:
-                print('Epoch %3d/%3d \n'
-                      'val_en_loss %5.5f, val_gen_loss %5.5f, val_dis_loss %5.5f \n' % \
-                      (epoch + 1, epochs,
-                       val_recon_loss, val_gen_loss, val_dis_loss))
+                print(
+                    'Epoch %3d/%3d \n'
+                    'val_en_loss %5.5f, val_gen_loss %5.5f, val_dis_loss %5.5f \n'
+                    % (epoch + 1, epochs, val_recon_loss, val_gen_loss, val_dis_loss),
+                )
 
             history['val_loss'].append(val_recon_loss + val_gen_loss + val_dis_loss)
 

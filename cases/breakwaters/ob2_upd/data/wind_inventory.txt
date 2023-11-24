@@ -1,0 +1,1 @@
+./data/wind_2018.txt

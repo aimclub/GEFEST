@@ -1,3 +1,5 @@
+.. _quickstart:
+
 Quickstart
 ==========
 
@@ -7,151 +9,236 @@ GEFEST Framework quick start guide
 How to install
 --------------
 
-Tested on python 3.7
+Tested on python 3.9-3.10
 
 .. code::
 
  pip install https://github.com/ITMO-NSS-team/GEFEST/archive/master.zip
 
-How to design your own polygon in manual way
-----------------------------------------------------
+How to run  
+----------
 
--  **Step 1**. Define estimator using loss function or simulator of the physical process.
+To run examples or custom config just use `run_experiments` and provide absolute path to config file.
 
-Loss function for finding a polygon that seems like circle showed below. 
+You can use it as API:
 
 .. code:: python
 
- from types import SimpleNamespace
- import numpy as np 
- from gefest.tools.estimators.estimator import Estimator
- from gefest.core.geometry.geometry_2d import Geometry2D
- 
- geometry = Geometry2D()
+    from gefest.tools.run_experiments import run_experiments    
+
+    path = 'C:\\Your\\Folder\\GEFEST\\cases\\synthetic\\circle\\multi_objective.py'
+    run_experiments(path)
+
+Or as CLI script:
+
+.. code:: 
+
+    python run_experiments.py C:\Path\To\Config\python_config.py
+
+How to design experiment with GEFEST
+------------------------------------
+
+To run an experiment, you need to define several entities: 
+    1. Objectives
+    2. Domain
+    3. TunerParams (if needed)
+    4. OptimizationParams
+
+They can be defined in the experiment startup script, 
+or placed in a separate python file and loaded using `gefest.core.configs.utils.load_config` function.
+
+All of them aggreagted into single `OptimizationParams` object.
+
+Let's take a step-by-step look at how to do this.
+
+-  **Step 0**. Import required GEFEST modules.
+
+.. code:: python
+
+    from gefest.core.configs.optimization_params import OptimizationParams
+    from gefest.core.configs.tuner_params import TunerParams
+    from gefest.core.geometry.datastructs.structure import Structure
+    from gefest.core.geometry.domain import Domain
+    from gefest.core.opt.objective.objective import Objective
+    from gefest.tools.estimators.estimator import Estimator
+
+-  **Step 1**. Define objectives using loss function and simulator of the physical process if required.
+
+Objective for finding a polygon that seems like circle showed below.
+
+Inherit from Objective, pass domain and estimator through `__init__`.
+Define logic of objective evaluation in `_evaluate` method, which returns float value.
+If you want to solve multiobjective optimisation task, just define more objectives classes below.
+
+.. code:: python
+
+    import numpy as np
+
+    class AreaLengthRatio(Objective):
+        """Area length ratio metric."""
+        def __init__(self, domain: Domain, estimator: Estimator = None) -> None:
+            super().__init__(domain, estimator)
+
+        def _evaluate(self, ind: Structure) -> float:
+
+            num = 3
+            num_polys = len(ind.polygons)
+            loss = 0
+            for poly in ind.polygons:
+                area = self.domain.geometry.get_square(poly)
+                length = self.domain.geometry.get_length(poly)
+                if area == 0:
+                    ratio = None
+                else:
+                    ratio = 1 - 4 * np.pi * area / length ** 2
+
+                loss += ratio
+
+            loss = loss + 20 * abs(num_polys - num)
+            return loss
 
 
- def circle_loss(structure):
-     #calculating area and length of designed polygon via GEFEST.gefest methods
- 
-     best = 999999
-     for idx, polygon in enumerate(structure.polygons):
-         area = geometry.get_square(polygon)
-         length = geometry.get_length(polygon)
-         centroid = geometry.get_centroid(polygon)
 
-         if area == 0:
-             continue
-         #checking "area/length" ratio (equal 1 for circle)
-         ratio = 4 * np.pi * area / length ** 2
-         loss = 1 - ratio
+-  **Step 2**. Define task domain.
 
-         if loss < best:
-             best = loss
-
-     return best
- 
- estimator = SimpleNamespace()
- estimator.estimate = circle_loss
- estimator = Estimator(estimator=estimator)
-
--  **Step 2**. Specify border coordinates of area where GEFEST will solve the task.
-
-Put the *Domain* to *Setup()* class for creating a task variable.
+Domain describes geometric constraints for individuals.
 
 .. code:: python
     
- from gefest.core.structure.domain import Domain
- from gefest.core.opt.setup import Setup
-
- domain = Domain(allowed_area=[
-                   (0, 0), 
-                   (0, 300), 
-                   (300, 300),
-                   (300, 0), 
-                   (0, 0)
-                ],
-
-                # specify processing way
-                geometry=geometry,
-
-                # every designed polygon locates into Structure(),
-                # these parameters determine number of polygons per Structure()
-                max_poly_num=3,
-                min_poly_num=1,
-
-                # every designed polygon might сontain up to 20 points
-                max_points_num=20,
-                min_points_num=5,
-
-                # designed polygons have closed borders
-                is_closed=True)
-
- task_setup = Setup(domain=domain)
+    domain_cfg = Domain(
+        allowed_area=[
+            [0, 0],
+            [0, 300],
+            [300, 300],
+            [300, 0],
+            [0, 0],
+        ],
+        min_poly_num=1,
+        max_poly_num=4,
+        min_points_num=3,
+        max_points_num=15,
+        polygon_side=0.0001,
+        min_dist_from_boundary=0.0001,
+        geometry_is_convex=True,
+        geometry_is_closed=True,
+    )
 
 -  **Step 3** Create sampler to generate population in specified domain.
 
-.. code:: python
+By default, the standard sampler is used.
+You can select another sampler or define custom for spicific task.
+How to define your own samler described in the tutorials section of the documentation.
 
- from gefest.tools.samplers.standard.standard import StandardSampler
- from gefest.tools.samplers.sampler import Sampler
+-  **Step 4**. Define tuner configuraton.
 
- sampler = Sampler(StandardSampler(), domain)
-
--  **Step 4**. Create optimizer. 
-
-.. code:: python
-
- from gefest.tools.optimizers.GA.GA import GA
- from gefest.tools.optimizers.optimizer import Optimizer
- from gefest.core.opt.operators.operators import default_operators
- from gefest.tools.samplers.standard.standard import StandardSampler
-
- n_steps = 25
- pop_size = 25
-
- params = GA.Params(pop_size=pop_size,
-                    crossover_rate=0.6, 
-                    mutation_rate=0.6,
-                    mutation_value_rate=[])
- ga = GA(params=params,
-         evolutionary_operators=default_operators(), 
-         task_setup=task_setup)
-
- optimizer = Optimizer(ga)
-
--  **Step 5**. Run generative design. 
+You can tune coordinates of optimized structures points to achieve better objective metric using GOLEM tuners.
+To use this feature define `TunerParams` configuration.
 
 .. code:: python
 
- from gefest.core.opt.gen_design import design
+    tuner_cfg = TunerParams(
+        tuner_type='optuna',
+        n_steps_tune=10,
+        hyperopt_dist='uniform',
+        verbose=True,
+        timeout_minutes=60,
+    )
 
- optimized_population = design(n_steps=n_steps,
-                               pop_size=pop_size,
-                               estimator=estimator,
-                               sampler=sampler,
-                               optimizer=optimizer)
+-  **Step 5**. Define OptimisationParams config.
 
--  **Step 6**. Create visualization of the best structure in designed population.
+To know more about configuration options see :ref:`configuration` section of API reference. 
 
 .. code:: python
-    
- import pickle
- import matplotlib.pyplot as plt
- from gefest.core.viz.struct_vizualizer import StructVizualizer
 
- 
- with open(f'HistoryFiles/performance_{n_steps-1}.pickle', 'rb') as f:
-     performance = pickle.load(f)
- with open(f'HistoryFiles/population_{n_steps-1}.pickle', 'rb') as f:
-     population = pickle.load(f)
+    opt_params = OptimizationParams(
+        optimizer='gefest_ga',
+        domain=domain_cfg,
+        tuner_cfg=tuner_cfg,
+        n_steps=50,
+        pop_size=50,
+        postprocess_attempts=3,
+        mutation_prob=0.6,
+        crossover_prob=0.6,
+        mutations=[
+            'rotate_poly',
+            'resize_poly',
+            'add_point',
+            'drop_point',
+            'add_poly',
+            'drop_poly',
+            'pos_change_point',
+        ],
+        selector='tournament_selection',
+        mutation_each_prob=[0.125, 0.125, 0.15, 0.35, 0.00, 0.00, 0.25],
+        crossovers=[
+            'polygon_level',
+            'structure_level',
+        ],
+        crossover_each_prob=[0.0, 1.0],
+        postprocess_rules=[
+            'not_out_of_bounds',
+            'valid_polygon_geom',
+            'not_self_intersects',
+            'not_too_close_polygons',
+            'not_too_close_points',
+        ],
+        extra=5,
+        n_jobs=-1,
+        log_dir='logs',
+        run_name='run_name',
+        golem_keep_histoy=False,
+        golem_genetic_scheme_type='steady_state',
+        golem_surrogate_each_n_gen=5,
+        objectives=[
+            AreaLengthRatio(domain_cfg),
+        ],
+    )
 
- idx_of_best = performance.index(min(performance))
- visualiser = StructVizualizer(task_setup.domain)
- plt.figure(figsize=(7, 7))
- info = {'fitness': f'{performance[idx_of_best]:.2f}',
-         'type': 'prediction'}
- visualiser.plot_structure([population[idx_of_best]], 
-                           [info],
-                           ['-'])
- plt.show()
- 
+-  **Step 5**. Run generative design and results visualisation. 
+
+Now you can run the optimization as it was described above in *How to run* section of this tutorial.
+Let's look at how it works inside.
+
+.. code:: python
+
+    from loguru import logger
+    from tqdm import tqdm
+
+    from gefest.core.configs.utils import load_config
+    from gefest.core.viz.struct_vizualizer import GIFMaker
+    from gefest.tools.tuners.tuner import GolemTuner
+
+    config_path = 'your/config/absolute/path.py'
+
+    # Load config
+    opt_params = load_config(
+        config_path
+    )
+
+    # Initialize and run optimizer
+    optimizer = opt_params.optimizer(opt_params)
+    optimized_pop = optimizer.optimize()
+
+    # Optimized pop visualization
+    logger.info('Collecting plots of optimized structures...')
+    # GIFMaker object creates mp4 series of optimized structures plots
+    gm = GIFMaker(domain=opt_params.domain)
+    for st in tqdm(optimized_pop):
+        gm.create_frame(st, {'Optimized': st.fitness})
+
+    gm.make_gif('Optimized population', 500)
+
+    # Run tuning if it defined in cofiguration
+    if opt_params.tuner_cfg:
+        tuner = GolemTuner(opt_params)
+        tuned_individuals = tuner.tune(optimized_pop[: opt_params.tuner_cfg.tune_n_best])
+
+        # Tuned structures visualization
+        logger.info('Collecting plots of tuned structures...')
+        gm = GIFMaker(domain=opt_params.domain)
+        for st in tqdm(tuned_individuals):
+            gm.create_frame(st, {'Tuned': st.fitness})
+
+        gm.make_gif('Tuned individuals', 500)
+
+To plot spicific structures with matplotlib.pyplot see :ref:`structvizualizer` examples. 

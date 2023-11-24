@@ -1,39 +1,37 @@
 import gc
 import os
-import pickledb
-import numpy as np
-import mph
 import pickle
-
 from uuid import uuid4
-from gefest.core.structure.structure import Structure
 
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+import mph
+import numpy as np
+import pickledb
+
+from gefest.core.geometry import Structure
+from gefest.tools import Estimator
+
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 USE_AVG_CONST = False
 
 
-class Comsol:
-    """
-    ::TODO:: make abstract class for further specific realizations
-    """
-    """
-    Comsol class for microfluidic problem
-    """
+class Comsol(Estimator):
+    """Comsol wrapper class for microfluidic problem estimation."""
 
-    def __init__(self, path_to_mph):
-        """
-        :param path_to_mph: (String), path to mph file
-        """
+    def __init__(self, path_to_mph: str) -> None:
+
         super(Comsol, self).__init__()
 
         self.client = mph.Client()
         self.path_to_mph = path_to_mph
 
-    def estimate(self, structure: Structure):
-        """
-        Estimation using comsol multiphysics
-        :param structure: (Structure), Structure of polygons
-        :return: (Int), Performance
+    def estimate(self, structure: Structure) -> int:
+        """Estimates  given structure using comsol multiphysics.
+
+        Args:
+            structure (Structure): GEFEST structure.
+
+        Returns:
+            int: Performance.
         """
         gc.collect()
         target, idx = self._load_fitness(structure)
@@ -42,7 +40,7 @@ class Comsol:
             if model is None:
                 poly_box = []
                 print('Start COMSOL')
-                for i, pol in enumerate(structure.polygons):
+                for _, pol in enumerate(structure.polygons):
                     poly_repr = []
                     poly_repr.append(' '.join([str(pt.x) for pt in pol.points]))
                     poly_repr.append(' '.join([str(pt.y) for pt in pol.points]))
@@ -52,7 +50,6 @@ class Comsol:
 
                 try:
                     model = self._poly_add(model, poly_box)
-
                     model.build()
                     model.mesh()
                     model.solve()
@@ -61,16 +58,16 @@ class Comsol:
                     self.client.clear()
                     return 0.0
 
-                idx = self._save_simulation_result(structure, model)
-
             try:
-                outs = [model.evaluate('vlct_1'),
-                        model.evaluate('vlct_2'),
-                        model.evaluate('vlct_3'),
-                        model.evaluate('vlct_4'),
-                        model.evaluate('vlct_5'),
-                        model.evaluate('vlct_side'),
-                        model.evaluate('vlct_main')]
+                outs = [
+                    model.evaluate('vlct_1'),
+                    model.evaluate('vlct_2'),
+                    model.evaluate('vlct_3'),
+                    model.evaluate('vlct_4'),
+                    model.evaluate('vlct_5'),
+                    model.evaluate('vlct_side'),
+                    model.evaluate('vlct_main'),
+                ]
             except Exception as ex:
                 print(ex)
                 self.client.clear()
@@ -91,14 +88,27 @@ class Comsol:
                 print('Speed common condition violated')
                 target = 0
 
-            mean_diff = float(np.mean([abs(float(o) / np.mean(outs[0:4]) - 1) * 100 for o in outs[0:4]]))
-            if USE_AVG_CONST and any([abs(float(o) / np.mean(outs[0:4]) - 1) * 100 > 5.0 for o in outs[0:4]]):
-                print('Speed equality violated', [abs(float(o) / np.mean(outs[0:4]) - 1) * 100 for o in outs[0:4]])
+            mean_diff = float(
+                np.mean([abs(float(o) / np.mean(outs[0:4]) - 1) * 100 for o in outs[0:4]]),
+            )
+            if USE_AVG_CONST and any(
+                abs(float(o) / np.mean(outs[0:4]) - 1) * 100 > 5.0 for o in outs[0:4]
+            ):
+                print(
+                    'Speed equality violated',
+                    [abs(float(o) / np.mean(outs[0:4]) - 1) * 100 for o in outs[0:4]],
+                )
                 target = 0
 
             if target > 0:
-                print(round(target, 4), round(mean_diff, 2), [round(_, 4) for _ in outs], round(float(curl)),
-                      round(curv, 4), round(width_ratio, 4))
+                print(
+                    round(target, 4),
+                    round(mean_diff, 2),
+                    [round(_, 4) for _ in outs],
+                    round(float(curl)),
+                    round(curv, 4),
+                    round(width_ratio, 4),
+                )
 
             self.client.clear()
 
@@ -113,13 +123,22 @@ class Comsol:
                 model.java.component('comp1').geom('geom1').create('pol' + str(n + 1), 'Polygon')
             except Exception:
                 pass
-            model.java.component('comp1').geom('geom1').feature('pol' + str(n + 1)).set('x', poly[0])
-            model.java.component('comp1').geom('geom1').feature('pol' + str(n + 1)).set('y', poly[1])
+
+            model.java.component('comp1').geom('geom1').feature('pol' + str(n + 1)).set(
+                'x',
+                poly[0],
+            )
+            model.java.component('comp1').geom('geom1').feature('pol' + str(n + 1)).set(
+                'y',
+                poly[1],
+            )
+
         return model
 
     def _save_simulation_result(self, configuration, model):
         if not os.path.exists('./models'):
             os.mkdir('./models')
+
         model_uid = str(uuid4())
         model.save(f'./models/{model_uid}.mph')
         db = pickledb.load('comsol_db.saved', False)

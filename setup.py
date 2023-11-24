@@ -12,7 +12,7 @@ AUTHOR = 'NSS Lab'
 SHORT_DESCRIPTION = 'The toolbox for the generative design of physical objects'
 README = Path(HERE, 'README.rst').read_text()
 URL = 'https://github.com/ITMO-NSS-team/GEFEST'
-REQUIRES_PYTHON = '>=3.7'
+REQUIRES_PYTHON = '>=3.9'
 LICENSE = 'BSD 3-Clause'
 
 
@@ -47,8 +47,7 @@ setuptools.setup(
     install_requires=_get_requirements('requirements.txt'),
     classifiers=[
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9'
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
     ],
 )

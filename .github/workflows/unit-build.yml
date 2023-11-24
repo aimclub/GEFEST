@@ -13,7 +13,7 @@ jobs:
     timeout-minutes: 5
     strategy:
       matrix:
-        python-version: [ 3.8, 3.9]
+        python-version: [ "3.9", "3.10" ]
 
     steps:
     - uses: actions/checkout@v2
@@ -27,6 +27,9 @@ jobs:
         pip install pytest
         pip install -r requirements.txt
         pip install pytest-cov
+    - name: Run flake8 checks
+      run: |
+        flake8 gefest test --count --statistics
     - name: Test with pytest
       run: |
         pytest --cov=GEFEST -s test/

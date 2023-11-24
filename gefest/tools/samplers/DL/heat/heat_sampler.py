@@ -1,7 +1,13 @@
-import torch
 import os
-from gefest.tools.samplers.DL.microfluid.backbones import Encoder, Decoder, Discriminator
+
+import torch
+
 from gefest.tools.samplers.DL.microfluid.aae import AAE
+from gefest.tools.samplers.DL.microfluid.backbones import (
+    Decoder,
+    Discriminator,
+    Encoder,
+)
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
@@ -33,15 +39,19 @@ class DeepSampler:
         n_layers = 2
         self.hidden_dim = 32
 
-        aae = AAE(Encoder=Encoder,
-                  Decoder=Decoder,
-                  Discriminator=Discriminator,
-                  hidden_dim=self.hidden_dim,
-                  conv_dims=conv_dims,
-                  n_layers=n_layers,
-                  device=self.device)
+        aae = AAE(
+            Encoder=Encoder,
+            Decoder=Decoder,
+            Discriminator=Discriminator,
+            hidden_dim=self.hidden_dim,
+            conv_dims=conv_dims,
+            n_layers=n_layers,
+            device=self.device,
+        )
 
-        aae.load_state_dict(torch.load(self.path, map_location=self.device))  # Load prepared sampler
+        aae.load_state_dict(
+            torch.load(self.path, map_location=self.device),
+        )  # Load prepared sampler
         aae.eval()
 
         self.sampler = aae
@@ -57,6 +67,8 @@ class DeepSampler:
         """
         with torch.no_grad():
             noise = torch.normal(mean=0, std=1, size=(n_samples, self.hidden_dim)).to(self.device)
-            objects = self.sampler.decoder.sample(noise).to('cpu').tolist()  # Numpy: {n_samples, 1, 128, 128}
+            objects = (
+                self.sampler.decoder.sample(noise).to('cpu').tolist()
+            )  # Numpy: {n_samples, 1, 128, 128}
 
         return objects

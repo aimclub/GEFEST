@@ -1,11 +1,11 @@
 from copy import deepcopy
 from multiprocessing import Pool
 
-from gefest.core.algs.postproc.resolve_errors import postprocess
 from gefest.core.opt.constraints import check_constraints
-from gefest.core.utils import project_root
-from gefest.core.structure.domain import Domain
 from gefest.core.opt.operators.sensitivity_methods import get_structure_for_analysis
+from gefest.core.opt.postproc.resolve_errors import postprocess
+from gefest.core.structure.domain import Domain
+from gefest.core.utils import project_root
 
 MAX_ITER = 50000
 NUM_PROC = 1
@@ -27,7 +27,7 @@ class SensitivitySampler:
                         new_items = p.map(self.get_pop_worker, [domain] * n_samples)
                 else:
                     new_items = []
-                    for i in range(n_samples):
+                    for _ in range(n_samples):
                         new_items.append(self.get_pop_worker(domain))
 
                 for structure in new_items:
