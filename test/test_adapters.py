@@ -12,7 +12,7 @@ from gefest.core.opt.adapters.configuration_mapping import (
 )
 
 filepath = Path(__file__)
-test_config = load_config(str(filepath.parent) + '\\test_config.py')
+test_config = load_config(str(filepath.parent) + '/test_config.py')
 
 
 def test_mapping_into_graph_requirements():
