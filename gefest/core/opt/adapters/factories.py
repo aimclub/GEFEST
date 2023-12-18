@@ -6,7 +6,7 @@ from gefest.tools.samplers.sampler import Sampler
 
 
 class StructureFactory(RandomGraphFactory):
-    """Simple GEFEST sampler wrap for GOLEM RandomGraphFactory compatibility."""
+    """GOLEM RandomGraphFactory version of GEFEST sampler."""
 
     def __init__(
         self,

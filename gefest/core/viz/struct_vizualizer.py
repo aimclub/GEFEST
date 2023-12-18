@@ -19,10 +19,10 @@ class StructVizualizer:
 
     """
 
-    def __init__(self, domain: Domain):
+    def __init__(self, domain: Domain = None):
         self.domain = domain
 
-    def plot_structure(self, structs: list[Structure], domain=None, infos=None, linestyles='-'):
+    def plot_structure(self, structs: list[Structure], infos=None, linestyles='-', legend=False):
         """The method displays the given list[obj:`Structure`].
 
         Args:
@@ -52,8 +52,8 @@ class StructVizualizer:
                 x = [pt.x for pt in boundary.points]
                 y = [pt.y for pt in boundary.points]
                 plt.plot(x, y, 'k')
-                if domain.prohibited_area:
-                    for poly in domain.prohibited_area:
+                if self.domain.prohibited_area:
+                    for poly in self.domain.prohibited_area:
                         self.plot_poly(poly, '-', color='m')
 
             for poly in struct.polygons:
@@ -62,7 +62,9 @@ class StructVizualizer:
         lines = [
             Line2D([0], [0], color='black', linewidth=3, linestyle=style) for style in linestyles
         ]
-        plt.legend(lines, infos, loc=2)
+        if legend:
+            plt.legend(lines, infos, loc=2)
+
         return fig
 
     def plot_poly(self, poly, linestyle, **kwargs):
@@ -88,14 +90,14 @@ class StructVizualizer:
 class GIFMaker(StructVizualizer):
     """Smple API for saving a series of plots in mp4 with moviepy."""
 
-    def __init__(self, domain) -> None:
+    def __init__(self, domain=None) -> None:
         super().__init__(domain=domain)
         self.frames = []
         self.counter = 0
 
     def create_frame(self, structure, infos):
         """Appends new frame from given structure."""
-        fig = self.plot_structure(structure, self.domain, infos)
+        fig = self.plot_structure(structure, infos)
         numpy_fig = mplfig_to_npimage(fig)
         self.frames.append(numpy_fig)
         plt.close()

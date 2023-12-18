@@ -1,3 +1,7 @@
+from typing import Union
+
+from golem.utilities.data_structures import ensure_wrapped_in_sequence
+
 from gefest.core.geometry.datastructs.structure import Structure
 from gefest.core.opt.objective.objective import Objective
 from gefest.core.utils import where
@@ -20,10 +24,11 @@ class ObjectivesEvaluator:
 
     def __call__(
         self,
-        pop: list[Structure],
+        pop: Union[list[Structure], Structure],
         **kwargs,
     ) -> list[Structure]:
         """Calls objectives evaluation."""
+        pop = ensure_wrapped_in_sequence(pop)
         return self.set_pop_objectives(pop=pop)
 
     def set_pop_objectives(
