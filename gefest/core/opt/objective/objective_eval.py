@@ -29,6 +29,7 @@ class ObjectivesEvaluator:
     ) -> list[Structure]:
         """Calls objectives evaluation."""
         pop = ensure_wrapped_in_sequence(pop)
+
         return self.set_pop_objectives(pop=pop)
 
     def set_pop_objectives(

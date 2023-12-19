@@ -387,6 +387,7 @@ class SensitivityAnalysis:
         fitness_history = mov_fitness + rotated_fitness + del_fitness + rm_points_fitness
         structure_history = mov_structure + rotated_structure + del_structure + rm_points_structure
         poly_history = mov_poly + rotated_poly + del_poly + rm_points_poly
+
         time_history = self.get_time_history
 
         return fitness_history, structure_history, poly_history, time_history
