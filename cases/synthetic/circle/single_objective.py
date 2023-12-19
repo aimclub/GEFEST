@@ -16,20 +16,19 @@ class AreaLengthRatio(Objective):
 
     def _evaluate(self, ind: Structure) -> float:
 
-        num = 3
         num_polys = len(ind.polygons)
         loss = 0
         for poly in ind.polygons:
             area = self.domain.geometry.get_square(poly)
             length = self.domain.geometry.get_length(poly)
             if area == 0:
-                ratio = None
+                ratio = float('inf')
             else:
                 ratio = 1 - 4 * np.pi * area / length ** 2
 
             loss += ratio
-
-        loss = loss + 20 * abs(num_polys - num)
+        if num_polys > 1:
+            loss += 20 * abs(num_polys - 1)
         return loss
 
 
@@ -61,7 +60,7 @@ domain_cfg = Domain(
 
 tuner_cfg = TunerParams(
     tuner_type='optuna',
-    n_steps_tune=10,
+    n_steps_tune=25,
     hyperopt_dist='uniform',
     verbose=True,
     timeout_minutes=60,
@@ -101,6 +100,7 @@ opt_params = OptimizationParams(
         'not_too_close_points',
     ],
     extra=5,
+    estimation_n_jobs=-1,
     n_jobs=-1,
     log_dir='logs',
     run_name='run_name',
