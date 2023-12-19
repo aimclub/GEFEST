@@ -64,6 +64,7 @@ class StructVizualizer:
         ]
         if legend:
             plt.legend(lines, infos, loc=2)
+
         return fig
 
     def plot_poly(self, poly, linestyle, **kwargs):
