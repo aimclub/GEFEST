@@ -35,6 +35,7 @@ struct_for_tune.fitness = [test_config.objectives[0](struct_for_tune)]
     ],
 )
 def test_golem_tuners_wrap(tuner_name, expectation):
+    """Check all available tuner types on single objective synthetic."""
     test_config.objectives = [ref_objectives_list[0]]  # sinngle objective
     if tuner_name:
         test_config.tuner_cfg = ref_tuner_cfg
@@ -51,9 +52,11 @@ def test_golem_tuners_wrap(tuner_name, expectation):
 
 
 def test_multiobj_tuner():
+    """Check optuna tuner on multiobjective synthetic."""
     test_config.tuner_cfg = ref_tuner_cfg
     test_config.objectives = ref_objectives_list
     test_config.tuner_cfg.tuner_type = 'optuna'
     tuner = GolemTuner(test_config)
     results = tuner.tune(struct_for_tune)
+    assert all(isinstance(res, Structure) for res in results)
     assert all(len(res.fitness) == len(test_config.objectives) for res in results)
