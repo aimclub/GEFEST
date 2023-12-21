@@ -5,12 +5,18 @@
 .. list-table::
    :stub-columns: 1
 
+   * - tests
+     - | |build|
    * - docs
      - |docs|
    * - license
      - | |license|
    * - support
      - | |tg|
+   * - gitlab
+     - | |gitlab|
+   * - funding
+     - | |ITMO| |NCCR|
 
 .. end-badges
 
@@ -41,8 +47,9 @@ The dynamics of the optimisation can be visualized as (breakwaters optimisation 
 How to use
 ==========
 
-All details about first steps with GEFEST might be found in the `quick start guide <https://gefest.readthedocs.io/en/latest/gefest/quickstart.html>`__
-and in the `tutorial for novices  </docs/tutorials/sample.rst>`__
+All details about first steps with GEFEST might be found in the `quick start guide <https://gefest.readthedocs.io/en/latest/gefest/quickstart.html>`__.
+
+Tutorals for more spicific use cases can be found `tutorial section of docs <https://gefest.readthedocs.io/en/latest/tutorials/index.html>`__.
 
 Project Structure
 =================
@@ -116,6 +123,10 @@ Citation
   publisher={Elsevier}
 }
 
+.. |build| image:: https://github.com/aimclub/GEFEST/workflows/unit%20tests/badge.svg?branch=main
+   :alt: Build Status
+   :target: https://github.com/aimclub/GEFEST/actions
+
 .. |docs| image:: https://readthedocs.org/projects/gefest/badge/?version=latest
    :target: https://gefest.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
@@ -127,3 +138,15 @@ Citation
 .. |tg| image:: https://img.shields.io/badge/Telegram-Group-blue.svg
    :target: https://t.me/gefest_helpdesk
    :alt: Telegram Chat
+
+.. |ITMO| image:: https://github.com/ITMO-NSS-team/open-source-ops/blob/add_badge/badges/ITMO_badge_rus.svg
+   :alt: Acknowledgement to ITMO
+   :target: https://itmo.ru
+
+.. |NCCR| image:: https://github.com/ITMO-NSS-team/open-source-ops/blob/add_badge/badges/NCCR_badge.svg
+   :alt: Acknowledgement to NCCR
+   :target: https://actcognitive.org/
+
+.. |gitlab| image::       https://camo.githubusercontent.com/9bd7b8c5b418f1364e72110a83629772729b29e8f3393b6c86bff237a6b784f6/68747470733a2f2f62616467656e2e6e65742f62616467652f6769746c61622f6d6972726f722f6f72616e67653f69636f6e3d6769746c6162
+   :alt: GitLab mirror for this repository
+   :target: https://gitlab.actcognitive.org/itmo-nss-team/GEFEST
