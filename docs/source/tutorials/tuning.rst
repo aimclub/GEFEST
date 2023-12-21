@@ -62,11 +62,12 @@ Here we will take a closer look at several ``TunerParams`` attributes which may 
 
 * 
   ``hyperopt_dist`` is the type of distribution from which random values will be taken during tuning. Available values are names of `hpyeropt hp module finctions <https://github.com/hyperopt/hyperopt/blob/master/hyperopt/hp.py>`_.
+  **Note**: in GOLEM 0.4.0 part of tuners does not converts bounds into mu and sigma. Use 'uniform' to avoid invalid intervals. 
 
 * 
   ``variance_generator`` is function that generates bounds of intervals from which random values should pe picked for all components of all point in structure. If normal distribution set they will be automatically converted into means and varicances.
 
-``verage_edge_variance`` function setes variance to 50% of average edge length for each polygon. This solution can be much more "greedy" than necessary, which can lead to many invalid intermediate variants during tuning. To improve fitness in fewer tuning steps, it is worth creating variance generation functions for selecting smaller intervals based on the conditions of a specific task.
+``percent_edge_variance`` function setes variance to spicific percent of average edge length for each polygon. This solution can be much more "greedy" than necessary, which can lead to many invalid intermediate variants during tuning. To improve fitness in fewer tuning steps, it is worth creating variance generation functions for selecting smaller intervals based on the conditions of a specific task.
 
 Now that the ``OptimizationParams`` have been defined and some structures have been created, we can run tuning with couple lines of code:
 
