@@ -67,7 +67,8 @@ Cases and examples
 ==================
 **Note**: To run the examples below, the old kernel gefest version, which can be installed on python 3.7 with: 
 
-.. code:: bash
+.. code-block:: bash
+
    pip install git+https://github.com/aimclub/GEFEST.git@4f9c34c449c0eb65d264476e5145f09b4839cd70
 
 - `Experiments <https://github.com/ITMO-NSS-team/GEFEST-paper-experiments>`__ with various real and synthetic cases
