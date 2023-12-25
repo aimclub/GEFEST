@@ -67,7 +67,7 @@ Cases and examples
 ==================
 **Note**: To run the examples below, the old kernel gefest version, which can be installed on python 3.7 with: 
 
-.. code-block:: bash
+.. code:: bash
 
    pip install git+https://github.com/aimclub/GEFEST.git@4f9c34c449c0eb65d264476e5145f09b4839cd70
 
@@ -125,15 +125,13 @@ Citation
   volume={119},
   pages={105715},
   year={2023},
-  publisher={Elsevier}
-}
+  publisher={Elsevier}}
 
 @inproceedings{solovev2023ai,
   title={AI Framework for Generative Design of Computational Experiments with Structures in Physical Environment},
   author={Solovev, Gleb Vitalevich and Kalyuzhnaya, Anna and Hvatov, Alexander and Starodubcev, Nikita and Petrov, Oleg and Nikitin, Nikolay},
   booktitle={NeurIPS 2023 AI for Science Workshop},
-  year={2023}
-}
+  year={2023}}
 
 .. |build| image:: https://github.com/aimclub/GEFEST/workflows/unit%20tests/badge.svg?branch=main
    :alt: Build Status
