@@ -65,9 +65,15 @@ The repository includes the following directories:
 
 Cases and examples
 ==================
+**Note**: To run the examples below, the old kernel gefest version, which can be installed on python 3.7 with: 
+
+.. code:: bash
+   pip install git+https://github.com/aimclub/GEFEST.git@4f9c34c449c0eb65d264476e5145f09b4839cd70
 
 - `Experiments <https://github.com/ITMO-NSS-team/GEFEST-paper-experiments>`__ with various real and synthetic cases
 - `Case <https://github.com/ITMO-NSS-team/rbc-traps-generative-design>`__ devoted to the red blood cell traps design.
+
+Migrated examples can be found in cases folder of the main branch. 
 
 Current R&D and future plans
 ============================
@@ -76,10 +82,8 @@ Currently, we are working on integration of new types of physical objects with c
 
 The major ongoing tasks:
 
-* to make the use of GEFEST more accessible and simple for users
 * to integrate three dimensional physical objects
 * to implement gradient based approaches for optimization of physical objects
-* to improve efficiency of GEFEST's standard sampler
 
 Documentation
 =============
@@ -121,6 +125,13 @@ Citation
   pages={105715},
   year={2023},
   publisher={Elsevier}
+}
+
+@inproceedings{solovev2023ai,
+  title={AI Framework for Generative Design of Computational Experiments with Structures in Physical Environment},
+  author={Solovev, Gleb Vitalevich and Kalyuzhnaya, Anna and Hvatov, Alexander and Starodubcev, Nikita and Petrov, Oleg and Nikitin, Nikolay},
+  booktitle={NeurIPS 2023 AI for Science Workshop},
+  year={2023}
 }
 
 .. |build| image:: https://github.com/aimclub/GEFEST/workflows/unit%20tests/badge.svg?branch=main

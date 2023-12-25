@@ -13,7 +13,7 @@ Tested on python 3.9-3.10
 
 .. code::
 
- pip install https://github.com/ITMO-NSS-team/GEFEST/archive/master.zip
+ pip install gefest
 
 How to run  
 ----------
