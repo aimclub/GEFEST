@@ -64,8 +64,9 @@ class GolemTuner:
         self.verbose: bool = opt_params.tuner_cfg.verbose
         self.timeout = timedelta(minutes=opt_params.tuner_cfg.timeout_minutes)
         self.generate_variances: VarianceGeneratorType = opt_params.tuner_cfg.variacne_generator
+        self.tuner = None
 
-    def _get_tuner(
+    def _set_tuner(
         self,
         graph: OptGraph,
         search_space: SearchSpace,
@@ -81,7 +82,7 @@ class GolemTuner:
         if self.tuner_type == 'optuna':
             kwargs['objectives_number'] = len(self.objective.metrics)
 
-        return getattr(TunerType, self.tuner_type).value(**kwargs)
+        self.tuner = getattr(TunerType, self.tuner_type).value(**kwargs)
 
     def _generate_search_space(
         self,
@@ -126,15 +127,15 @@ class GolemTuner:
                 graph,
                 self.generate_variances(struct, self.domain),
             )
-            tuner = self._get_tuner(graph, SearchSpace(search_space))
-            tuned_structures = tuner.tune(graph)
-            metrics = tuner.obtained_metric
+            self._set_tuner(graph, SearchSpace(search_space))
+            tuned_structures = self.tuner.tune(graph)
+            metrics = self.tuner.obtained_metric
 
             tuned_structures = ensure_wrapped_in_sequence(tuned_structures)
-            metrics = ensure_wrapped_in_sequence(tuner.obtained_metric)
+            metrics = ensure_wrapped_in_sequence(self.tuner.obtained_metric)
 
             for idx_, _ in enumerate(tuned_structures):
-                tuned_structures[idx_].fitness = metrics[idx_]
+                tuned_structures[idx_].fitness = ensure_wrapped_in_sequence(metrics[idx_])
 
         tuned_objects.extend(tuned_structures)
         tuned_objects = sorted(tuned_objects, key=lambda x: x.fitness)

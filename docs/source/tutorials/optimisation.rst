@@ -7,7 +7,7 @@ Optimisation
 Optimisers summary
 ------------------
 
-To solve the optimisation problem, 4 optimisers are available in GEFEST - 1 native and 2 based on GOLEM.
+To solve the optimisation problems 4 optimisers are available in GEFEST - 1 native and 2 based on GOLEM.
 All of them have a single interface and can be imported from ``gefest.tools.optimizers``.
 
 .. list-table:: Optimizers comparation
@@ -39,13 +39,13 @@ All of them have a single interface and can be imported from ``gefest.tools.opti
      - :raw-html-m2r:`<code style="background:green;color:white;font-weight:bold">Yes</code>`
 
 
-``BaseGA`` implements the base genetic algorithm, that performs generation of the initial population,
+``BaseGA`` implements the base genetic algorithm, that performs sampling of the initial population,
 crossover and mutation operations, fitness estimation and selection.
 Each of the steps is encapsulated in a separate executor, which allows you to change the logic of individual steps.
 Thus, BaseGA essentially only implements the sequence of their call.
 
-``StandardOptimizer`` is a wrapper for GOLEM`s ``EvoGraphOptimizer`` optimiser.
-It allows to select different evolutionary schemes, adaptive mutation strategies and some other features.
+``StandardOptimizer`` is a wrapper for GOLEM`s ``EvoGraphOptimizer``.
+It allows to use different evolutionary schemes, adaptive mutation strategies and some other features.
 To use multiobjective optimisation set `golem_selection_type` in ``OptimizationParams`` config to 'spea2'.
 
 ``SurrogateOptimizer`` is the extension of ``StandardOptimizer`` with the ability 
@@ -64,7 +64,7 @@ How to optimise
 
 Easiest way to run optimiser described in :ref:`quickstart`.
 
-If you want to get some more control you can do it in code by import corresponding classes:
+If you want to get some more control you can do it in your code:
 
 .. code-block:: python
 

@@ -13,7 +13,7 @@ Tested on python 3.9-3.10
 
 .. code::
 
- pip install https://github.com/ITMO-NSS-team/GEFEST/archive/master.zip
+ pip install gefest
 
 How to run  
 ----------
@@ -62,7 +62,7 @@ Let's take a step-by-step look at how to do this.
     from gefest.core.opt.objective.objective import Objective
     from gefest.tools.estimators.estimator import Estimator
 
--  **Step 1**. Define objectives using loss function and simulator of the physical process if required.
+-  **Step 1**. Define objectives using fitness function and simulator of the physical process if required.
 
 Objective for finding a polygon that seems like circle showed below.
 
@@ -127,7 +127,7 @@ Domain describes geometric constraints for individuals.
 
 By default, the standard sampler is used.
 You can select another sampler or define custom for spicific task.
-How to define your own samler described in the tutorials section of the documentation.
+How to define your own sampler described in the tutorials section of the documentation.
 
 -  **Step 4**. Define tuner configuraton.
 
@@ -197,7 +197,7 @@ To know more about configuration options see :ref:`configuration` section of API
 -  **Step 5**. Run generative design and results visualisation. 
 
 Now you can run the optimization as it was described above in *How to run* section of this tutorial.
-Let's look at how it works inside.
+Let's take a look at code in `run_experiments.py` script.
 
 .. code:: python
 
@@ -221,7 +221,7 @@ Let's look at how it works inside.
 
     # Optimized pop visualization
     logger.info('Collecting plots of optimized structures...')
-    # GIFMaker object creates mp4 series of optimized structures plots
+    # GIFMaker object creates mp4 from optimized structures plots
     gm = GIFMaker(domain=opt_params.domain)
     for st in tqdm(optimized_pop):
         gm.create_frame(st, {'Optimized': st.fitness})

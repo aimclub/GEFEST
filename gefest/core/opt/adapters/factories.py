@@ -6,7 +6,7 @@ from gefest.tools.samplers.sampler import Sampler
 
 
 class StructureFactory(RandomGraphFactory):
-    """Simple GEFEST sampler wrap for GOLEM RandomGraphFactory compatibility."""
+    """GOLEM RandomGraphFactory version of GEFEST sampler."""
 
     def __init__(
         self,
@@ -19,4 +19,4 @@ class StructureFactory(RandomGraphFactory):
     def __call__(self, *args, **kwargs) -> OptGraph:
         """Generates ranom GOLEM graph."""
         samples = self.sampler(1)
-        return self.adapter(samples[0])
+        return self.adapter.adapt(samples[0])

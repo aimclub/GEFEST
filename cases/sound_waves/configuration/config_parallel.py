@@ -78,10 +78,10 @@ domain_cfg = Domain(
 
 tuner_cfg = TunerParams(
     tuner_type='sequential',
-    n_steps_tune=10,
-    hyperopt_dist='normal',
+    n_steps_tune=50,
+    hyperopt_dist='uniform',
     verbose=True,
-    variacne_generator=partial(percent_edge_variance, percent=0.2),
+    variacne_generator=partial(percent_edge_variance, percent=0.5),
     timeout_minutes=30,
 )
 
@@ -121,7 +121,7 @@ opt_params = OptimizationParams(
     ],
     extra=5,
     estimation_n_jobs=-1,
-    n_jobs=11,
+    n_jobs=-1,
     log_dir='logs/tuners_exp',
     run_name='roulette_1_obj',
     golem_keep_histoy=True,

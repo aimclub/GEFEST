@@ -5,12 +5,18 @@
 .. list-table::
    :stub-columns: 1
 
+   * - tests
+     - | |build|
    * - docs
      - |docs|
    * - license
      - | |license|
    * - support
      - | |tg|
+   * - gitlab
+     - | |gitlab|
+   * - funding
+     - | |ITMO| |NCCR|
 
 .. end-badges
 
@@ -41,8 +47,9 @@ The dynamics of the optimisation can be visualized as (breakwaters optimisation 
 How to use
 ==========
 
-All details about first steps with GEFEST might be found in the `quick start guide <https://gefest.readthedocs.io/en/latest/gefest/quickstart.html>`__
-and in the `tutorial for novices  </docs/tutorials/sample.rst>`__
+All details about first steps with GEFEST might be found in the `quick start guide <https://gefest.readthedocs.io/en/latest/gefest/quickstart.html>`__.
+
+Tutorals for more spicific use cases can be found `tutorial section of docs <https://gefest.readthedocs.io/en/latest/tutorials/index.html>`__.
 
 Project Structure
 =================
@@ -58,9 +65,15 @@ The repository includes the following directories:
 
 Cases and examples
 ==================
+**Note**: To run the examples below, the old kernel gefest version, which can be installed on python 3.7 with: 
+
+.. code:: bash
+   pip install git+https://github.com/aimclub/GEFEST.git@4f9c34c449c0eb65d264476e5145f09b4839cd70
 
 - `Experiments <https://github.com/ITMO-NSS-team/GEFEST-paper-experiments>`__ with various real and synthetic cases
 - `Case <https://github.com/ITMO-NSS-team/rbc-traps-generative-design>`__ devoted to the red blood cell traps design.
+
+Migrated examples can be found in cases folder of the main branch. 
 
 Current R&D and future plans
 ============================
@@ -69,10 +82,8 @@ Currently, we are working on integration of new types of physical objects with c
 
 The major ongoing tasks:
 
-* to make the use of GEFEST more accessible and simple for users
 * to integrate three dimensional physical objects
 * to implement gradient based approaches for optimization of physical objects
-* to improve efficiency of GEFEST's standard sampler
 
 Documentation
 =============
@@ -116,6 +127,17 @@ Citation
   publisher={Elsevier}
 }
 
+@inproceedings{solovev2023ai,
+  title={AI Framework for Generative Design of Computational Experiments with Structures in Physical Environment},
+  author={Solovev, Gleb Vitalevich and Kalyuzhnaya, Anna and Hvatov, Alexander and Starodubcev, Nikita and Petrov, Oleg and Nikitin, Nikolay},
+  booktitle={NeurIPS 2023 AI for Science Workshop},
+  year={2023}
+}
+
+.. |build| image:: https://github.com/aimclub/GEFEST/workflows/unit%20tests/badge.svg?branch=main
+   :alt: Build Status
+   :target: https://github.com/aimclub/GEFEST/actions
+
 .. |docs| image:: https://readthedocs.org/projects/gefest/badge/?version=latest
    :target: https://gefest.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
@@ -127,3 +149,15 @@ Citation
 .. |tg| image:: https://img.shields.io/badge/Telegram-Group-blue.svg
    :target: https://t.me/gefest_helpdesk
    :alt: Telegram Chat
+
+.. |ITMO| image:: https://github.com/ITMO-NSS-team/open-source-ops/blob/add_badge/badges/ITMO_badge_rus.svg
+   :alt: Acknowledgement to ITMO
+   :target: https://itmo.ru
+
+.. |NCCR| image:: https://github.com/ITMO-NSS-team/open-source-ops/blob/add_badge/badges/NCCR_badge.svg
+   :alt: Acknowledgement to NCCR
+   :target: https://actcognitive.org/
+
+.. |gitlab| image::       https://camo.githubusercontent.com/9bd7b8c5b418f1364e72110a83629772729b29e8f3393b6c86bff237a6b784f6/68747470733a2f2f62616467656e2e6e65742f62616467652f6769746c61622f6d6972726f722f6f72616e67653f69636f6e3d6769746c6162
+   :alt: GitLab mirror for this repository
+   :target: https://gitlab.actcognitive.org/itmo-nss-team/GEFEST
