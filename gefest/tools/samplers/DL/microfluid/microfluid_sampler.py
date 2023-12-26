@@ -3,6 +3,7 @@ import os
 import cv2 as cv
 import numpy as np
 import torch
+from tools.samplers.sampler import Sampler
 
 from gefest.core.geometry import Point, Polygon, Structure
 from gefest.core.geometry.domain import Domain
@@ -16,16 +17,13 @@ from gefest.tools.samplers.DL.microfluid.backbones import (
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
 
-class DeepSampler:
-    """
-    Deep learning sampler for microfluidic problem based on adversarial auto encoder.
-    It is creates images of polygons with size 128x128
+class DeepSampler(Sampler):
+    """Deep learning sampler for microfluidic problem based on adversarial auto encoder.
+
+    It is creates images of polygons with size 128x128.
     """
 
     def __init__(self, path):
-        """
-        :param path: path to deep learning generative model
-        """
         super(DeepSampler, self).__init__()
 
         self.path = path
@@ -37,12 +35,9 @@ class DeepSampler:
         self._configurate_sampler()
 
     def _configurate_sampler(self):
-        """
-        Configurate deep sampler using configuration parameters
-        :return: None
-        """
+        """Configurate deep sampler using configuration parameters."""
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        conv_dims = [32, 64, 128, 256, 256, 512]  # We define 6 layers encoder and decoder
+        conv_dims = [32, 64, 128, 256, 256, 512]  # 6 layers
         n_layers = 2
         self.hidden_dim = 32
 
@@ -66,15 +61,12 @@ class DeepSampler:
     def _transform(self, objects, domain) -> list[Structure]:
         """Transforms images to polygons using edge detector.
 
-        :param objects: (Array) [n_samples x 1 x 128 x 128]
-        :return: List(Structure)
-
         Args:
-            objects (_type_): _description_
-            domain (_type_): _description_
+            objects (Array): [n_samples x 1 x 128 x 128].
+            domain (Doamin): Task domain.
 
         Returns:
-            _type_: _description_
+            List(Structure): Structures.
         """
         samples = []
 
@@ -110,15 +102,7 @@ class DeepSampler:
         return samples
 
     def sample(self, n_samples: int, domain: Domain):
-        """
-        Sampling procedure using deep learning sampler.
-        It based on general GEFEST deep learning sampler architecture,
-        i.e. on mapping noise to object
-
-        :param n_samples: (Int) number of samples
-        :param domain: (Domain) design domain
-        :return: (List(Structure)) sample n_samples structures
-        """
+        """Sampling procedure using deep learning sampler."""
         with torch.no_grad():
             noise = torch.normal(mean=0, std=1, size=(n_samples, self.hidden_dim)).to(self.device)
             objects = self.sampler.decoder.sample(noise).numpy()  # Numpy: {n_samples, 1, 128, 128}

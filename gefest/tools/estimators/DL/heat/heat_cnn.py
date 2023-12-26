@@ -7,15 +7,11 @@ import torchvision.models as models
 from torch import nn
 from torchvision import transforms
 
+from gefest.tools.estimators.estimator import Estimator
 
-class HeatCNN:
-    """
-    ::TODO:: Make abstract version for creation own realizations for specific tasks
-    """
 
-    """
-    Surrogate model for the heat components task
-    """
+class HeatCNN(Estimator):
+    """Surrogate model for the heat components task."""
 
     def __init__(self, path):
         super(HeatCNN, self).__init__()
@@ -26,10 +22,13 @@ class HeatCNN:
         self.img_size = 128
 
     def estimate(self, obj):
-        """
-        Estimation step
-        :param obj: (Tensor), [1 x C x W x H], object for estimate
-        :return: (Float), performance of object
+        """Estimation step.
+
+        Args:
+            obj (torch.Tensor): [1 x C x W x H], object for estimate.
+
+        Returns:
+            (Float): performance of object.
         """
         plt.imsave('tmp_images/0.png', torch.squeeze(torch.tensor(obj)))
 
@@ -50,6 +49,7 @@ class HeatCNN:
 
 
 class EffModel(nn.Module):
+    """Efficient net surrogate model."""
     def __init__(self):
         super(EffModel, self).__init__()
 
