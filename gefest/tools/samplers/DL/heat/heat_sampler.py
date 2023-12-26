@@ -1,6 +1,7 @@
 import os
 
 import torch
+from tools.samplers.sampler import Sampler
 
 from gefest.tools.samplers.DL.microfluid.aae import AAE
 from gefest.tools.samplers.DL.microfluid.backbones import (
@@ -12,10 +13,10 @@ from gefest.tools.samplers.DL.microfluid.backbones import (
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
 
-class DeepSampler:
-    """
-    Deep learning sampler for microfluidic problem based on adversarial auto encoder.
-    It is creates images of polygons with size 128x128
+class DeepSampler(Sampler):
+    """Deep learning sampler for microfluidic problem based on adversarial auto encoder.
+
+    It is creates images of polygons with size 128x128.
     """
 
     def __init__(self, path):
@@ -30,10 +31,7 @@ class DeepSampler:
         self._configurate_sampler()
 
     def _configurate_sampler(self):
-        """
-        Configurate deep sampler using configuration parameters
-        :return: None
-        """
+        """Configurate deep sampler using configuration parameters."""
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         conv_dims = [32, 64, 128, 256, 512, 512]  # We define 6 layers encoder and decoder
         n_layers = 2
@@ -57,13 +55,16 @@ class DeepSampler:
         self.sampler = aae
 
     def sample(self, n_samples: int, domain):
-        """
-        Sampling procedure using deep learning sampler.
-        It based on general GEFEST deep learning sampler architecture,
-        i.e. on mapping noise to object
+        """Sampling procedure using deep learning sampler.
 
-        :param n_samples: (Int) number of samples
-        :return: (List(Structure)) sample n_samples structures
+        It based on general GEFEST deep learning sampler architecture,
+        i.e. on mapping noise to object.
+
+        Args:
+            n_samples (Int): Number of samples.
+
+        Returns:
+            (List(Structure)): Sample n_samples structures.
         """
         with torch.no_grad():
             noise = torch.normal(mean=0, std=1, size=(n_samples, self.hidden_dim)).to(self.device)

@@ -62,6 +62,7 @@ The repository includes the following directories:
 * Package `cases <https://github.com/ITMO-NSS-team/GEFEST/tree/main/cases>`__ includes several *how-to-use-cases* where you can start to discover how GEFEST works;
 * All *unit and integration tests* can be observed in the `test <https://github.com/ITMO-NSS-team/GEFEST/tree/main/test>`__ directory;
 * The sources of the documentation are in the `docs <https://github.com/ITMO-NSS-team/GEFEST/tree/main/docs>`__.
+* Weights of pretrained DL models can be downloaded from `this repository <https://gitlab.actcognitive.org/itmo-nss-team/gefest-models>`__.
 
 Cases and examples
 ==================

@@ -1,28 +1,22 @@
 import os
 import shutil
-from typing import Optional
 
 import matplotlib
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow import keras
 
-from gefest.core.structure.domain import Domain
-from gefest.core.structure.structure import Structure
+from gefest.core.geometry import Structure
+from gefest.core.geometry.domain import Domain
+from gefest.tools.estimators.estimator import Estimator
 
 matplotlib.use('agg')
 
 
-class BWCNN:
-    """
-    ::TODO:: Make abstract version to create own realizations for specific tasks
-    """
+class BWCNN(Estimator):
+    """Surrogate model for breakwaters task."""
 
-    """
-    Surrogate model for breakwaters task
-    """
-
-    def __init__(self, path, domain: Domain, main_model: Optional = None):
+    def __init__(self, path, domain: Domain, main_model=None):
         super(BWCNN, self).__init__()
 
         self.domain = domain
@@ -35,24 +29,22 @@ class BWCNN:
         self.rate = 4
 
     def _create_temp_path(self):
-        """
-        Creation of temporary folder for images
-        :return: None
-        """
+        """Creation of temporary folder for images."""
         path = 'tmp_images'
 
         if os.path.exists(path):
             shutil.rmtree(path)
+
         os.makedirs(path)
 
         return
 
     def _save_as_fig(self, struct: Structure, ax=plt):
-        """
-        Saving structure as image
-        :param struct: (Structure)
-        :param ax: figure
-        :return: None
+        """Saves structs as images.
+
+        Args:
+            struct (Structure): _description_
+            ax : Plot. Defaults to plt.
         """
         plt.style.use('dark_background')
 
@@ -82,10 +74,13 @@ class BWCNN:
         ax.close('all')
 
     def _to_tensor(self, struct: Structure):
-        """
-        Transformation structure to binary tensor
-        :param struct: (Structure), input structure
-        :return: (Tensor), binary matrix with WxHx1 dimension
+        """Transformation structure to binary tensor.
+
+        Args:
+            struct (Structure): Input structure
+
+        Returns:
+            Tensor: Binary matrix with WxHx1 dimension.
         """
         self._save_as_fig(struct)
 
@@ -97,10 +92,13 @@ class BWCNN:
         return image_tensor
 
     def estimate(self, struct: Structure):
-        """
-        Estimation step
-        :param struct: (Structure), input structure
-        :return: (Float), performance of structure
+        """Estimation step.
+
+        Args:
+            struct (Structure), input structure.
+
+        Returns:
+            (float): Performance.
         """
         tensor = self._to_tensor(struct)
         tensor = tf.reshape(tensor, (1, self.img_size, self.img_size, 1))
