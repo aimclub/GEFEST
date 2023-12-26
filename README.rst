@@ -5,6 +5,8 @@
 .. list-table::
    :stub-columns: 1
 
+   * - package
+     - | |pypi| |python|
    * - tests
      - | |build|
    * - docs
@@ -158,6 +160,14 @@ Citation
    :alt: Acknowledgement to NCCR
    :target: https://actcognitive.org/
 
-.. |gitlab| image::       https://camo.githubusercontent.com/9bd7b8c5b418f1364e72110a83629772729b29e8f3393b6c86bff237a6b784f6/68747470733a2f2f62616467656e2e6e65742f62616467652f6769746c61622f6d6972726f722f6f72616e67653f69636f6e3d6769746c6162
+.. |gitlab| image:: https://camo.githubusercontent.com/9bd7b8c5b418f1364e72110a83629772729b29e8f3393b6c86bff237a6b784f6/68747470733a2f2f62616467656e2e6e65742f62616467652f6769746c61622f6d6972726f722f6f72616e67653f69636f6e3d6769746c6162
    :alt: GitLab mirror for this repository
    :target: https://gitlab.actcognitive.org/itmo-nss-team/GEFEST
+
+.. |pypi| image:: https://img.shields.io/pypi/v/gefest.svg
+   :alt: PyPI Package Version
+   :target: https://img.shields.io/pypi/v/gefest
+
+.. |python| image:: https://img.shields.io/pypi/pyversions/gefest.svg
+   :alt: Supported Python Versions
+   :target: https://img.shields.io/pypi/pyversions/gefest
