@@ -47,10 +47,14 @@ def mutate_structure(
                 size=1,
                 p=operations_probs,
             )
-            new_structure = chosen_mutation[0](new_structure, domain, idx_)
+            new_structure = chosen_mutation[0](copy.deepcopy(new_structure), domain, idx_)
+
             if not new_structure:
                 logger.warning(f'None out: {chosen_mutation[0].__name__}')
+            else:
+                new_structure.set_extra('mutations', (idx_, chosen_mutation[0].__name__))
 
+    new_structure.set_extra('parents', structure.id_)
     return new_structure
 
 

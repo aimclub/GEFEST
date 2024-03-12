@@ -41,11 +41,16 @@ def crossover_structures(
         size=1,
         p=operations_probs,
     )
-    new_structure = chosen_crossover[0](s1, s2, domain)
-    if not new_structure:
+    new_structures = chosen_crossover[0](s1, s2, domain)
+    if not new_structures:
         logger.warning(f'None out: {chosen_crossover[0].__name__}')
+    else:
+        for child in new_structures:
+            child.clear_extra()
+            child.set_extra('crossover', (chosen_crossover[0].__name__))
+            child.set_extra('parents', (structure1.id_, structure2.id_))
 
-    return new_structure
+    return new_structures
 
 
 # pairs for crossover selection
@@ -83,7 +88,7 @@ def structure_level_crossover(
     result = list(copy.deepcopy(part_1))
     result.extend(copy.deepcopy(part_2))
 
-    new_structure = Structure(polygons=result)
+    new_structure = Structure(polygons=result, parent='structure_level_crossover')
 
     return (new_structure,)
 
@@ -142,6 +147,7 @@ def polygon_level_crossover(
 
     idx_ = where(s1.polygons, lambda p: p == poly_1)[0]
     s1[idx_] = new_poly
+    s1.parent = 'polygon_level_crossover'
     return (s1,)
 
 

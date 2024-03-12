@@ -47,7 +47,7 @@ class BaseGA(Optimizer):
         if len(self.opt_params.objectives) > 1:
             if self.opt_params.multiobjective_selector.__name__ == 'MOEAD':
                 self.opt_params.extra = 0
-                logger.warning('For moead extra not available.')
+                logger.warning('Extra not available for moead.')
 
             self.selector = self.opt_params.multiobjective_selector(
                 single_demention_selection=self.selector,
@@ -72,8 +72,10 @@ class BaseGA(Optimizer):
             mutated_child = self.mutation(child)
             self._pop.extend(mutated_child)
             self._pop.extend(self.sampler(self.opt_params.extra))
+            self._pop = list(set(self._pop))
             self._pop = self.objectives_evaluator(self._pop)
             self.log_dispatcher.log_pop(self._pop, str(step + 1))
 
+        self._pop = self.selector(self._pop, self.pop_size)
         pbar.set_description(f'Best fitness: {self._pop[0].fitness}')
         return self._pop

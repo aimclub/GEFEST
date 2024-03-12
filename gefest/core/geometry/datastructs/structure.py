@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Any, Union
 from uuid import UUID, uuid4
 
 from pydantic import Field
@@ -16,6 +16,9 @@ class Structure:
     fitness: list[float] = Field(default_factory=list)
     extra_characteristics: dict = Field(default_factory=dict)
     id_: UUID = Field(default_factory=uuid4)
+
+    def __hash__(self) -> int:
+        return hash((self.id_, *self.polygons, *self.fitness))
 
     def __len__(self):
         return len(self.polygons)
@@ -35,6 +38,7 @@ class Structure:
         if polygons[key] != value:
             polygons[key] = value
             self.polygons = tuple(polygons)
+            self.id_ = uuid4()
 
     def __getitem__(self, key):
         return self.polygons[key]
@@ -57,3 +61,14 @@ class Structure:
         polygons = list(self.polygons)
         polygons.remove(value)
         self.polygons = tuple(polygons)
+
+    def set_extra(self, field: str, data: Any):
+        """Add any extra information."""
+        if field in self.extra_characteristics.keys():
+            self.extra_characteristics[field].append(data)
+        else:
+            self.extra_characteristics[field] = [data]
+
+    def clear_extra(self):
+        """Clear all extra information."""
+        self.extra_characteristics = {}

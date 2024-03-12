@@ -9,6 +9,9 @@ class Point:
     x: float
     y: float
 
+    def __hash__(self) -> int:
+        return hash((self.x, self.y))
+
     @computed_field(repr=False)
     def coords(self) -> list[float]:
         """List coordinates representation."""

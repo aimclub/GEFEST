@@ -5,6 +5,7 @@ from typing import Any, Callable, Optional, Union
 from golem.core.optimisers.adaptive.operator_agent import MutationAgentTypeEnum
 from golem.core.optimisers.genetic.operators.inheritance import GeneticSchemeTypesEnum
 from golem.core.optimisers.genetic.operators.selection import SelectionTypesEnum
+from loguru import logger
 from pydantic import BaseModel, ConfigDict, model_validator
 
 from gefest.core.configs.tuner_params import TunerParams
@@ -96,7 +97,7 @@ class OptimizationParams(BaseModel):
     moead_multi_objective_selector_neighbors: int = 2
     """Parameter used in moead selector."""
 
-    optimizer: ValidOptimizer = 'gefest_ga'
+    optimizer: Optional[ValidOptimizer] = 'gefest_ga'
     """Optimizer."""
 
     pair_selector: Callable = panmixis
@@ -207,6 +208,14 @@ class OptimizationParams(BaseModel):
         """Selects and initializes specified modules."""
         if isinstance(self.optimizer, str):
             self.optimizer = getattr(OptimizerTypes, self.optimizer).value
+        elif self.optimizer is None:
+            logger.warning('Optimizer not provided.')
+
+        if len(self.crossover_each_prob) != len(self.crossovers):
+            raise ValueError('Mismatch number of crossovers and probs.')
+
+        if len(self.mutation_each_prob) != len(self.mutations):
+            raise ValueError('Mismatch number of mutations and probs.')
 
         if isinstance(self.postprocess_rules[0], str):
             self.postprocess_rules = [getattr(Rules, name).value for name in self.postprocess_rules]

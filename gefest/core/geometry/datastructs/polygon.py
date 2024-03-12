@@ -27,6 +27,9 @@ class Polygon:
     points: list[Point] = Field(default_factory=list)
     id_: Optional[Union[UUID, PolyID]] = Field(default_factory=uuid4)
 
+    def __hash__(self) -> int:
+        return hash((self.id_, *self.points))
+
     def __len__(self) -> int:
         return len(self.points)
 
