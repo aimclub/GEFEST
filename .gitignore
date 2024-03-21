@@ -28,6 +28,15 @@ share/python-wheels/
 MANIFEST
 .idea/
 
+#Train data for surrogate models
+data_from_comsol/generated_data
+data_from_comsol/test_gen_data
+data_from_comsol/gen_data_extend
+#Weights 
+weights
+*.npz
+events.out*
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.

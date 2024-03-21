@@ -166,7 +166,7 @@ def _create_area(domain: Domain, structure: Structure, geometry: Geometry2D) -> 
             geom._poly_to_shapely_poly(poly).convex_hull.buffer(domain.dist_between_polygons, 1),
         ).intersection(area)
 
-    sigma_max = 0.95 * _get_sigma_max(area, (min(domain.max_x, domain.max_y) / 2) * 1.01)
+    sigma_max = 0.95 * _get_sigma_max(area, (min(domain.max_x, domain.max_y) / 2) * 6.01)
     sigma_min = max(domain.max_x - domain.min_x, domain.max_y - domain.min_y) * 0.05
 
     sigma = np.random.uniform(sigma_min, sigma_max)

@@ -82,16 +82,16 @@ tuner_cfg = TunerParams(
     hyperopt_dist='uniform',
     verbose=True,
     variacne_generator=partial(percent_edge_variance, percent=0.5),
-    timeout_minutes=30,
+    timeout_minutes=130,
 )
 
 
 opt_params = OptimizationParams(
-    optimizer='gefest_ga',
+    optimizer='gefest_ga_h',
     domain=domain_cfg,
     tuner_cfg=tuner_cfg,
-    n_steps=100,
-    pop_size=100,
+    n_steps=10,
+    pop_size=10,
     postprocess_attempts=3,
     mutation_prob=0.9,
     crossover_prob=0.6,
@@ -120,8 +120,8 @@ opt_params = OptimizationParams(
         'not_too_close_points',
     ],
     extra=5,
-    estimation_n_jobs=-1,
-    n_jobs=-1,
+    estimation_n_jobs=1,
+    n_jobs=1,
     log_dir='logs/tuners_exp',
     run_name='roulette_1_obj',
     golem_keep_histoy=True,

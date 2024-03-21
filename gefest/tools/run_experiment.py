@@ -1,6 +1,8 @@
 from loguru import logger
 from tqdm import tqdm
-
+import sys
+import os
+sys.path.append(os.getcwd())
 from gefest.core.configs.utils import load_config
 from gefest.core.viz.struct_vizualizer import GIFMaker
 from gefest.tools.tuners.tuner import GolemTuner
@@ -32,3 +34,5 @@ def run_experiment(config_path: str):
             gm.create_frame(st, {'Tuned': st.fitness})
 
         gm.make_gif('Tuned individuals', 500)
+
+run_experiment(config_path = 'D:\Projects\GEFEST\GEFEST_surr\GEFEST\cases\sound_waves\configuration\config_parallel.py')

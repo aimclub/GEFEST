@@ -8,7 +8,7 @@ import numpy as np
 import pickledb
 
 from gefest.core.geometry import Structure
-from gefest.tools import Estimator
+from gefest.tools.estimators.estimator import Estimator
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 USE_AVG_CONST = False
@@ -116,6 +116,141 @@ class Comsol(Estimator):
             print(f'Cached: {target}')
 
         return -target
+
+    def _poly_add(self, model, polygons):
+        for n, poly in enumerate(polygons):
+            try:
+                model.java.component('comp1').geom('geom1').create('pol' + str(n + 1), 'Polygon')
+            except Exception:
+                pass
+
+            model.java.component('comp1').geom('geom1').feature('pol' + str(n + 1)).set(
+                'x',
+                poly[0],
+            )
+            model.java.component('comp1').geom('geom1').feature('pol' + str(n + 1)).set(
+                'y',
+                poly[1],
+            )
+
+        return model
+
+    def _save_simulation_result(self, configuration, model):
+        if not os.path.exists('./models'):
+            os.mkdir('./models')
+
+        model_uid = str(uuid4())
+        model.save(f'./models/{model_uid}.mph')
+        db = pickledb.load('comsol_db.saved', False)
+        db.set(str(configuration), model_uid)
+        db.dump()
+
+        if not os.path.exists('./structures'):
+            os.mkdir('./structures')
+
+        with open(f'./structures/{model_uid}.str', 'wb') as f:
+            pickle.dump(configuration, f)
+
+        return model_uid
+
+    def _load_simulation_result(self, client, configuration):
+        db = pickledb.load('comsol_db.saved', False)
+
+        model_uid = db.get(str(configuration))
+
+        if model_uid is False:
+            return None, None
+
+        model = client.load(f'./models/{model_uid}.mph')
+
+        return model, model_uid
+
+    def _save_fitness(self, configuration, fitness):
+        array_structure = [[[p.x, p.y] for p in poly.points] for poly in configuration.polygons]
+        db = pickledb.load('fitness_db.saved', False)
+        db.set(str(array_structure), str(round(fitness, 4)))
+        db.dump()
+
+    def _load_fitness(self, configuration):
+        array_structure = [[[p.x, p.y] for p in poly.points] for poly in configuration.polygons]
+        db = pickledb.load('fitness_db.saved', False)
+
+        db_models = pickledb.load('comsol_db.saved', False)
+
+        model_uid = db_models.get(str(configuration))
+
+        result = db.get(str(array_structure))
+
+        if result is False:
+            return None, None
+        else:
+            fitness = float(result)
+
+        return float(fitness), model_uid
+
+
+class Comsol_generate(Estimator):
+    """Comsol wrapper class for microfluidic problem estimation."""
+
+    def __init__(self, path_to_mph: str) -> None:
+
+        super().__init__()
+
+        self.client = mph.Client()
+        self.path_to_mph = path_to_mph
+
+    def estimate(self, structure: Structure) -> int:
+        """Estimates  given structure using comsol multiphysics.
+
+        Args:
+            structure (Structure): GEFEST structure.
+
+        Returns:
+            int: Performance.
+        """
+        gc.collect()
+        target, idx = self._load_fitness(structure)
+        if target is None:
+            model, idx = self._load_simulation_result(self.client, structure)
+            if model is None:
+                poly_box = []
+                print('Start COMSOL')
+                for _, pol in enumerate(structure.polygons):
+                    poly_repr = []
+                    poly_repr.append(' '.join([str(pt.x) for pt in pol.points]))
+                    poly_repr.append(' '.join([str(pt.y) for pt in pol.points]))
+                    poly_box.append(poly_repr)
+
+                model = self.client.load(self.path_to_mph)
+
+                try:
+                    model = self._poly_add(model, poly_box)
+                    model.build()
+                    model.mesh()
+                    model.solve()
+                except Exception as ex:
+                    print(ex)
+                    self.client.clear()
+                    return 0.0
+
+            try:
+                veloc = model.export('velocity')
+                mask = model.export('mask')
+                self.client.clear()
+                return veloc,mask
+                outs = [
+                    model.evaluate('vlct_1'),
+                    model.evaluate('vlct_2'),
+                    model.evaluate('vlct_3'),
+                    model.evaluate('vlct_4'),
+                    model.evaluate('vlct_5'),
+                    model.evaluate('vlct_side'),
+                    model.evaluate('vlct_main'),
+                ]
+            except Exception as ex:
+                print(ex)
+                self.client.clear()
+                return 0.0
 
     def _poly_add(self, model, polygons):
         for n, poly in enumerate(polygons):
