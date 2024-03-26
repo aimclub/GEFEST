@@ -46,7 +46,7 @@ class UNet(nn.Module):
             in_channels=features, out_channels=out_channels, kernel_size=1
         )
 
-    def forward(self, x,mask):
+    def forward(self, x):
         x = torch.unsqueeze(x,dim=1).float()
         enc1 = self.encoder1(x)
         enc2 = self.encoder2(self.pool1(enc1))
@@ -353,6 +353,7 @@ class U_Net(nn.Module):
 
     def forward(self,x):
         # encoding path
+
         x1 = self.Conv1(x)
 
         x2 = self.Maxpool(x1)
@@ -495,6 +496,7 @@ class AttU_Net(nn.Module):
 
     def forward(self,x):
         # encoding path
+        x = torch.unsqueeze(x,dim=1).float()
         x1 = self.Conv1(x)
 
         x2 = self.Maxpool(x1)

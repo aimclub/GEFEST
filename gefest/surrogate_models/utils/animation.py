@@ -91,4 +91,4 @@ def animation_npz(path_to_dir):
 #animation_npz(path_to_dir='gefest\surrogate_models\gendata/ssim_23')
 #animation_npz(path_to_dir='gefest\surrogate_models\gendata/ssim_plus_57')
 #animation_data_npz(path_to_dir='data_from_comsol/gen_data_extend')
-animation_npz(path_to_dir='gefest\surrogate_models\gendata/ssim_plus_58')
+animation_npz(path_to_dir='gefest\surrogate_models\gendata/att_11')
