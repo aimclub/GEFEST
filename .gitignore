@@ -33,11 +33,14 @@ MANIFEST
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
-
+writer
+weights
+result_tests
+gefest/surrogate_models/gendata
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
-
+data_from_comsol
 # Unit test / coverage reports
 htmlcov/
 .tox/

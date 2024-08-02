@@ -12,7 +12,7 @@ AUTHOR = 'NSS Lab'
 SHORT_DESCRIPTION = 'The toolbox for the generative design of physical objects'
 README = Path(HERE, 'README.rst').read_text()
 URL = 'https://github.com/ITMO-NSS-team/GEFEST'
-VERSION = '0.1.0'
+VERSION = '0.2.0'
 REQUIRES_PYTHON = '>=3.9'
 LICENSE = 'BSD 3-Clause'
 
