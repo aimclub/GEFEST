@@ -27,7 +27,9 @@ share/python-wheels/
 *.egg
 MANIFEST
 .idea/
-
+data_from_comsol/data/*.txt
+result_tests
+data_from_comsol/*.zip
 #Train data for surrogate models
 data_from_comsol/generated_data
 data_from_comsol/test_gen_data

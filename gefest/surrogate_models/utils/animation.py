@@ -81,7 +81,7 @@ def animation_npz(path_to_dir):
             axs[2].clear()
             
             
-            time.sleep(2.2)
+            #time.sleep(2.2)
             a1.remove(),a2.remove(),a3.remove()
         print(summ_mae)
         print(cnt)
@@ -91,4 +91,6 @@ def animation_npz(path_to_dir):
 #animation_npz(path_to_dir='gefest\surrogate_models\gendata/ssim_23')
 #animation_npz(path_to_dir='gefest\surrogate_models\gendata/ssim_plus_57')
 #animation_data_npz(path_to_dir='data_from_comsol/gen_data_extend')
-animation_npz(path_to_dir='gefest\surrogate_models\gendata/att_11')
+#animation_npz(path_to_dir='gefest\surrogate_models\gendata/unet_68_Adam_att_unet_bi_wu_f01_t01_10ep_bs32_30_to_0001_ssim_2')
+if __name__=='__main__':
+    animation_npz(path_to_dir=r'D:\Projects\GEFEST\GEFEST_surr\GEFEST\gefest\surrogate_models\gendata\unet_69_Adam_from01_lr20to3e104_bs4')
