@@ -98,10 +98,13 @@ Contacts
 * `Newsfeed <https://t.me/NSS_group>`_
 * `Youtube channel <https://www.youtube.com/channel/UC4K9QWaEUpT_p3R4FeDp5jA>`_
 
-Supported by
-============
+Funding
+=======
 
-`National Center for Cognitive Research of ITMO University <https://actcognitive.org/>`_
+This research is financially supported by the Foundation for
+National Technology Initiative's Projects Support as a part of the roadmap
+implementation for the development of the high-tech field of
+Artificial Intelligence for the period up to 2030 (agreement 70-2021-00187).
 
 Citation
 ========
