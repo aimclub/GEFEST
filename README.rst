@@ -68,7 +68,7 @@ The repository includes the following directories:
 
 Cases and examples
 ==================
-**Note**: To run the examples below, the old kernel gefest version, which can be installed on python 3.7 with: 
+**Note**: To run the examples below, the old kernel gefest version, which can be installed on python 3.7 with:
 
 .. code-block:: bash
 
@@ -77,7 +77,7 @@ Cases and examples
 - `Experiments <https://github.com/ITMO-NSS-team/GEFEST-paper-experiments>`__ with various real and synthetic cases
 - `Case <https://github.com/ITMO-NSS-team/rbc-traps-generative-design>`__ devoted to the red blood cell traps design.
 
-Migrated examples can be found in cases folder of the main branch. 
+Migrated examples can be found in cases folder of the main branch.
 
 Current R&D and future plans
 ============================
@@ -113,10 +113,13 @@ Contacts
 * `Newsfeed <https://t.me/NSS_group>`_
 * `Youtube channel <https://www.youtube.com/channel/UC4K9QWaEUpT_p3R4FeDp5jA>`_
 
-Supported by
-============
+Funding
+=======
 
-`National Center for Cognitive Research of ITMO University <https://actcognitive.org/>`_
+This research is financially supported by the Foundation for
+National Technology Initiative's Projects Support as a part of the roadmap
+implementation for the development of the high-tech field of
+Artificial Intelligence for the period up to 2030 (agreement 70-2021-00187).
 
 Citation
 ========
