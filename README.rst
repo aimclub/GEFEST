@@ -82,7 +82,7 @@ Migrated examples can be found in cases folder of the main branch.
 Current R&D and future plans
 ============================
 
-Currently, we are working on integration of new types of physical objects with consideration of their internal structure.\n
+Currently, we are working on integration of new types of physical objects with consideration of their internal structure.
 
 The major ongoing tasks:
 
